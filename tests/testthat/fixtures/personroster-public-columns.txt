@@ -1,4 +1,5 @@
 valtillfalle
+valar
 valtyp
 kandidatnummer
 namn

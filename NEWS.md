@@ -1,5 +1,11 @@
 # valresultat 0.3.0.9000
 
+* Extends `personroster()` to official final RD, RF and KF results for 2022.
+  Exact year vectors, `"alla"` and `fran`/`till` return long-format results
+  with integer `valar`. The 2022 area view uses official area-level result
+  lists; district views use district lists. Those levels are not forced to
+  sum identically. List numbers are result identifiers, not proof of printed
+  name ballots; verified `90000` rows do not generate candidate votes.
 * `ersattare()` now reads verified final substitute relations for RD, RF and KF
   in 2022 and 2026. It supports exact year vectors, `"alla"` and `fran`/`till`
   with integer `valar`, preserves each member–substitute relation and its

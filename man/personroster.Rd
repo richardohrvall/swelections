@@ -14,11 +14,14 @@ personroster(
   progress = interactive(),
   niva = "personvalsomrade",
   per_lista = FALSE,
-  komplettera_nollor = FALSE
+  komplettera_nollor = FALSE,
+  fran = NULL,
+  till = NULL
 )
 }
 \arguments{
-\item{ar}{Valår. För närvarande stöds 2026.}
+\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
@@ -41,15 +44,20 @@ personroster(
 \item{komplettera_nollor}{Om \code{TRUE}, komplettera glesa distrikts- och
 listvyer med verifierade nollrader. För standardvyn på personvalsområdesnivå
 utan lista ändras inte resultatet. Standard är \code{FALSE}.}
+
+\item{fran, till}{Inklusiva årsgränser bland stödda år, som alternativ till
+\code{ar}. En utelämnad gräns är öppen.}
 }
 \value{
 En tibble med en rad per giltig kandidat, parti och
-personvalsområde som standard. Nyckeln innehåller \code{valtillfalle},
+personvalsområde som standard. \code{valar} är integer direkt efter
+\code{valtillfalle}; flerårsresultat staplas i begärd årsordning.
+Nyckeln innehåller \code{valtillfalle},
 \code{valtyp}, \code{valomradeskod}, \code{personvalsomradeskod}, \code{partikod} och
 \code{kandidatnummer}, samt \code{valdistriktskod} och \code{valdistriktstyp} på
 distriktsnivå och \code{listnummer} när \code{per_lista = TRUE}.
-\code{antal_partiroster} är partiets officiella
-mandatpåverkande röstetal i samma område. \code{andel_personroster} är den
+\code{antal_partiroster} är partiets officiella röstetal i samma område.
+\code{andel_personroster} är den
 orundade proportionen \code{antal_personroster / antal_partiroster} på
 0–1-skalan. \code{kvalificerad_personval} är \code{FALSE} endast när en komplett
 officiell personvalslista saknar kandidaten; annars används \code{NA} för
@@ -102,16 +110,25 @@ utan lista och 4,18 miljoner med lista. Råa listsummeringar valideras
 innan ogiltiga kandidaturer filtreras bort.
 
 \code{per_lista = TRUE} visar från vilken lista kandidatens personröster kom.
-\verb{*-90000} är en kandidatfri partiröstkategori och korsas inte med
-kandidaturer. En saknad listnod kan ge 0 liströster i ett fullständigt
+\code{listnummer} avser resultatets lista och behöver inte motsvara en tryckt
+namnvalsedel. \verb{*-90000} är en kandidatfri partiröstkategori när källans
+personröststruktur bekräftar detta och korsas då inte med kandidaturer.
+En saknad listnod kan ge 0 liströster i ett fullständigt
 avstämt slutresultat, men ger inte 0 under pågående räkning. Om
 personröstunderlaget är ofullständigt används \code{NA}, inte en gissad nolla.
+
+För 2022 saknas \code{summeradePersonroster}. Områdesvyn använder de officiella
+slutliga \code{listRoster} inom personvalsområdet och distriktsvyn använder
+distriktets egna listor. Nivåernas tal kan skilja sig i 2022-materialet;
+de krävs därför inte summera exakt till varandra. Funktionen läser enbart
+slutliga resultatfiler och gör ingen preliminär personröstberäkning.
 }
 \examples{
 \dontrun{
 personroster(val = "RD", source = "local", data_dir = "mitt_arkiv")
 personroster(val = "RD", per_lista = TRUE) |>
   dplyr::select(kandidatnummer, listnummer, antal_personroster)
+personroster(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{

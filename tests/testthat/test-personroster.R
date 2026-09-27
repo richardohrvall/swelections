@@ -77,13 +77,14 @@ personrostomrades_fixture <- function(incomplete_first = FALSE,
 
 test_that("person vote areas have the fixed public schema, key and 0-1 shares", {
   x <- personrostomrades_fixture()
-  out <- .personrostomraden_2026(x$kandidaturer, x$kandidater, x$rost, x$mandat)
+  out <- .personrostomraden_2026(x$kandidaturer, x$kandidater, x$rost, x$mandat) |>
+    dplyr::mutate(valar = 2026L, .after = valtillfalle)
   expect_identical(
     names(out),
     readLines(test_path("fixtures", "personroster-public-columns.txt"))
   )
   expect_identical(unname(vapply(out, typeof, "")), c(
-    rep("character", 14L), "integer", "integer", "double",
+    "character", "integer", rep("character", 13L), "integer", "integer", "double",
     "logical", "character", "character", "logical"))
   key <- c("valtillfalle", "valtyp", "geografiniva", "valomradeskod",
            "personvalsomradeskod", "partikod", "kandidatnummer")
@@ -197,7 +198,7 @@ test_that("public personroster validates arguments without file access", {
   local_mocked_bindings(
     kandidaturer = function(...) stop("Unexpected file access")
   )
-  expect_error(personroster(ar = 2022), "2026")
+  expect_error(personroster(ar = 2024), "2022.*2026")
   expect_error(personroster(val = "EU"), "valtyp")
   expect_error(personroster(source = "invalid"), "arg")
   expect_error(personroster(source = "local", update = TRUE), "local")
@@ -207,7 +208,8 @@ test_that("public personroster returns the shared area table", {
   x <- personrostomrades_fixture()
   expected <- .personrostomraden_2026(
     x$kandidaturer, x$kandidater, x$rost, x$mandat
-  )
+  ) |>
+    dplyr::mutate(valar = 2026L, .after = valtillfalle)
   local_mocked_bindings(
     kandidaturer = function(...) x$kandidaturer,
     .las_kandidatresultat_filer_2026 = function(...) {

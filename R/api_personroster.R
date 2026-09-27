@@ -31,12 +31,23 @@
 #' innan ogiltiga kandidaturer filtreras bort.
 #'
 #' `per_lista = TRUE` visar från vilken lista kandidatens personröster kom.
-#' `*-90000` är en kandidatfri partiröstkategori och korsas inte med
-#' kandidaturer. En saknad listnod kan ge 0 liströster i ett fullständigt
+#' `listnummer` avser resultatets lista och behöver inte motsvara en tryckt
+#' namnvalsedel. `*-90000` är en kandidatfri partiröstkategori när källans
+#' personröststruktur bekräftar detta och korsas då inte med kandidaturer.
+#' En saknad listnod kan ge 0 liströster i ett fullständigt
 #' avstämt slutresultat, men ger inte 0 under pågående räkning. Om
 #' personröstunderlaget är ofullständigt används `NA`, inte en gissad nolla.
 #'
-#' @param ar Valår. För närvarande stöds 2026.
+#' För 2022 saknas `summeradePersonroster`. Områdesvyn använder de officiella
+#' slutliga `listRoster` inom personvalsområdet och distriktsvyn använder
+#' distriktets egna listor. Nivåernas tal kan skilja sig i 2022-materialet;
+#' de krävs därför inte summera exakt till varandra. Funktionen läser enbart
+#' slutliga resultatfiler och gör ingen preliminär personröstberäkning.
+#'
+#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
+#' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
+#'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
@@ -52,12 +63,14 @@
 #'   utan lista ändras inte resultatet. Standard är `FALSE`.
 #'
 #' @return En tibble med en rad per giltig kandidat, parti och
-#'   personvalsområde som standard. Nyckeln innehåller `valtillfalle`,
+#'   personvalsområde som standard. `valar` är integer direkt efter
+#'   `valtillfalle`; flerårsresultat staplas i begärd årsordning.
+#'   Nyckeln innehåller `valtillfalle`,
 #'   `valtyp`, `valomradeskod`, `personvalsomradeskod`, `partikod` och
 #'   `kandidatnummer`, samt `valdistriktskod` och `valdistriktstyp` på
 #'   distriktsnivå och `listnummer` när `per_lista = TRUE`.
-#'   `antal_partiroster` är partiets officiella
-#'   mandatpåverkande röstetal i samma område. `andel_personroster` är den
+#'   `antal_partiroster` är partiets officiella röstetal i samma område.
+#'   `andel_personroster` är den
 #'   orundade proportionen `antal_personroster / antal_partiroster` på
 #'   0–1-skalan. `kvalificerad_personval` är `FALSE` endast när en komplett
 #'   officiell personvalslista saknar kandidaten; annars används `NA` för
@@ -81,6 +94,7 @@
 #' personroster(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' personroster(val = "RD", per_lista = TRUE) |>
 #'   dplyr::select(kandidatnummer, listnummer, antal_personroster)
+#' personroster(ar = c(2022, 2026), val = "RD")
 #' }
 #' @seealso [kandidater()], [kandidaturer()], [valresultat-package]
 #' @export
@@ -94,12 +108,23 @@ personroster <- function(
     progress = interactive(),
     niva = "personvalsomrade",
     per_lista = FALSE,
-    komplettera_nollor = FALSE
+    komplettera_nollor = FALSE,
+    fran = NULL,
+    till = NULL
 ) {
-  source <- .check_public_args(
-    ar, "personroster", source, data_dir, update, archive, progress
-  )
+  ar_angivet <- !missing(ar)
   val <- .valtyper(val)
+  val <- if (is.null(val)) c("RD", "RF", "KF") else val
+  valar <- .resolve_valar(ar, fran, till, "personroster", val[[1]], ar_angivet)
+  if (length(val) > 1L && !all(vapply(val[-1], function(v) {
+    all(valar %in% .stodd_valar("personroster", v))
+  }, logical(1)))) {
+    stop("Valda \u00e5r st\u00f6ds inte f\u00f6r alla valtyper.", call. = FALSE)
+  }
+  source <- .check_public_args(
+    valar[[1]], "personroster", source, data_dir, update, archive, progress,
+    valar_resolved = TRUE
+  )
   .check_text(niva, "niva")
   if (length(niva) != 1L || !niva %in% c("personvalsomrade", "valdistrikt")) {
     stop("`niva` ska vara `personvalsomrade` eller `valdistrikt`.", call. = FALSE)
@@ -111,6 +136,24 @@ personroster <- function(
       is.na(komplettera_nollor)) {
     stop("`komplettera_nollor` ska vara TRUE eller FALSE.", call. = FALSE)
   }
+  purrr::map(valar, function(ett_ar) {
+    tryCatch(
+      if (ett_ar == 2022L) {
+        .personroster_ett_ar_2022(ett_ar, val, source, data_dir, update,
+          archive, progress, niva, per_lista, komplettera_nollor)
+      } else {
+        .personroster_ett_ar_2026(ett_ar, val, source, data_dir, update,
+          archive, progress, niva, per_lista, komplettera_nollor)
+      },
+      error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
+                               call. = FALSE)
+    )
+  }) |> purrr::list_rbind()
+}
+
+.personroster_ett_ar_2026 <- function(ar, val, source, data_dir, update,
+                                     archive, progress, niva, per_lista,
+                                     komplettera_nollor) {
   kandidaturdata <- kandidaturer(
     ar = ar,
     val = val,
@@ -120,8 +163,6 @@ personroster <- function(
     archive = archive
   )
   kandidater_data <- make_kandidater_2026(kandidaturdata)
-  if (is.null(val)) val <- c("RD", "RF", "KF")
-
   parsed <- .las_kandidatresultat_filer_2026(
     kandidaturer = kandidaturdata,
     kandidater = kandidater_data,
@@ -143,6 +184,7 @@ personroster <- function(
   parsed |>
     purrr::map(kolumn) |>
     purrr::list_rbind() |>
+    dplyr::mutate(valar = as.integer(ar), .after = valtillfalle) |>
     dplyr::arrange(
       valtyp, valomradeskod, personvalsomradeskod, partikod, kandidatnummer,
       dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer")))

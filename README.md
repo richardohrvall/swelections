@@ -45,9 +45,8 @@ library(valresultat)
 | `ersattare()` | Official final substitute relationships for elected representatives |
 
 The main functions currently target the 2026 parliamentary (`RD`), regional
-(`RF`) and municipal (`KF`) elections. `valresultat()`, `mandat()`,
-`kandidaturer()`, `kandidater()`, `valda()` and `ersattare()` also support 2022 where their
-official source data are available.
+(`RF`) and municipal (`KF`) elections. All seven functions also support 2022
+where their official source data are available.
 
 ## Quick start
 
@@ -77,6 +76,9 @@ kandidater(val = "RD")
 
 # Personal votes by parliamentary constituency
 personroster(val = "RD")
+
+# Final personal votes for two election years
+personroster(ar = c(2022, 2026), val = "RD")
 
 # Elected candidates
 valda(val = "RD")
@@ -288,7 +290,17 @@ The 2026 implementation currently includes support for:
 - local and remote source files
 - optional local archiving of source files
 
-Broader support for earlier elections is planned for later stages.
+Further historical election years are planned for later stages.
+
+`personroster()` uses only final results. Its area view is the default;
+`niva = "valdistrikt"` selects district results. List results are available
+with `per_lista = TRUE`. District and list views contain observed candidate
+rows by default; `komplettera_nollor = TRUE` adds only verified zero rows.
+Missing rows and `NA` are different from verified zero. Result list numbers
+need not refer to printed name ballots. The `90000` category is kept separate
+from candidate lists and checked for candidate votes in each source. For 2022,
+area and district counts come from their respective official files and need
+not match exactly.
 
 `valresultat(ar = 2022)` supports both `rakning = "preliminar"` and
 `rakning = "slutlig"` at these official source levels:
@@ -310,8 +322,7 @@ integrated. `mandat(ar = 2022)` reads the official mandate nodes for RD
 files when mandate results are present. Historical mandate comparisons are
 `NA`. In final results, `antal_tomma_stolar` is derived only where the same
 fully counted node contains both party mandates and complete elected-member
-data; otherwise it is `NA`. Candidate and personal-vote functions remain
-2026-only.
+data; otherwise it is `NA`.
 
 ## Status
 
