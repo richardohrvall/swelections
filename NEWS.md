@@ -1,5 +1,9 @@
 # valresultat 0.3.0.9000
 
+* `ersattare()` now reads verified final substitute relations for RD, RF and KF
+  in 2022 and 2026. It supports exact year vectors, `"alla"` and `fran`/`till`
+  with integer `valar`, preserves each member–substitute relation and its
+  constituency, and does not infer substitutes from preliminary results.
 * `valda()` reads the official final elected-member relation for RD, RF and KF
   in 2022 and 2026. It supports exact year vectors, `"alla"` and `fran`/`till`
   in long format. Missing or unfinished final relations give an error; no

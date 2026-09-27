@@ -235,10 +235,14 @@ test_that("ersattare has a stable public relationship schema and key", {
       )
     ))
   )))
+  kd <- fixture_kandidaturer() |>
+    dplyr::mutate(giltig = TRUE)
   local_mocked_bindings(
-    .read_resultatindex_2026 = function(...) tibble::tibble(path = "s/rd/x_00_RD.zip"),
-    .resultat_file_2026 = function(...) "fixture.zip",
-    read_raw_json_zip_2026 = function(...) raw
+    .read_resultatindex = function(...) tibble::tibble(
+      path = "s/rd/Val_2026_slutlig_00_RD.zip"),
+    .resultat_file = function(...) "fixture.zip",
+    read_raw_json_zip_2026 = function(...) raw,
+    kandidaturer = function(...) kd
   )
   out <- ersattare(val = "RD", progress = FALSE)
   expect_equal(nrow(out), 2L)
@@ -250,7 +254,7 @@ test_that("ersattare has a stable public relationship schema and key", {
   expect_false(any(vapply(out, is.list, logical(1))))
   expect_false(any(c("kommunkod", "kommunnamn", "kommunnamn_officiellt") %in% names(out)))
   expect_identical(names(out), c(
-    "valtillfalle", "valtyp", "partikod", "partiforkortning",
+    "valtillfalle", "valar", "valtyp", "partikod", "partiforkortning",
     "partibeteckning", "partifarg", "ledamot_kandidatnummer",
     "ledamot_namn", "ersattare_kandidatnummer", "ersattare_namn",
     "ersattarordning", "ersattargrupp", "valgrund_id", "valgrund_text",
@@ -258,6 +262,7 @@ test_that("ersattare has a stable public relationship schema and key", {
     "valklass", "rakningstillfalle", "valdatum",
     "valdatum_fg", "test"
   ))
+  expect_identical(out$valar, c(2026L, 2026L))
 })
 
 test_that("the intended public namespace is fixed", {

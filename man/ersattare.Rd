@@ -11,11 +11,14 @@ ersattare(
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
-  progress = interactive()
+  progress = interactive(),
+  fran = NULL,
+  till = NULL
 )
 }
 \arguments{
-\item{ar}{Valår. För närvarande stöds 2026.}
+\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
@@ -31,24 +34,36 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 \item{archive}{Om \code{TRUE}, sparas även daterade snapshots.}
 
 \item{progress}{Visa progressindikator.}
+
+\item{fran, till}{Inklusiva årsgränser bland stödda år, som alternativ till
+\code{ar}. En utelämnad gräns är öppen.}
 }
 \value{
 En tibble där en rad är relationen mellan en vald ledamot och en
 ersättare inom val, område/valkrets, parti och ersättargrupp.
-Den avsedda radnyckeln är \code{valtillfalle}, \code{valtyp}, \code{geografiniva},
+Samma ersättare kan förekomma på flera rader när de officiella relationerna
+avser olika ledamöter, valkretsar eller ersättarordningar.
+Den avsedda radnyckeln är \code{valar}, \code{valtyp}, \code{geografiniva},
 \code{valomradeskod}, \code{valkretskod}, \code{partikod}, \code{ledamot_kandidatnummer},
 \code{ersattare_kandidatnummer} och \code{ersattarordning} tillsammans. Ordning är integer; koder och
 namn är character. Parti- och relationsfält ligger före geografi och
-teknisk valmetadata. Ett känt tomt resultat behåller samma typade schema.
+teknisk valmetadata. \code{valar} är integer direkt efter \code{valtillfalle}.
+\code{valkretskod} och \code{valkretsnamn} avser den officiella ersättarrelationens
+valkrets, inte ersättarens samtliga kandidaturer. Ett känt tomt resultat
+behåller samma typade schema; saknad eller ofärdig slutlig relation ger fel.
 För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \code{valomradeskod}; separata kommunfält dupliceras inte.
 }
 \description{
-Hämtar relationer mellan valda ledamöter och deras ersättare från
-den slutliga mandatfördelningen.
+Hämtar officiella relationer mellan valda ledamöter och deras ersättare
+från slutliga mandatfiler. Preliminära filer används aldrig för att
+uppskatta ersättare.
 }
 \examples{
-\dontrun{ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")}
+\dontrun{
+ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")
+ersattare(ar = c(2022, 2026), val = "RD")
+}
 }
 \seealso{
 \code{\link[=valda]{valda()}}, \code{\link[=mandat]{mandat()}}, \link{valresultat-package}

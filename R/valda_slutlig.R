@@ -1,5 +1,5 @@
 # Valda hämtas endast från officiella slutliga mandatfiler.
-.valda_slutliga_paths <- function(index, val) {
+.slutliga_mandat_paths <- function(index, val, funktion) {
   purrr::map_dfr(val, function(valtyp) {
     kod <- switch(valtyp, RD = "00", RF = "[0-9]{2}", KF = "[0-9]{4}")
     suffix <- paste0("/.*_", kod, "_", valtyp, "\\.zip$")
@@ -10,7 +10,8 @@
     filkod <- function(path) sub(".*_([^_]+)_[A-Z]{2}\\.zip$", "\\1", path)
     if (!length(slutliga)) {
       stop("Slutlig resultatk\u00e4lla saknas f\u00f6r ", valtyp,
-           ". `valda()` kan inte byggas fr\u00e5n prelimin\u00e4r r\u00e4kning.", call. = FALSE)
+           ". `", funktion, "()` kan inte byggas fr\u00e5n prelimin\u00e4r r\u00e4kning.",
+           call. = FALSE)
     }
     slutkoder <- filkod(slutliga)
     omraden <- filkod(preliminara)
@@ -21,10 +22,15 @@
     if (length(saknade)) {
       stop("Slutlig resultatk\u00e4lla saknas f\u00f6r ", valtyp, " i valomr\u00e5de ",
            paste(saknade, collapse = ", "),
-           ". `valda()` anv\u00e4nder inte prelimin\u00e4r r\u00e4kning.", call. = FALSE)
+           ". `", funktion, "()` anv\u00e4nder inte prelimin\u00e4r r\u00e4kning.",
+           call. = FALSE)
     }
     tibble::tibble(valtyp = valtyp, path = slutliga)
   })
+}
+
+.valda_slutliga_paths <- function(index, val) {
+  .slutliga_mandat_paths(index, val, "valda")
 }
 
 .valda_validera_nycklar <- function(valda_data, kandidater_bas) {

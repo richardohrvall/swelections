@@ -42,11 +42,11 @@ library(valresultat)
 | `kandidater()` | Analysis-ready candidate data |
 | `personroster()` | Personal votes by candidate, party and personal-vote area |
 | `valda()` | People in the official final elected-member result |
-| `ersattare()` | Substitute relationships for elected representatives |
+| `ersattare()` | Official final substitute relationships for elected representatives |
 
 The main functions currently target the 2026 parliamentary (`RD`), regional
 (`RF`) and municipal (`KF`) elections. `valresultat()`, `mandat()`,
-`kandidaturer()`, `kandidater()` and `valda()` also support 2022 where their
+`kandidaturer()`, `kandidater()`, `valda()` and `ersattare()` also support 2022 where their
 official source data are available.
 
 ## Quick start
@@ -189,6 +189,8 @@ through `valomradeskod` use the same short name directly in
 
 `valda()` uses the official **final** elected-member relation for 2022 and 2026. It accepts exact year vectors, `ar = "alla"`, or `fran`/`till`, with 2026 as the default. Years are stacked with integer `valar` after `valtillfalle`. There is no preliminary `valda()` result: preliminary files do not identify elected people, and a missing or unfinished final source gives an error. The table omits the candidacy count `antal_valkretsar`; `valkretskod` and `valkretsnamn` instead identify where the person was elected.
 
+`ersattare()` reads the official **final** substitute relations for RD, RF and KF in 2022 and 2026 and accepts the same year selections. One row links an elected member to a substitute at a specified order; the same substitute can appear on several rows. Its constituency fields describe the relation, and an absent or unfinished final relation gives an error. No preliminary substitute result is inferred.
+
 ```r
 # Detailed candidacies
 kandidaturer(val = "KF")
@@ -201,6 +203,9 @@ kandidater(ar = c(2022, 2026), val = "RD")
 # Elected candidates
 valda(val = "KF")
 valda(ar = c(2022, 2026), val = "RD")
+
+# Substitute relations
+ersattare(ar = c(2022, 2026), val = "RD")
 ```
 
 Candidate-result information is included when the corresponding final result data are available. For 2022, personal votes come from reconciled official area-level result lists. The total counts votes officially reported for the identified candidate: `90000` party ballots add no candidate votes, and a verified absence gives 0. An area with unverifiable result structure gives `NA`. Result-list numbers do not determine whether a candidate appeared on a printed ballot.
