@@ -1,5 +1,4 @@
-# En snabb resultatväg för kompletta slutliga mandatfiler. Otillräckliga
-# strukturer lämnas till den befintliga kandidatvägen.
+# En snabb resultatväg för kompletta slutliga mandatfiler.
 .valda_mandat_komplett_2026 <- function(raw, omraden) {
   omrade <- raw$valomrade
   if (!identical(.normalisera_rakningstillfalle_2026(raw$rakningstillfalle),
@@ -51,10 +50,8 @@
              "invald_valkretskod", "invald_valkretsnamn") %in% names(out))) {
     return(out)
   }
-  kod <- out$valtyp %in% "RD" & !is.na(out$invald_valkretskod)
-  namn <- out$valtyp %in% "RD" & !is.na(out$invald_valkretsnamn)
-  out$valkretskod[kod] <- out$invald_valkretskod[kod]
-  out$valkretsnamn[namn] <- out$invald_valkretsnamn[namn]
+  out$valkretskod <- out$invald_valkretskod
+  out$valkretsnamn <- out$invald_valkretsnamn
   out
 }
 
@@ -71,33 +68,40 @@
                               update, archive)
   mandat_raw <- read_raw_json_zip_2026(file, type = "mandatfordelning")
   if (!identical(as_chr_na(mandat_raw$valtyp), "RD")) return(NULL)
+  .valda_fran_raw_2026(mandat_raw, kandidaturdata, kandidater_bas)
+}
+
+.valda_fran_raw_2026 <- function(mandat_raw, kandidaturdata,
+                                 kandidater_bas) {
   omraden <- .personvalsomraden_mandat_2026(mandat_raw)
-  if (!.valda_mandat_komplett_2026(mandat_raw, omraden)) return(NULL)
+  if (!.valda_mandat_komplett_2026(mandat_raw, omraden)) {
+    stop("Slutlig invaldsrelation 2026 saknas eller \u00e4r inte verifierbart f\u00e4rdig.",
+         call. = FALSE)
+  }
 
   valda_data <- parse_valda_ersattare_2026(mandat_raw)$valda
-  nyckel <- c("kandidatnummer", "valtyp", "partikod")
-  if (anyDuplicated(valda_data[nyckel]) ||
-      nrow(dplyr::anti_join(valda_data, kandidater_bas,
-                           by = dplyr::join_by(kandidatnummer, valtyp, partikod)))) {
-    return(NULL)
-  }
+  .valda_validera_nycklar(valda_data, kandidater_bas)
   valda_bas <- dplyr::semi_join(
     kandidater_bas, valda_data,
     by = dplyr::join_by(kandidatnummer, valtyp, partikod)
   )
 
   summerade <- .personroster_summerade_omrade_2026(omraden)
+  indelad <- any(!is.na(omraden$valkretskod))
   population <- kandidaturdata |>
     dplyr::filter(giltig %in% TRUE) |>
     dplyr::semi_join(valda_data,
       by = dplyr::join_by(kandidatnummer, valtyp, partikod)) |>
     dplyr::distinct(kandidatnummer, valtyp, partikod,
                     valomradeskod, valkretskod) |>
-    dplyr::rename(personvalsomradeskod = valkretskod)
+    dplyr::mutate(personvalsomradeskod = if (indelad) valkretskod else
+      valomradeskod)
   partier <- .personval_partiroster_2026(omraden)
   if (nrow(dplyr::anti_join(
       population, partier,
-      by = dplyr::join_by(personvalsomradeskod, partikod)))) return(NULL)
+      by = dplyr::join_by(personvalsomradeskod, partikod)))) {
+    stop("Slutligt personr\u00f6stunderlag saknar relevant partirad.", call. = FALSE)
+  }
   personrostomraden <- population |>
     dplyr::left_join(summerade,
       by = dplyr::join_by(kandidatnummer, partikod, personvalsomradeskod),
@@ -109,7 +113,8 @@
   personval <- parse_personval_2026(mandat_raw)
   parsed <- list(list(
     status = tibble::tibble(
-      valtyp = "RD", valomradeskod = as_chr_na(mandat_raw$valomrade$kod),
+      valtyp = as_chr_na(mandat_raw$valtyp),
+      valomradeskod = as_chr_na(mandat_raw$valomrade$kod),
       valda_available = TRUE, personval_available = TRUE
     ),
     personrostomraden = personrostomraden,
@@ -117,7 +122,7 @@
     valda = valda_data
   ))
   .add_kandidatresultat_fran_parsade_2026(
-    valda_bas, kandidaturdata, "RD", parsed
+    valda_bas, kandidaturdata, as_chr_na(mandat_raw$valtyp), parsed
   ) |>
     dplyr::filter(invald %in% TRUE)
 }

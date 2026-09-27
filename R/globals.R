@@ -2,6 +2,7 @@
 # Explicit declarations for R CMD check; these do not create or rename columns.
 utils::globalVariables(c(
   ".lista_id",
+  ".data",
   ".env",
   ".avstamt",
   ".personval_nod",

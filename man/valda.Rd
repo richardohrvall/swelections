@@ -11,11 +11,14 @@ valda(
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
-  progress = interactive()
+  progress = interactive(),
+  fran = NULL,
+  till = NULL
 )
 }
 \arguments{
-\item{ar}{Valår. För närvarande stöds 2026.}
+\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
@@ -31,21 +34,34 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 \item{archive}{Om \code{TRUE}, sparas även daterade snapshots.}
 
 \item{progress}{Visa progressindikator vid läsning av resultatfiler.}
+
+\item{fran, till}{Inklusiva årsgränser bland stödda år, som alternativ till
+\code{ar}. En utelämnad gräns är öppen.}
 }
 \value{
-En tibble med samma observationsnivå som \code{kandidater()}, filtrerad
-till explicit \code{invald == TRUE}. Kandidater med okänd status ingår inte.
+En tibble med en rad per vald kandidat, valtyp och parti. Endast
+personer i den verifierade slutliga invaldsrelationen ingår; en saknad
+eller ännu ofärdig slutlig källa ger fel. Ingen egen preliminär
+invaldsfördelning beräknas.
 Kolumnerna motsvarar \code{kandidater(resultat = TRUE)} utom
 \code{antal_valkretsar}, som beskriver kandidaturer och inte invaldsrelationen.
-För slutlig RD 2026 anger \code{valkretskod} och \code{valkretsnamn} den valkrets
-där ledamoten valdes, även om personen kandiderade i flera valkretsar.
+\code{valkretskod} och \code{valkretsnamn} kommer från invaldsrelationen och anger
+valkretsen där personen valdes, även vid kandidatur i flera valkretsar.
+I odelade valområden är dessa fält \code{NA}. \code{valar} är integer direkt efter
+\code{valtillfalle}; flera år staplas i angiven årsordning. För 2022 hämtas
+personröster från slutliga områdeslistor, för 2026 från verifierade
+områdessummeringar. Kandidatfilens metadata och dess \code{NA} bevaras.
 }
 \description{
-Bekväm vy av \code{kandidater()} som endast innehåller kandidater med
-\code{invald == TRUE}.
+Läser personer i Valmyndighetens officiella slutliga invaldsrelation och
+kompletterar med kandidatmetadata. Preliminära resultatfiler saknar denna
+relation och används aldrig som reservkälla.
 }
 \examples{
-\dontrun{valda(val = "RD", source = "local", data_dir = "mitt_arkiv")}
+\dontrun{
+valda(val = "RD", source = "local", data_dir = "mitt_arkiv")
+valda(ar = c(2022, 2026), val = "RD")
+}
 }
 \seealso{
 \code{\link[=kandidater]{kandidater()}}, \code{\link[=ersattare]{ersattare()}}, \link{valresultat-package}

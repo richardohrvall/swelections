@@ -15,6 +15,7 @@ test_that("direct elected path preserves candidate values and uses elected const
   )
   omraden <- tibble::tibble(
     personvalsomradeskod = c("01", "02"),
+    valkretskod = c("01", "02"),
     .personval_nod = list(NULL, NULL)
   )
   local_mocked_bindings(
@@ -101,31 +102,82 @@ test_that("direct path requires complete final mandate person votes", {
   expect_false(.valda_mandat_komplett_2026(raw, area))
 })
 
-test_that("valda falls back when the direct source is incomplete", {
-  candidate <- tibble::tibble(kandidatnummer = c("1", "2"),
-                              invald = c(TRUE, FALSE),
-                              antal_valkretsar = c(29L, 1L))
+test_that("a final path with unfinished elected structure is an error", {
+  raw <- list(valtyp = "RF", rakningstillfalle = "slutlig",
+              valomrade = list(kod = "01"))
   local_mocked_bindings(
-    .valda_direkt_2026 = function(...) NULL,
-    kandidater = function(...) candidate
+    .personvalsomraden_mandat_2026 = function(...) tibble::tibble(),
+    .valda_mandat_komplett_2026 = function(...) FALSE
   )
-  expect_identical(valda(ar = 2026, val = "RD", progress = FALSE),
-                   dplyr::filter(candidate, invald %in% TRUE) |>
-                     dplyr::select(-antal_valkretsar))
+  expect_error(.valda_fran_raw_2026(raw, tibble::tibble(), tibble::tibble()),
+               "Slutlig invaldsrelation 2026")
 })
 
-test_that("valda uses the direct result without building all candidates", {
+test_that("direct 2026 RF and KF map person votes to actual election geography", {
+  for (valtyp in c("RF", "KF")) {
+    omradeskod <- if (valtyp == "RF") "01" else "0980"
+    valkretskod <- if (valtyp == "RF") "0101" else "098000"
+    personvalsomradeskod <- if (valtyp == "RF") valkretskod else omradeskod
+    kd <- fixture_kandidaturer()[4, ] |>
+      dplyr::mutate(
+        valtyp = .env$valtyp, partikod = "P",
+        valomradeskod = omradeskod, valkretskod = .env$valkretskod,
+        valkretsnamn = "Krets", oppen_lista = FALSE, pa_namnvalsedel = TRUE
+      )
+    vald <- dplyr::mutate(
+      fixture_valda(), valtyp = .env$valtyp, partikod = "P",
+      valomradeskod = omradeskod,
+      valkretskod = if (valtyp == "RF") .env$valkretskod else NA_character_,
+      valkretsnamn = if (valtyp == "RF") "Krets" else NA_character_
+    )
+    local_mocked_bindings(
+      .personvalsomraden_mandat_2026 = function(...) tibble::tibble(
+        valkretskod = if (valtyp == "RF") .env$valkretskod else NA_character_,
+        personvalsomradeskod = .env$personvalsomradeskod,
+        .personval_nod = list(NULL)
+      ),
+      .valda_mandat_komplett_2026 = function(...) TRUE,
+      parse_valda_ersattare_2026 = function(...) list(valda = vald),
+      .personroster_summerade_omrade_2026 = function(...) tibble::tibble(
+        kandidatnummer = "1", partikod = "P",
+        personvalsomradeskod = .env$personvalsomradeskod,
+        antal_personroster_omrade = 5L
+      ),
+      .personval_partiroster_2026 = function(...) tibble::tibble(
+        personvalsomradeskod = .env$personvalsomradeskod,
+        partikod = "P", antal_partiroster = 10L
+      ),
+      parse_personval_2026 = function(...) fixture_personval()[0, ]
+    )
+    raw <- list(valtyp = valtyp, valomrade = list(kod = omradeskod))
+    out <- .valda_fran_raw_2026(raw, kd, .kandidater_bas(kd, 2026L)) |>
+      .valda_invaldsvalkrets_2026()
+    expect_identical(nrow(out), 1L)
+    expect_identical(out$antal_personroster_totalt, 5L)
+    expect_identical(out$valkretskod,
+                     if (valtyp == "RF") valkretskod else NA_character_)
+  }
+})
+
+test_that("missing final source never falls back to preliminary", {
+  index <- tibble::tibble(path = "p/rd/Val_2026_preliminar_00_RD.zip")
+  expect_error(.valda_slutliga_paths(index, "RD"),
+               "RD.*valda")
+  index <- dplyr::bind_rows(index,
+    tibble::tibble(path = "s/rd/Val_2026_slutlig_00_RD.zip"))
+  expect_identical(.valda_slutliga_paths(index, "RD")$path[[1]],
+                   "s/rd/Val_2026_slutlig_00_RD.zip")
+})
+
+test_that("elected constituency comes from the final relation", {
   elected <- tibble::tibble(
     kandidatnummer = "1", valtyp = "RD", invald = TRUE,
     antal_valkretsar = 29L,
     valkretskod = NA_character_, valkretsnamn = NA_character_,
     invald_valkretskod = "02", invald_valkretsnamn = "Krets 2"
   )
-  local_mocked_bindings(
-    .valda_direkt_2026 = function(...) elected,
-    kandidater = function(...) stop("Full candidate path was used")
-  )
-  out <- valda(ar = 2026, val = "RD", progress = FALSE)
+  out <- .valda_invaldsvalkrets_2026(elected) |>
+    dplyr::select(-antal_valkretsar)
   expect_identical(out$valkretskod, "02")
   expect_identical(out$valkretsnamn, "Krets 2")
   expect_false("antal_valkretsar" %in% names(out))

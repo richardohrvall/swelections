@@ -120,7 +120,12 @@ test_that("public candidate column contract keeps constituency count beside geog
   )
   local_mocked_bindings(
     kandidaturer = function(...) kandidaturdata,
-    .valda_direkt_2026 = function(...) NULL,
+    .valda_ett_ar = function(...) {
+      kandidater(val = "RD", progress = FALSE) |>
+        dplyr::filter(invald %in% TRUE) |>
+        .valda_invaldsvalkrets_2026() |>
+        dplyr::select(-antal_valkretsar)
+    },
     .read_resultatindex_2026 = function(...) tibble::tibble(path = "s/rd/val_00_RD.zip"),
     .parse_kandidatresultat_fil_2026 = function(...) list(
       status = tibble::tibble(valtyp = "RD", valomradeskod = "00",
@@ -159,7 +164,10 @@ test_that("valda omits the candidacy constituency count", {
     antal_valkretsar = c(29L, 1L),
     marker = c("a", "b")
   )
-  local_mocked_bindings(kandidater = function(...) candidates)
+  local_mocked_bindings(.valda_ett_ar = function(...) {
+    dplyr::filter(candidates, invald %in% TRUE) |>
+      dplyr::select(-antal_valkretsar)
+  })
   out <- valda(progress = FALSE)
   expect_identical(out, dplyr::filter(candidates, invald %in% TRUE) |>
                      dplyr::select(-antal_valkretsar))

@@ -182,19 +182,33 @@ kandidater <- function(
 
 #' Valda kandidater
 #'
-#' Bekväm vy av `kandidater()` som endast innehåller kandidater med
-#' `invald == TRUE`.
+#' Läser personer i Valmyndighetens officiella slutliga invaldsrelation och
+#' kompletterar med kandidatmetadata. Preliminära resultatfiler saknar denna
+#' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
+#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
+#' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
+#'   `ar`. En utelämnad gräns är öppen.
 #' @param progress Visa progressindikator vid läsning av resultatfiler.
-#' @return En tibble med samma observationsnivå som `kandidater()`, filtrerad
-#'   till explicit `invald == TRUE`. Kandidater med okänd status ingår inte.
+#' @return En tibble med en rad per vald kandidat, valtyp och parti. Endast
+#'   personer i den verifierade slutliga invaldsrelationen ingår; en saknad
+#'   eller ännu ofärdig slutlig källa ger fel. Ingen egen preliminär
+#'   invaldsfördelning beräknas.
 #'   Kolumnerna motsvarar `kandidater(resultat = TRUE)` utom
 #'   `antal_valkretsar`, som beskriver kandidaturer och inte invaldsrelationen.
-#'   För slutlig RD 2026 anger `valkretskod` och `valkretsnamn` den valkrets
-#'   där ledamoten valdes, även om personen kandiderade i flera valkretsar.
+#'   `valkretskod` och `valkretsnamn` kommer från invaldsrelationen och anger
+#'   valkretsen där personen valdes, även vid kandidatur i flera valkretsar.
+#'   I odelade valområden är dessa fält `NA`. `valar` är integer direkt efter
+#'   `valtillfalle`; flera år staplas i angiven årsordning. För 2022 hämtas
+#'   personröster från slutliga områdeslistor, för 2026 från verifierade
+#'   områdessummeringar. Kandidatfilens metadata och dess `NA` bevaras.
 #' @examples
-#' \dontrun{valda(val = "RD", source = "local", data_dir = "mitt_arkiv")}
+#' \dontrun{
+#' valda(val = "RD", source = "local", data_dir = "mitt_arkiv")
+#' valda(ar = c(2022, 2026), val = "RD")
+#' }
 #' @seealso [kandidater()], [ersattare()], [valresultat-package]
 #' @export
 valda <- function(
@@ -204,37 +218,28 @@ valda <- function(
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
-    progress = interactive()
+    progress = interactive(),
+    fran = NULL,
+    till = NULL
 ) {
-
+  ar_angivet <- !missing(ar)
+  val <- .valtyper(val)
+  val <- if (is.null(val)) c("RD", "RF", "KF") else val
+  valar <- .resolve_valar(ar, fran, till, "valda", val[[1]], ar_angivet)
+  if (length(val) > 1L && !all(vapply(val[-1], function(v) {
+    all(valar %in% .stodd_valar("valda", v))
+  }, logical(1)))) {
+    stop("Valda \u00e5r st\u00f6ds inte f\u00f6r alla valtyper.", call. = FALSE)
+  }
   source <- .check_public_args(
-    ar, "valda", source, data_dir, update, archive, progress
+    valar[[1]], "valda", source, data_dir, update, archive, progress,
+    valar_resolved = TRUE
   )
-
-  if (identical(as.integer(ar), 2026L) && identical(.valtyper(val), "RD")) {
-    direkt <- .valda_direkt_2026(
-      source = source, data_dir = data_dir, update = update,
-      archive = archive
+  purrr::map(valar, function(ett_ar) {
+    tryCatch(
+      .valda_ett_ar(ett_ar, val, source, data_dir, update, archive, progress),
+      error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
+                               call. = FALSE)
     )
-    if (!is.null(direkt)) {
-      return(.valda_invaldsvalkrets_2026(direkt) |>
-        dplyr::select(-dplyr::any_of("antal_valkretsar")))
-    }
-  }
-
-  out <- kandidater(
-    ar = ar,
-    val = val,
-    resultat = TRUE,
-    source = source,
-    data_dir = data_dir,
-    update = update,
-    archive = archive,
-    progress = progress
-  ) |>
-    dplyr::filter(invald %in% TRUE)
-  if (identical(as.integer(ar), 2026L)) {
-    out <- .valda_invaldsvalkrets_2026(out)
-  }
-  dplyr::select(out, -dplyr::any_of("antal_valkretsar"))
+  }) |> purrr::list_rbind()
 }

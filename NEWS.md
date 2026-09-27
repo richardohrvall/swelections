@@ -1,5 +1,10 @@
 # valresultat 0.3.0.9000
 
+* `valda()` reads the official final elected-member relation for RD, RF and KF
+  in 2022 and 2026. It supports exact year vectors, `"alla"` and `fran`/`till`
+  in long format. Missing or unfinished final relations give an error; no
+  preliminary elected-member result is inferred. The direct mandate-file path
+  retains the actual elected constituency and avoids district vote parsing.
 * Places `antal_valkretsar` beside the candidate-level constituency fields in
   `kandidater()`. It counts distinct constituencies across valid candidacies,
   including all actual constituencies reached by nationwide RD lists; several
