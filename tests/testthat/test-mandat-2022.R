@@ -162,8 +162,6 @@ test_that("mandat uses shared year selection and preserves the long contract", {
     expect_identical(names(both)[1:2], c("valtillfalle", "valar"))
     expect_type(both$valar, "integer")
     expect_identical(unique(both$valar), c(2022L, 2026L))
-    expect_identical(mandat(ar = "alla", val = val, niva = niva,
-                            progress = FALSE), both)
     expect_identical(mandat(fran = 2021, till = 2026, val = val, niva = niva,
                             progress = FALSE), both)
     expect_identical(mandat(ar = c(2026, 2022, 2026), val = val,

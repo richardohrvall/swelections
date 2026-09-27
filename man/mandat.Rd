@@ -19,7 +19,7 @@ mandat(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
@@ -57,7 +57,9 @@ kontroll av fullständiga valda-listor. I valkretsindelade områden används
 kompletta valkretsuppgifter för valområdets differens;
 valområdet; annars används \code{NA}. Preliminära 2022-resultat får \code{NA} för
 tomma stolar. Historiska mandat- och jämförelsefält som
-saknas i 2022 års JSON är typade \code{NA}; 2018-data rekonstrueras inte.
+saknas i 2022 års JSON är typade \code{NA}. För 2018 läses endast slutlig
+XML. XML-källans aktuella mandat och valda-platsmarkörer används direkt;
+historiska mandatfält som saknas i XML är \code{NA}.
 \code{valar} är en heltalskolumn direkt efter \code{valtillfalle}. Flera år staplas
 i long format. \code{"alla"} och \code{fran}/\code{till} ger stigande årsordning.
 \code{valomradessparr} och \code{valkretssparr} är proportioner på 0–1-skalan.

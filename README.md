@@ -47,6 +47,13 @@ library(valresultat)
 The main functions currently target the 2026 parliamentary (`RD`), regional
 (`RF`) and municipal (`KF`) elections. All seven functions also support 2022
 where their official source data are available.
+Final 2018 results are available through `valresultat()`, `mandat()` and
+`kandidaturer()` using Valmyndigheten's XML and candidacy files. The public
+2018 candidacy name is always missing, including when a local historical
+snapshot retains names. The named snapshot is neither required nor bundled.
+Valmyndigheten's 2018 XML ZIP is no longer downloadable from its published
+statistics page, so 2018 vote and mandate results currently require a local
+copy of that archive.
 
 ## Quick start
 

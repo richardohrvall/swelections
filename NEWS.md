@@ -1,5 +1,10 @@
 # valresultat 0.3.0.9000
 
+* Adds final 2018 results to `valresultat()` and `mandat()` through a separate
+  XML reader and shared public schemas. Adds 2018 `kandidaturer()` from the
+  official semicolon-separated source. Public 2018 candidacy names remain
+  `NA` regardless of local historical snapshots; names are never keys.
+  The 2018 preliminary count is not supported.
 * Extends `personroster()` to official final RD, RF and KF results for 2022.
   Exact year vectors, `"alla"` and `fran`/`till` return long-format results
   with integer `valar`. The 2022 area view uses official area-level result

@@ -2,7 +2,7 @@
 #'
 #' Hämtar kandidaturdata från Valmyndigheten.
 #'
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -22,7 +22,10 @@
 #'   ogiltiga kandidaturer bevaras. Den avsedda radnyckeln
 #'   är `valtyp`, `valomradeskod`, `valkretskod`, `partikod`, `listnummer`,
 #'   `ordning` och `kandidatnummer` tillsammans.
-#'   Källans namn bevaras i `namn` och `giltig` är logical.
+#'   Källans namn bevaras i `namn` för 2022/2026 och `giltig` är logical.
+#'   För 2018 är publikt `namn` alltid `NA_character_`: den nu publicerade
+#'   officiella filen är namngallrad, och en äldre namngiven lokal snapshot
+#'   får inte ändra det publika namnkontraktet. Namn används aldrig som nyckel.
 #'   För KF är valområdet kommunen och `valomradesnamn` är paketets korta
 #'   kommunnamn, uppslaget exakt via `valomradeskod`.
 #'   `valar` är en heltalskolumn direkt efter `valtillfalle`. Flera år
@@ -77,6 +80,12 @@ kandidaturer <- function(
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
+  if (ar == 2018L) {
+    file <- .kalla_2018("kandidaturer", source, data_dir, update, archive)
+    out <- .read_kandidaturer_2018(file)
+    if (!is.null(val)) out <- dplyr::filter(out, valtyp %in% val)
+    return(.kort_kommunnamn_2026(out))
+  }
   kalla <- .kandidatur_kalla(ar)
   file <- .resolve_val_file(
     path = kalla$path, ar = ar, samling = kalla$samling, source = source,

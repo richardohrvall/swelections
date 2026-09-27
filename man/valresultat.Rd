@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_valresultat.R
 \name{valresultat}
 \alias{valresultat}
-\title{Officiella valresultat för 2022 och 2026}
+\title{Officiella valresultat för 2018, 2022 och 2026}
 \usage{
 valresultat(
   ar = 2026,
@@ -19,7 +19,7 @@ valresultat(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår, till exempel \code{c(2022, 2026)}, eller
+\item{ar}{Ett eller flera exakta valår, till exempel \code{c(2018, 2022, 2026)}, eller
 \code{"alla"} för samtliga stödda år för vald valtyp. Dubbletter tas bort med
 den först angivna årsordningen bevarad. Standard är 2026 när inga
 intervallgränser anges.}
@@ -72,6 +72,12 @@ M-noderna, vid såväl preliminär som slutlig räkning:\tabular{llll}{
 
 Övriga 2022-nivåer stöds inte: separata U/O-summeringar finns inte i
 2022 års resultatindex. Nivåer skapas inte genom egen distriktsaggregering.
+För 2018 används Valmyndighetens separata slutliga XML-källa. RD stöder
+valdistrikt, kommun, kommunvalkrets, län, riksdagsvalkrets och riket; RF
+valdistrikt, kommun, kommunvalkrets, regionvalkrets, region och riket; KF
+valdistrikt, kommun, kommunvalkrets, län och riket. Preliminär 2018-räkning
+stöds inte. XML-värden normaliseras till samma interna och publika schema;
+saknade jämförelseuppgifter är typade \code{NA}.
 RD/lan stöds inte. RF/lan är dokumenterat i OS-formatet men ännu inte
 aktiverat, eftersom faktisk slutlig källa inte är verifierad.
 

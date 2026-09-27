@@ -43,7 +43,7 @@
 #'
 #' Hämtar mandatfördelningen.
 #'
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -70,7 +70,9 @@
 #'   kompletta valkretsuppgifter för valområdets differens;
 #'   valområdet; annars används `NA`. Preliminära 2022-resultat får `NA` för
 #'   tomma stolar. Historiska mandat- och jämförelsefält som
-#'   saknas i 2022 års JSON är typade `NA`; 2018-data rekonstrueras inte.
+#'   saknas i 2022 års JSON är typade `NA`. För 2018 läses endast slutlig
+#'   XML. XML-källans aktuella mandat och valda-platsmarkörer används direkt;
+#'   historiska mandatfält som saknas i XML är `NA`.
 #'   `valar` är en heltalskolumn direkt efter `valtillfalle`. Flera år staplas
 #'   i long format. `"alla"` och `fran`/`till` ger stigande årsordning.
 #'   `valomradessparr` och `valkretssparr` är proportioner på 0–1-skalan.
@@ -127,6 +129,13 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
+  if (ar == 2018L) {
+    if (rakning != "slutlig") {
+      stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
+           call. = FALSE)
+    }
+    return(.mandat_2018(val, par, source, data_dir, update, archive, progress))
+  }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)
 
   prefix <- dplyr::recode_values(

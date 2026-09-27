@@ -1,11 +1,11 @@
-#' Officiella valresultat för 2022 och 2026
+#' Officiella valresultat för 2018, 2022 och 2026
 #'
 #' Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 #' från Valmyndighetens
 #' officiella primärkälla. Ingen geografisk aggregering eller automatisk
 #' reservkälla används om den valda källan saknas.
 #'
-#' @param ar Ett eller flera exakta valår, till exempel `c(2022, 2026)`, eller
+#' @param ar Ett eller flera exakta valår, till exempel `c(2018, 2022, 2026)`, eller
 #'   `"alla"` för samtliga stödda år för vald valtyp. Dubbletter tas bort med
 #'   den först angivna årsordningen bevarad. Standard är 2026 när inga
 #'   intervallgränser anges.
@@ -33,6 +33,12 @@
 #'
 #' Övriga 2022-nivåer stöds inte: separata U/O-summeringar finns inte i
 #' 2022 års resultatindex. Nivåer skapas inte genom egen distriktsaggregering.
+#' För 2018 används Valmyndighetens separata slutliga XML-källa. RD stöder
+#' valdistrikt, kommun, kommunvalkrets, län, riksdagsvalkrets och riket; RF
+#' valdistrikt, kommun, kommunvalkrets, regionvalkrets, region och riket; KF
+#' valdistrikt, kommun, kommunvalkrets, län och riket. Preliminär 2018-räkning
+#' stöds inte. XML-värden normaliseras till samma interna och publika schema;
+#' saknade jämförelseuppgifter är typade `NA`.
 #' RD/lan stöds inte. RF/lan är dokumenterat i OS-formatet men ännu inte
 #' aktiverat, eftersom faktisk slutlig källa inte är verifierad.
 #'
@@ -180,6 +186,13 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  if (ar == 2018L) {
+    if (rakning != "slutlig") {
+      stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
+           call. = FALSE)
+    }
+    return(.valresultat_2018(val, niva, source, data_dir, update, archive, progress))
+  }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)
   paths <- .valresultat_paths(index, val, rakning, kalla)
   resultat <- purrr::map(paths, function(path) {
@@ -211,6 +224,10 @@ valresultat <- function(
 }
 
 .valresultat_kalla <- function(val, niva, ar = 2026) {
+  if (ar == 2018L) {
+    .valresultat_niva_2018(val, niva)
+    return("XML")
+  }
   if (ar == 2022) {
     matris <- list(
       RD = c(valdistrikt = "D", riksdagsvalkrets = "M", riket = "M"),

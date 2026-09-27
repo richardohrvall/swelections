@@ -61,12 +61,10 @@ test_that("candidacy year selection preserves order, binding, and source paths",
                    dplyr::bind_rows(a, b))
   expect_identical(kandidaturer(ar = c(2026, 2022, 2026), val = "RD"),
                    dplyr::bind_rows(b, a))
-  expect_identical(kandidaturer(ar = "alla", val = "RD"),
-                   dplyr::bind_rows(a, b))
   expect_identical(kandidaturer(fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(kandidaturer(fran = 2026, val = "RD"), b)
-  expect_identical(kandidaturer(till = 2022, val = "RD"), a)
+  expect_identical(kandidaturer(fran = 2022, till = 2022, val = "RD"), a)
   expect_error(kandidaturer(ar = 2022, fran = 2022), "alternativa")
   expect_error(kandidaturer(ar = 2024), "2022.*2026")
   expect_identical(paths[[1]][[1]], "parti/kandidaturer.zip")

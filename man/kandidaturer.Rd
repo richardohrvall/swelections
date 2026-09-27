@@ -16,7 +16,7 @@ kandidaturer(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
@@ -43,7 +43,10 @@ kan sakna tryckt namnvalsedel. En kandidat kan ha flera rader och
 ogiltiga kandidaturer bevaras. Den avsedda radnyckeln
 är \code{valtyp}, \code{valomradeskod}, \code{valkretskod}, \code{partikod}, \code{listnummer},
 \code{ordning} och \code{kandidatnummer} tillsammans.
-Källans namn bevaras i \code{namn} och \code{giltig} är logical.
+Källans namn bevaras i \code{namn} för 2022/2026 och \code{giltig} är logical.
+För 2018 är publikt \code{namn} alltid \code{NA_character_}: den nu publicerade
+officiella filen är namngallrad, och en äldre namngiven lokal snapshot
+får inte ändra det publika namnkontraktet. Namn används aldrig som nyckel.
 För KF är valområdet kommunen och \code{valomradesnamn} är paketets korta
 kommunnamn, uppslaget exakt via \code{valomradeskod}.
 \code{valar} är en heltalskolumn direkt efter \code{valtillfalle}. Flera år

@@ -9,26 +9,26 @@ fixture_flerar_index <- function(ar) {
 }
 
 test_that("shared year resolver distinguishes exact years, all and inclusive ranges", {
-  expect_identical(.stodd_valar("valresultat", "RD"), c(2022L, 2026L))
-  expect_identical(.stodd_valar("valresultat", "RF"), c(2022L, 2026L))
-  expect_identical(.stodd_valar("valresultat", "KF"), c(2022L, 2026L))
-  expect_identical(.stodd_valar("mandat", "RD"), c(2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "RD"), c(2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "RF"), c(2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "KF"), c(2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("mandat", "RD"), c(2018L, 2022L, 2026L))
   expect_identical(.resolve_valar(2026L), 2026L)
   expect_identical(.resolve_valar(c(2026, 2022, 2026)), c(2026L, 2022L))
-  expect_identical(.resolve_valar("alla"), c(2022L, 2026L))
+  expect_identical(.resolve_valar("alla"), c(2018L, 2022L, 2026L))
   expect_identical(.resolve_valar(fran = 2022, ar_angivet = FALSE), c(2022L, 2026L))
-  expect_identical(.resolve_valar(till = 2022, ar_angivet = FALSE), 2022L)
+  expect_identical(.resolve_valar(till = 2022, ar_angivet = FALSE), c(2018L, 2022L))
   expect_identical(.resolve_valar(fran = 2021, till = 2026,
                                   ar_angivet = FALSE), c(2022L, 2026L))
-  for (ar in list(2018:2022, 2024, 2022.5, numeric(), NA_real_, "2022",
+  for (ar in list(2019:2022, 2024, 2022.5, numeric(), NA_real_, "2022",
                   c(2022, "alla"), NULL)) {
-    expect_error(.resolve_valar(ar), "2022.*2026")
+    expect_error(.resolve_valar(ar), "2018.*2022.*2026")
   }
   expect_error(.resolve_valar(2022, fran = 2018), "ar.*fran")
   expect_error(.resolve_valar("alla", till = 2022), "ar.*till")
   expect_error(.resolve_valar(fran = 2026, till = 2022, ar_angivet = FALSE),
                "fran.*till")
-  expect_error(.resolve_valar(till = 2021, ar_angivet = FALSE), "2022.*2026")
+  expect_identical(.resolve_valar(till = 2021, ar_angivet = FALSE), 2018L)
   for (grans in list(2022:2026, 2022.5, NA_real_, "2022", TRUE)) {
     expect_error(.resolve_valar(fran = grans, ar_angivet = FALSE), "fran")
   }
@@ -63,13 +63,9 @@ test_that("multi-year results equal bound single-year results without changing o
     expect_identical(names(ab)[1:2], c("valtillfalle", "valar"))
     expect_identical(typeof(ab$valar), "integer")
     expect_identical(unique(ab$valar), c(2022L, 2026L))
-    expect_identical(valresultat(ar = "alla", val = val, niva = niva,
-                                progress = FALSE), ab)
-    expect_identical(valresultat(fran = 2010, till = 2026, val = val,
-                                niva = niva, progress = FALSE), ab)
     expect_identical(valresultat(fran = 2022, val = val, niva = niva,
                                 progress = FALSE), ab)
-    expect_identical(valresultat(till = 2022, val = val, niva = niva,
+    expect_identical(valresultat(fran = 2022, till = 2022, val = val, niva = niva,
                                 progress = FALSE), a)
   }
   expect_identical(valresultat(progress = FALSE),
@@ -94,7 +90,7 @@ test_that("multi-year requests reject unsupported combinations before source I/O
   expect_error(valresultat(ar = 2022, fran = 2018), "ar.*fran")
   expect_error(valresultat(ar = "alla", till = 2022), "ar.*till")
   expect_error(valresultat(ar = 2021), "2021.*2022.*2026")
-  expect_error(valresultat(fran = 2010, till = 2021), "2022.*2026")
+  expect_error(valresultat(fran = 2019, till = 2021), "2018.*2022.*2026")
 })
 
 test_that("missing local source in any selected year aborts the whole request", {

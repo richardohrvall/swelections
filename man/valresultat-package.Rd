@@ -37,11 +37,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Richard <U+00D6>hrvall \email{richard.ohrvall@gmail.com}
+\strong{Maintainer}: Richard Öhrvall \email{richard.ohrvall@gmail.com}
 
 Authors:
 \itemize{
-  \item Richard <U+00D6>hrvall \email{richard.ohrvall@gmail.com}
+  \item Richard Öhrvall \email{richard.ohrvall@gmail.com}
 }
 
 }
