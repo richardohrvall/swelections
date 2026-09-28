@@ -52,7 +52,7 @@ val_data_dir <- function(data_dir = NULL) {
     ))
   }
 
-  data_dir <- getOption("valresultat.data_dir")
+  data_dir <- getOption("swelections.data_dir", getOption("valresultat.data_dir"))
 
   if (is.null(data_dir)) {
     return(NULL)
@@ -80,7 +80,7 @@ val_local_path <- function(
   if (is.null(data_dir)) {
     stop(
       "Ingen lokal datamapp har angetts. ",
-      "Ange `data_dir` eller s\u00e4tt optionen `valresultat.data_dir`.",
+      "Ange `data_dir` eller s\u00e4tt optionen `swelections.data_dir`.",
       call. = FALSE
     )
   }
@@ -107,7 +107,7 @@ val_archive_path <- function(
   if (is.null(data_dir)) {
     stop(
       "Ingen lokal datamapp har angetts. ",
-      "Ange `data_dir` eller s\u00e4tt optionen `valresultat.data_dir`.",
+      "Ange `data_dir` eller s\u00e4tt optionen `swelections.data_dir`.",
       call. = FALSE
     )
   }

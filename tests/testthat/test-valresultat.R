@@ -738,7 +738,7 @@ test_that("local index and ZIP pipeline never uses the network, including archiv
   local_mocked_bindings(download.file = unexpected, .package = "utils")
   root <- tempfile()
   on.exit(unlink(root, recursive = TRUE), add = TRUE)
-  old <- options(valresultat.resultatsamling_2026 = "test", valresultat.data_dir = root)
+  old <- options(swelections.resultatsamling_2026 = "test", swelections.data_dir = root)
   on.exit(options(old), add = TRUE)
   path <- fixture_resultatpath()
   file <- val_local_path(path, 2026, "test", root)

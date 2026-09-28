@@ -78,7 +78,7 @@
 #' kandidater(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' kandidater(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidaturer()], [valda()], [valresultat-package]
+#' @seealso [kandidaturer()], [valda()], [swelections-package]
 #' @export
 kandidater <- function(
     ar = 2026,
@@ -217,7 +217,7 @@ kandidater <- function(
 #' valda(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' valda(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidater()], [ersattare()], [valresultat-package]
+#' @seealso [kandidater()], [ersattare()], [swelections-package]
 #' @export
 valda <- function(
     ar = 2026,

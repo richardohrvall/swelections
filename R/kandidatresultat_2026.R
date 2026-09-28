@@ -1,7 +1,7 @@
 .resultatsamling_2026 <- function() {
   getOption(
-    "valresultat.resultatsamling_2026",
-    "val2026"
+    "swelections.resultatsamling_2026",
+    getOption("valresultat.resultatsamling_2026", "val2026")
   )
 }
 

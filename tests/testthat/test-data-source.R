@@ -1,14 +1,33 @@
 test_that("explicit data directory takes precedence over the option", {
   root <- tempdir()
-  old <- options(valresultat.data_dir = file.path(root, "option"))
+  old <- options(swelections.data_dir = file.path(root, "option"),
+                 valresultat.data_dir = NULL)
   on.exit(options(old), add = TRUE)
   expect_identical(val_data_dir(file.path(root, "explicit")),
                    normalizePath(file.path(root, "explicit"), winslash = "/", mustWork = FALSE))
   expect_identical(val_data_dir(),
                    normalizePath(file.path(root, "option"), winslash = "/", mustWork = FALSE))
-  options(valresultat.data_dir = NULL)
+  options(swelections.data_dir = NULL)
   expect_null(val_data_dir())
   expect_error(val_local_path("file.txt", 2026, "test"), "Ingen lokal datamapp")
+})
+
+test_that("new package options take precedence over legacy options", {
+  old <- options(swelections.data_dir = "new", valresultat.data_dir = "old",
+                 swelections.resultatsamling_2022 = "new2022",
+                 valresultat.resultatsamling_2022 = "old2022",
+                 swelections.resultatsamling_2026 = "new2026",
+                 valresultat.resultatsamling_2026 = "old2026")
+  on.exit(options(old), add = TRUE)
+  expect_identical(basename(val_data_dir()), "new")
+  expect_identical(.resultatsamling(2022), "new2022")
+  expect_identical(.resultatsamling(2026), "new2026")
+  options(swelections.data_dir = NULL,
+          swelections.resultatsamling_2022 = NULL,
+          swelections.resultatsamling_2026 = NULL)
+  expect_identical(basename(val_data_dir()), "old")
+  expect_identical(.resultatsamling(2022), "old2022")
+  expect_identical(.resultatsamling(2026), "old2026")
 })
 
 test_that("ordinary local reads never fall back to remote sources", {

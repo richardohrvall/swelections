@@ -1,11 +1,11 @@
-# valresultat
+# swelections
 
-`valresultat` is an R package for downloading, parsing and analysing Swedish election data from Valmyndigheten.
+`swelections` is an R package for downloading, parsing and analysing Swedish election data from Valmyndigheten.
 
 The aim is to provide analysis-ready data on election results, mandates, candidates, candidacies, elected representatives and substitutes while preserving important information from the official source files.
 
 > [!WARNING]
-> `valresultat` is under active development. Development currently focuses on
+> `swelections` is under active development. Development currently focuses on
 > the 2026 Swedish elections, and the public API and data structures may still
 > change. Testing uses deterministic fixtures, Valmyndigheten's rehearsal data
 > and targeted checks against current live result files.
@@ -16,20 +16,20 @@ Install the development version from GitHub with `pak`:
 
 ```r
 install.packages("pak")
-pak::pak("richardohrvall/valresultat")
+pak::pak("richardohrvall/swelections")
 ```
 
 Alternatively, using `remotes`:
 
 ```r
 install.packages("remotes")
-remotes::install_github("richardohrvall/valresultat")
+remotes::install_github("richardohrvall/swelections")
 ```
 
 Then load the package:
 
 ```r
-library(valresultat)
+library(swelections)
 ```
 
 ## Main functions
@@ -59,7 +59,7 @@ source remotely.
 ## Quick start
 
 ```r
-library(valresultat)
+library(swelections)
 
 # National result in the parliamentary election
 valresultat(val = "RD")
@@ -245,13 +245,13 @@ RF/KF files were still partly counted at verification.
 
 ## Data access
 
-`valresultat` reads public election data from Valmyndigheten. Source files can be accessed remotely or stored locally for reproducible analysis.
+`swelections` reads public election data from Valmyndigheten. Source files can be accessed remotely or stored locally for reproducible analysis.
 
 Normal calls use the live 2026 result collection, `val2026`. Rehearsal data
 remain available for explicit testing or development with:
 
 ```r
-options(valresultat.resultatsamling_2026 = "genrep2026")
+options(swelections.resultatsamling_2026 = "genrep2026")
 ```
 
 The main source modes are:
@@ -263,7 +263,7 @@ The main source modes are:
 A local data directory can be supplied with `data_dir` or set for the R session:
 
 ```r
-options(valresultat.data_dir = "C:/path/to/valdata")
+options(swelections.data_dir = "C:/path/to/valdata")
 ```
 
 Functions also support `update` and `archive` where relevant. Raw source files are deliberately kept outside the package repository.

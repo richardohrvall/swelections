@@ -66,5 +66,5 @@ valda(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{
-\code{\link[=kandidater]{kandidater()}}, \code{\link[=ersattare]{ersattare()}}, \link{valresultat-package}
+\code{\link[=kandidater]{kandidater()}}, \code{\link[=ersattare]{ersattare()}}, \link{swelections-package}
 }

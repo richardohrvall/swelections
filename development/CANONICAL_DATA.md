@@ -114,13 +114,13 @@ Läsprototypen `.canonical_manifest()`, `.canonical_asset()` och
 Cache-nyckeln innehåller dataversion, assetnamn och checksumma. Cacheträff
 kontrolleras mot både byte och SHA256; skadade filer underkänns och kan hämtas
 om från en explicit given URL. Standardcache är
-`tools::R_user_dir("valresultat", "cache")`; tester injicerar en isolerad
+`tools::R_user_dir("swelections", "cache")`; tester injicerar en isolerad
 cache. Ingen nedladdning sker utan URL. Parquet-läsning kräver `nanoparquet`
 först när ett sådant asset används; installationen kräver inte `.local-data`
 eller utvecklingsfiler.
 
 En framtida release kan använda taggen `data-v0.1.0` och adresser av formen
-`https://github.com/richardohrvall/valresultat/releases/download/data-v0.1.0/<asset>`.
+`https://github.com/richardohrvall/swelections/releases/download/data-v0.1.0/<asset>`.
 Paketet bör läsa en **explicit** dataversion från ett litet versionsregister,
 aldrig `latest`. En framtida publik `source = "canonical"` bör föreslås och
 beslutas separat; nuvarande råkällebetydelse bevaras.
@@ -129,9 +129,9 @@ Integrationen har två nivåer. Det ordinarie nätfria testet är deterministisk
 och använder små fixtures. Den separata 2018-integrationen jämför alla
 Parquet-vyer exakt med de RDS-mellanobjekt som byggts av råvägen, inklusive
 personrösternas fyra områdesvarianter och båda glesa distriktsvarianterna.
-Den kan aktiveras med `VALRESULTAT_TEST_CANONICAL_DIR` och
-`VALRESULTAT_TEST_CANONICAL_STAGE_DIR`. En full omparsning av rå-XML för
-varje variant är dessutom möjlig med `VALRESULTAT_TEST_CANONICAL_FULL_RAW=1`,
+Den kan aktiveras med `SWELECTIONS_TEST_CANONICAL_DIR` och
+`SWELECTIONS_TEST_CANONICAL_STAGE_DIR`. En full omparsning av rå-XML för
+varje variant är dessutom möjlig med `SWELECTIONS_TEST_CANONICAL_FULL_RAW=1`,
 men är ett separat långsamt test. För nollkompletterade distriktsvyer verifieras
 de fem normaliserade grundtabellerna per valtyp/nivå exakt; samma interna
 adapter körs sedan som på råvägen.

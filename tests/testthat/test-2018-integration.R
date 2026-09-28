@@ -1,6 +1,6 @@
 test_that("official 2018 XML, party register and candidacies agree", {
-  root <- Sys.getenv("VALRESULTAT_TEST_2018_DATA_DIR", unset = "")
-  skip_if(!nzchar(root), "Read-only 2018 integration needs VALRESULTAT_TEST_2018_DATA_DIR")
+  root <- swelections_test_env("2018_DATA_DIR")
+  skip_if(!nzchar(root), "Read-only 2018 integration needs SWELECTIONS_TEST_2018_DATA_DIR")
   zip <- file.path(root, "2018", "valresultat", "slutresultat.zip")
   expect_length(.xml2018_members(zip, "RD", "kommun"), 290L)
   expect_length(.xml2018_members(zip, "RF", "kommun"), 289L)

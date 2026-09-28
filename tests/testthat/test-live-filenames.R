@@ -14,7 +14,8 @@ test_that("live index paths with Val_2026 are used without prefix assumptions", 
   )
   index_file <- tempfile()
   writeLines(paste(md5, paste0("./", paths)), index_file)
-  old <- options(valresultat.resultatsamling_2026 = NULL)
+  old <- options(swelections.resultatsamling_2026 = NULL,
+                 valresultat.resultatsamling_2026 = NULL)
   on.exit(options(old), add = TRUE)
   expect_identical(.resultatsamling_2026(), "val2026")
   local_mocked_bindings(.resolve_val_file = function(path, ar, samling, ...) {
@@ -37,7 +38,7 @@ test_that("genrep collection remains an explicit configurable choice", {
   index_file <- tempfile()
   path <- "s/rd/Genrep_2026_slutlig_00_RD.zip"
   writeLines(paste(strrep("b", 32), paste0("./", path)), index_file)
-  old <- options(valresultat.resultatsamling_2026 = "genrep2026")
+  old <- options(swelections.resultatsamling_2026 = "genrep2026")
   on.exit(options(old), add = TRUE)
   local_mocked_bindings(.resolve_val_file = function(path, ar, samling, ...) {
     expect_identical(samling, "genrep2026")

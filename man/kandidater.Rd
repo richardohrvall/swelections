@@ -110,5 +110,5 @@ kandidater(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{
-\code{\link[=kandidaturer]{kandidaturer()}}, \code{\link[=valda]{valda()}}, \link{valresultat-package}
+\code{\link[=kandidaturer]{kandidaturer()}}, \code{\link[=valda]{valda()}}, \link{swelections-package}
 }

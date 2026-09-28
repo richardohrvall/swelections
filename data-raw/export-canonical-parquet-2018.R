@@ -11,7 +11,7 @@ if (identical(stage, out)) stop("Staging och output maste vara olika kataloger."
 pkgload::load_all(".", quiet = TRUE)
 if (!requireNamespace("nanoparquet", quietly = TRUE)) stop("Installera nanoparquet.")
 
-sha <- valresultat:::.canonical_sha256
+sha <- swelections:::.canonical_sha256
 source_manifest <- jsonlite::read_json(file.path(stage, "manifest.json"),
                                       simplifyVector = TRUE)
 assets <- list()
@@ -86,7 +86,7 @@ for (v in c("RD", "RF", "KF")) {
       data.frame(per_lista = c(FALSE, TRUE),
                  komplettera_nollor = c(FALSE, FALSE))
     views <- lapply(seq_len(nrow(flags)), function(i) {
-      x <- valresultat:::.xml2018_person_public(raw, area, kd_v, level,
+      x <- swelections:::.xml2018_person_public(raw, area, kd_v, level,
         flags$per_lista[[i]], flags$komplettera_nollor[[i]]) |>
         dplyr::arrange(.data$valtyp, .data$valomradeskod,
           .data$personvalsomradeskod, .data$partikod, .data$kandidatnummer,

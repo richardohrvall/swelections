@@ -1,4 +1,4 @@
-# valresultat 0.3.0.9000
+# swelections 0.3.0.9000
 
 * Completes final 2018 support in `kandidater()`, `valda()`, `ersattare()` and
   all four `personroster()` views using the official XML structures. The

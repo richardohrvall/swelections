@@ -1,11 +1,11 @@
 test_that("official 2022 candidacies preserve rows, validity and keys", {
-  root <- Sys.getenv("VALRESULTAT_TEST_KANDIDATURER_DATA_DIR")
-  zip <- Sys.getenv("VALRESULTAT_TEST_KANDIDATURER_2022_ZIP")
+  root <- swelections_test_env("KANDIDATURER_DATA_DIR")
+  zip <- swelections_test_env("KANDIDATURER_2022_ZIP")
   if (!nzchar(zip) && nzchar(root)) {
     zip <- file.path(root, "2022", "val2022", "parti", "kandidaturer.zip")
   }
   skip_if_not(file.exists(zip), "Official 2022 candidate ZIP not configured")
-  current <- Sys.getenv("VALRESULTAT_TEST_KANDIDATURER_2026_CSV")
+  current <- swelections_test_env("KANDIDATURER_2026_CSV")
   if (!nzchar(current) && nzchar(root)) {
     current <- file.path(root, "2026", "val2026", "parti", "kandidaturer.csv")
   }

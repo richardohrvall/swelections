@@ -1,7 +1,7 @@
 # Frivillig kontroll av alla 2022 års officiella mandat-ZIP. Råfiler läses
 # från extern fixturekatalog eller hämtas en och en till R:s temporära katalog.
 pkgload::load_all(".", quiet = TRUE)
-index <- valresultat:::parse_index_2026(readLines(
+index <- swelections:::parse_index_2026(readLines(
   "https://resultat.val.se/resultatfiler/val2022/index.md5", warn = FALSE
 ))
 index <- index[grepl("^[ps]/(rd|rf|kf)/Val_20220911_(preliminar|slutlig)_[0-9]{2,4}_(RD|RF|KF)\\.zip$",
@@ -20,9 +20,9 @@ check_one <- function(path, md5) {
                                 path), file, mode = "wb", quiet = TRUE)
   }
   stopifnot(identical(unname(tools::md5sum(file)), md5))
-  raw <- valresultat:::.read_valresultat_raw(file, "M", val, rakning, ar = 2022L)
-  seats <- valresultat:::parse_mandat_2026(raw)
-  vacant <- valresultat:::parse_tomma_stolar_2022(raw)
+  raw <- swelections:::.read_valresultat_raw(file, "M", val, rakning, ar = 2022L)
+  seats <- swelections:::parse_mandat_2026(raw)
+  vacant <- swelections:::parse_tomma_stolar_2022(raw)
   if (nrow(vacant)) {
     seats <- dplyr::left_join(seats, vacant,
       by = dplyr::join_by(valtyp, geografiniva, valomradeskod,
@@ -30,13 +30,13 @@ check_one <- function(path, md5) {
   } else {
     seats$antal_tomma_stolar <- NA_integer_
   }
-  public <- valresultat:::.mandat_public_2026(
-    valresultat:::.kort_kommunnamn_2026(seats), ar = 2022L
+  public <- swelections:::.mandat_public_2026(
+    swelections:::.kort_kommunnamn_2026(seats), ar = 2022L
   )
-  stopifnot(identical(names(seats), c(names(valresultat:::.mandat_schema_2026()),
+  stopifnot(identical(names(seats), c(names(swelections:::.mandat_schema_2026()),
                                       "antal_tomma_stolar")),
             identical(names(public),
-                      names(valresultat:::.mandat_public_schema_2026())),
+                      names(swelections:::.mandat_public_schema_2026())),
             identical(typeof(public$valar), "integer"),
             !anyDuplicated(public[c("valar", "valtyp", "rakningstillfalle",
                                     "geografiniva", "valomradeskod",

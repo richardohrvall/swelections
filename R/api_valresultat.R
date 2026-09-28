@@ -117,18 +117,18 @@
 #' `valomradeskod`, `valomradesnamn`, `valkretskod`, `valkretsnamn`; riket —
 #' inga ytterligare geografiska kolumner. `geografiniva` finns alltid.
 #'
-#' `data_dir` går före optionen `valresultat.data_dir`. Resultatsamlingen
-#' väljs med optionen `valresultat.resultatsamling_2026` (default `"val2026"`).
+#' `data_dir` går före optionen `swelections.data_dir`. Resultatsamlingen
+#' väljs med optionen `swelections.resultatsamling_2026` (default `"val2026"`).
 #' Test-/utvecklingssamlingen `"genrep2026"` kan väljas uttryckligen.
 #' För 2022 används `"val2022"` och vid behov optionen
-#' `valresultat.resultatsamling_2022`.
+#' `swelections.resultatsamling_2022`.
 #' `source = "local"` använder aldrig nätet. Lokal arkivering kopierar endast
 #' befintliga filer; en snapshot från samma datum får ersättas.
 #' @return En tibble i long format med ett nivåspecifikt publikt
 #'   kolumnkontrakt, `valar` som integer och unika val-/områdes-/partinycklar.
 #'   Inga mandat eller personröster ingår. `dplyr::bind_rows()` kan användas
 #'   för att skapa unionen av kolumner från flera nivåer.
-#' @seealso [mandat()], [valresultat-package]
+#' @seealso [mandat()], [swelections-package]
 #' @examples
 #' \dontrun{
 #' valresultat(val = "RD", source = "local", data_dir = "mitt_arkiv")

@@ -7,7 +7,7 @@ stopifnot(length(root) == 1L, dir.exists(root))
 blocked <- function(...) stop("Blocked network/archive access")
 testthat::local_mocked_bindings(
   download_val_file = blocked, archive_val_file = blocked,
-  val_remote_url = blocked, .package = "valresultat"
+  val_remote_url = blocked, .package = "swelections"
 )
 testthat::local_mocked_bindings(download.file = blocked, .package = "utils")
 

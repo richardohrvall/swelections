@@ -5,11 +5,11 @@ pkgload::load_all(".", quiet = TRUE)
 root <- commandArgs(trailingOnly = TRUE)[1]
 stopifnot(!is.na(root), dir.exists(root))
 options(valresultat.resultatsamling_2026 = "genrep2026", valresultat.data_dir = root)
-ns <- asNamespace("valresultat")
+ns <- asNamespace("swelections")
 run <- function() {
   blocked <- function(...) stop("BLOCKERAD: nat/skrift till raarkiv")
   testthat::local_mocked_bindings(download_val_file = blocked, archive_val_file = blocked,
-                                val_remote_url = blocked, .package = "valresultat")
+                                val_remote_url = blocked, .package = "swelections")
   testthat::local_mocked_bindings(download.file = blocked, .package = "utils")
   index <- .read_resultatindex_2026(source = "local", data_dir = root)
   local_root <- file.path(root, "2026", "genrep2026")
@@ -58,7 +58,7 @@ run <- function() {
             .read_valresultat_raw = function(file, kalla, val, rakning) {
               stopifnot(identical(normalizePath(file), normalizePath(file.path(local_root, path))))
               raw
-            }, .package = "valresultat")
+            }, .package = "swelections")
           valresultat(val = val, niva = niva, source = "local", data_dir = root, progress = FALSE)
         }), error = identity)
         if (inherits(api, "error")) {

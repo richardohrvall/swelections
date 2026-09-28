@@ -72,5 +72,5 @@ kandidaturer(fran = 2022, till = 2026, val = "RF")
 }
 }
 \seealso{
-\code{\link[=kandidater]{kandidater()}}, \link{valresultat-package}
+\code{\link[=kandidater]{kandidater()}}, \link{swelections-package}
 }

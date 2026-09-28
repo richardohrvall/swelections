@@ -56,7 +56,7 @@ test_that("candidate CSV and result index use local archival", {
   )
   expect_true(file.exists(val_archive_path("parti/kandidaturer.csv", 2026, "val2026", root)))
 
-  old <- options(valresultat.resultatsamling_2026 = "test")
+  old <- options(swelections.resultatsamling_2026 = "test")
   on.exit(options(old), add = TRUE)
   dir.create(file.path(root, "2026", "test"), recursive = TRUE)
   md5 <- paste(rep("a", 32), collapse = "")

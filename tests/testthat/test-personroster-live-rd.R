@@ -1,10 +1,10 @@
 test_that("complete final RD 2026 has no artificial person-vote NA", {
-  data_dir <- Sys.getenv("VALRESULTAT_TEST_RD_DATA_DIR", "")
+  data_dir <- swelections_test_env("RD_DATA_DIR")
   skip_if(!nzchar(data_dir),
-          "Read-only RD integration test requires VALRESULTAT_TEST_RD_DATA_DIR")
-  old_option <- getOption("valresultat.resultatsamling_2026")
-  options(valresultat.resultatsamling_2026 = "val2026")
-  on.exit(options(valresultat.resultatsamling_2026 = old_option), add = TRUE)
+          "Read-only RD integration test requires SWELECTIONS_TEST_RD_DATA_DIR")
+  old_option <- getOption("swelections.resultatsamling_2026")
+  options(swelections.resultatsamling_2026 = "val2026")
+  on.exit(options(swelections.resultatsamling_2026 = old_option), add = TRUE)
 
   area <- personroster(val = "RD", source = "local", data_dir = data_dir,
                        progress = FALSE)

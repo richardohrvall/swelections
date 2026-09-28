@@ -78,5 +78,5 @@ mandat(fran = 2022, till = 2026, val = "KF", niva = "kommun")
 }
 }
 \seealso{
-\code{\link[=valda]{valda()}}, \code{\link[=ersattare]{ersattare()}}, \link{valresultat-package}
+\code{\link[=valda]{valda()}}, \code{\link[=ersattare]{ersattare()}}, \link{swelections-package}
 }

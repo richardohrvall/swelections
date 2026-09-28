@@ -6,7 +6,7 @@ stopifnot(!is.na(root), dir.exists(root))
 main <- function() {
   blocked <- function(...) stop("Blocked network/archive access")
   testthat::local_mocked_bindings(download_val_file = blocked, archive_val_file = blocked,
-    val_remote_url = blocked, .package = "valresultat")
+    val_remote_url = blocked, .package = "swelections")
   testthat::local_mocked_bindings(download.file = blocked, .package = "utils")
   paths <- list.files(file.path(root, "2026/genrep2026"), "\\.zip$", recursive = TRUE)
   files <- file.path(root, "2026/genrep2026", paths)
@@ -40,7 +40,7 @@ main <- function() {
       old_reader <- read_raw_json_zip_2026
       testthat::local_mocked_bindings(read_raw_json_zip_2026 = function(zip_file, type) {
         if (type == "rostfordelning") raw else old_reader(zip_file, type)
-      }, .package = "valresultat")
+      }, .package = "swelections")
       .parse_kandidatresultat_fil_2026(path, val, source = "local", data_dir = root)
     })
     stopifnot(identical(file_step$personroster_status, u$status), identical(file_step$personroster, u$roster))

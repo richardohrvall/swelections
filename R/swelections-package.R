@@ -4,12 +4,12 @@
 #' mandat och ersättarrelationer för valet 2026 med bland annat
 #' [valresultat()] och [personroster()].
 #' Resultatfiler väljs via `index.md5`. Optionen
-#' `valresultat.resultatsamling_2026` väljer resultatsamling och har för närvarande
+#' `swelections.resultatsamling_2026` väljer resultatsamling och har för närvarande
 #' standardvärdet `"val2026"`. Test-/utvecklingssamlingen `"genrep2026"` kan
 #' väljas uttryckligen.
 #'
 #' En lokal rådatamapp anges med `data_dir` eller optionen
-#' `valresultat.data_dir`. Explicit `data_dir` har företräde.
+#' `swelections.data_dir`. Explicit `data_dir` har företräde.
 #' Med `source = "auto"` används en befintlig lokal fil, annars fjärrkällan.
 #' Med `source = "local"` krävs en befintlig lokal fil och nätåtkomst används aldrig.
 #' Med `source = "remote"` används fjärrkällan vid vanlig läsning.

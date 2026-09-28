@@ -156,11 +156,11 @@ läns- och kommunidentitet samt \code{kommunvalkretskod},
 \code{valomradeskod}, \code{valomradesnamn}, \code{valkretskod}, \code{valkretsnamn}; riket —
 inga ytterligare geografiska kolumner. \code{geografiniva} finns alltid.
 
-\code{data_dir} går före optionen \code{valresultat.data_dir}. Resultatsamlingen
-väljs med optionen \code{valresultat.resultatsamling_2026} (default \code{"val2026"}).
+\code{data_dir} går före optionen \code{swelections.data_dir}. Resultatsamlingen
+väljs med optionen \code{swelections.resultatsamling_2026} (default \code{"val2026"}).
 Test-/utvecklingssamlingen \code{"genrep2026"} kan väljas uttryckligen.
 För 2022 används \code{"val2022"} och vid behov optionen
-\code{valresultat.resultatsamling_2022}.
+\code{swelections.resultatsamling_2022}.
 \code{source = "local"} använder aldrig nätet. Lokal arkivering kopierar endast
 befintliga filer; en snapshot från samma datum får ersättas.
 }
@@ -174,5 +174,5 @@ valresultat(fran = 2010, till = 2026, val = "RD", niva = "riket")
 }
 }
 \seealso{
-\code{\link[=mandat]{mandat()}}, \link{valresultat-package}
+\code{\link[=mandat]{mandat()}}, \link{swelections-package}
 }

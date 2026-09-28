@@ -39,7 +39,7 @@
 #' ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' ersattare(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [valda()], [mandat()], [valresultat-package]
+#' @seealso [valda()], [mandat()], [swelections-package]
 #' @export
 ersattare <- function(
     ar = 2026,

@@ -3,7 +3,7 @@
 # Kör från repots rot med ett installerat/på PATH tillgängligt R och nätåtkomst.
 pkgload::load_all(".", quiet = TRUE)
 index_url <- "https://resultat.val.se/resultatfiler/val2022/index.md5"
-index <- valresultat:::parse_index_2026(readLines(index_url, warn = FALSE))
+index <- swelections:::parse_index_2026(readLines(index_url, warn = FALSE))
 pattern <- "^[ps]/(rd|rf|kf)/Val_20220911_(preliminar|slutlig)_[0-9]{2,4}_(RD|RF|KF)\\.zip$"
 index <- index[grepl(pattern, index$path), , drop = FALSE]
 stopifnot(nrow(index) == 622L, !anyDuplicated(index$path), !anyNA(index$md5))
@@ -31,7 +31,7 @@ check_file <- function(path, md5) {
   if (!identical(unname(tools::md5sum(file)), md5)) {
     stop("MD5 stämmer inte: ", path)
   }
-  raw_d <- valresultat:::.read_valresultat_raw(
+  raw_d <- swelections:::.read_valresultat_raw(
     file, "D", val, rakning, distrikt_context = TRUE, ar = 2022L
   )
   raw_m <- attr(raw_d, "valresultat_distrikt_context")$mandat
@@ -39,13 +39,13 @@ check_file <- function(path, md5) {
                    RF = c("region", "regionvalkrets"),
                    KF = c("kommun", "kommunvalkrets"))
   parse_public <- function(raw, kalla, niva) {
-    internal <- valresultat:::.parse_valresultat(raw, kalla, val, niva, rakning, path)
-    stopifnot(identical(names(internal), names(valresultat:::.valresultat_schema())))
-    public <- valresultat:::.valresultat_public_2026(internal, niva, raw, ar = 2022L)
-    stopifnot(identical(names(public), valresultat:::.valresultat_public_columns_2026(niva)),
+    internal <- swelections:::.parse_valresultat(raw, kalla, val, niva, rakning, path)
+    stopifnot(identical(names(internal), names(swelections:::.valresultat_schema())))
+    public <- swelections:::.valresultat_public_2026(internal, niva, raw, ar = 2022L)
+    stopifnot(identical(names(public), swelections:::.valresultat_public_columns_2026(niva)),
               identical(typeof(public$valar), "integer"),
               !any(vapply(public, is.list, logical(1))))
-    valresultat:::.valresultat_check_key(public, niva)
+    swelections:::.valresultat_check_key(public, niva)
     public
   }
   d <- parse_public(raw_d, "D", "valdistrikt")

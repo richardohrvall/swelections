@@ -20,7 +20,7 @@ test_that("2022 support matrix contains only official D and M nodes", {
 test_that("2022 source selection follows index paths and local never downloads", {
   root <- tempfile()
   on.exit(unlink(root, recursive = TRUE), add = TRUE)
-  old <- options(valresultat.resultatsamling_2022 = "val2022")
+  old <- options(swelections.resultatsamling_2022 = "val2022")
   on.exit(options(old), add = TRUE)
   path <- "s/rd/Val_20220911_slutlig_00_RD.zip"
   index_path <- val_local_path("index.md5", 2022, "val2022", root)

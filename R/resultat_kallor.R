@@ -2,7 +2,8 @@
 # de faktiska filnamnen; varken valdag eller filprefix byggs in i sökvägen.
 .resultatsamling <- function(ar) {
   if (ar == 2026) return(.resultatsamling_2026())
-  getOption("valresultat.resultatsamling_2022", "val2022")
+  getOption("swelections.resultatsamling_2022",
+            getOption("valresultat.resultatsamling_2022", "val2022"))
 }
 
 .read_resultatindex <- function(ar, source, data_dir, update, archive) {

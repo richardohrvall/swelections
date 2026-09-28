@@ -1,6 +1,6 @@
 # Frivillig read-only-kontroll mot explicita tomma stolar i officiella 2026-filer.
 pkgload::load_all(".", quiet = TRUE)
-index <- valresultat:::parse_index_2026(readLines(
+index <- swelections:::parse_index_2026(readLines(
   "https://resultat.val.se/resultatfiler/val2026/index.md5", warn = FALSE
 ))
 index <- index[grepl("^s/(rd|rf|kf)/[^/]+_slutlig_[0-9]{2,4}_(RD|RF|KF)\\.zip$",
@@ -11,7 +11,7 @@ check_one <- function(path, md5) {
   utils::download.file(paste0("https://resultat.val.se/resultatfiler/val2026/",
                               path), file, mode = "wb", quiet = TRUE)
   stopifnot(identical(unname(tools::md5sum(file)), md5))
-  raw <- valresultat:::read_raw_json_zip_2026(file, "mandatfordelning")
+  raw <- swelections:::read_raw_json_zip_2026(file, "mandatfordelning")
   nodes <- c(list(raw$valomrade), raw$valomrade$valkretsLista)
   compared <- mismatch <- 0L
   for (node in nodes) {

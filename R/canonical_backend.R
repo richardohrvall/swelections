@@ -49,7 +49,7 @@
     stop("Ange exakt ett kanoniskt asset.", call. = FALSE)
   entry <- manifest$assets[manifest$assets$asset == asset, , drop = FALSE]
   if (nrow(entry) != 1L) stop("Unknown canonical asset: ", asset, call. = FALSE)
-  if (is.null(cache_dir)) cache_dir <- tools::R_user_dir("valresultat", "cache")
+  if (is.null(cache_dir)) cache_dir <- tools::R_user_dir("swelections", "cache")
   root <- file.path(cache_dir, manifest$data_version, asset,
                     substr(entry$sha256, 1L, 16L))
   path <- file.path(root, entry$file)

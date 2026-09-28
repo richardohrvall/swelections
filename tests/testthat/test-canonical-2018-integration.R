@@ -1,8 +1,8 @@
 test_that("canonical RKL 2018 reproduces raw public tables", {
-  skip_if(Sys.getenv("VALRESULTAT_TEST_CANONICAL_FULL_RAW") != "1",
+  skip_if(swelections_test_env("CANONICAL_FULL_RAW") != "1",
           "Full raw XML sweep is opt-in because it reparses large files")
-  build <- Sys.getenv("VALRESULTAT_TEST_CANONICAL_DIR")
-  root <- Sys.getenv("VALRESULTAT_TEST_2018_DATA_DIR")
+  build <- swelections_test_env("CANONICAL_DIR")
+  root <- swelections_test_env("2018_DATA_DIR")
   skip_if(!nzchar(build) || !nzchar(root),
           "Read-only canonical integration needs build and raw archive")
   skip_if_not_installed("nanoparquet")
@@ -91,8 +91,8 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
 })
 
 test_that("canonical RKL 2018 reproduces all staged raw-path outputs", {
-  build <- Sys.getenv("VALRESULTAT_TEST_CANONICAL_DIR")
-  stage <- Sys.getenv("VALRESULTAT_TEST_CANONICAL_STAGE_DIR")
+  build <- swelections_test_env("CANONICAL_DIR")
+  stage <- swelections_test_env("CANONICAL_STAGE_DIR")
   skip_if(!nzchar(build) || !nzchar(stage),
           "Read-only canonical integration needs assets and raw-path stage")
   skip_if_not_installed("nanoparquet")

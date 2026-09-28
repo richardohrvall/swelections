@@ -102,7 +102,7 @@
 #'   dplyr::select(kandidatnummer, listnummer, antal_personroster)
 #' personroster(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidater()], [kandidaturer()], [valresultat-package]
+#' @seealso [kandidater()], [kandidaturer()], [swelections-package]
 #' @export
 personroster <- function(
     ar = 2026,

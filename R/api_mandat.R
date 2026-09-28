@@ -85,7 +85,7 @@
 #' mandat(ar = "alla", val = "RF", niva = "region")
 #' mandat(fran = 2022, till = 2026, val = "KF", niva = "kommun")
 #' }
-#' @seealso [valda()], [ersattare()], [valresultat-package]
+#' @seealso [valda()], [ersattare()], [swelections-package]
 #' @export
 mandat <- function(
     ar = 2026,

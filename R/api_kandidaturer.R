@@ -45,7 +45,7 @@
 #' kandidaturer(ar = "alla", val = "RD")
 #' kandidaturer(fran = 2022, till = 2026, val = "RF")
 #' }
-#' @seealso [kandidater()], [valresultat-package]
+#' @seealso [kandidater()], [swelections-package]
 #' @export
 kandidaturer <- function(
     ar = 2026,

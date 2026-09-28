@@ -1,4 +1,4 @@
 library(testthat)
-library(valresultat)
+library(swelections)
 
-test_check("valresultat")
+test_check("swelections")

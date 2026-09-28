@@ -10,7 +10,7 @@ root <- normalizePath(args[[1]], mustWork = TRUE)
 candidate <- normalizePath(args[[2]], mustWork = TRUE)
 pkgload::load_all(".", quiet = TRUE)
 
-sha <- valresultat:::.canonical_sha256
+sha <- swelections:::.canonical_sha256
 result_file <- file.path(root, "2018", "valresultat", "slutresultat.zip")
 party_file <- file.path(root, "2018", "valresultat", "deltagande_partier.skv")
 for (file in c(result_file, party_file, candidate))
@@ -26,7 +26,7 @@ if (!identical(tolower(unname(tools::md5sum(candidate))),
 # outside the repository, then remove them after the build.
 build <- function() {
 temp_root <- normalizePath(tempdir(), winslash = "/", mustWork = TRUE)
-stage <- tempfile("valresultat-canonical-stage-", tmpdir = temp_root)
+stage <- tempfile("swelections-canonical-stage-", tmpdir = temp_root)
 if (!startsWith(normalizePath(stage, winslash = "/", mustWork = FALSE),
                 paste0(temp_root, "/")))
   stop("Temporar byggrot ligger utanfor systemets tempkatalog.")
@@ -77,7 +77,8 @@ save_asset <- function(object, name, surfaces) {
              stringsAsFactors = FALSE)
 }
 entries <- list()
-resume <- identical(Sys.getenv("VALRESULTAT_CANONICAL_RESUME"), "1")
+resume <- identical(Sys.getenv("SWELECTIONS_CANONICAL_RESUME",
+                               unset = Sys.getenv("VALRESULTAT_CANONICAL_RESUME")), "1")
 existing_entry <- function(name, surfaces) {
   path <- file.path(outdir, paste0(name, ".rds"))
   readRDS(path) # A truncated or invalid RDS is never accepted on resume.
@@ -149,9 +150,9 @@ for (v in values) {
   }
   kd <- kandidaturer(ar = 2018L, val = v, source = "local", data_dir = stage,
                     archive = FALSE)
-  area <- valresultat:::.xml2018_person_las(v, "personvalsomrade", kd,
+  area <- swelections:::.xml2018_person_las(v, "personvalsomrade", kd,
     "local", stage, FALSE, FALSE, FALSE)
-  district <- valresultat:::.xml2018_person_las(v, "valdistrikt", kd,
+  district <- swelections:::.xml2018_person_las(v, "valdistrikt", kd,
     "local", stage, FALSE, FALSE, FALSE)
   entries[[length(entries) + 1L]] <- save_asset(area,
     area_name, "personroster")

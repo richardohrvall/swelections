@@ -138,5 +138,5 @@ personroster(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{
-\code{\link[=kandidater]{kandidater()}}, \code{\link[=kandidaturer]{kandidaturer()}}, \link{valresultat-package}
+\code{\link[=kandidater]{kandidater()}}, \code{\link[=kandidaturer]{kandidaturer()}}, \link{swelections-package}
 }
