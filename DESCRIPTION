@@ -25,6 +25,7 @@ Imports:
     tools,
     utils
 Suggests:
+    nanoparquet,
     roxygen2,
     testthat (>= 3.2.0)
 Config/testthat/edition: 3
