@@ -12,7 +12,8 @@ kandidaturer(
   update = FALSE,
   archive = FALSE,
   fran = NULL,
-  till = NULL
+  till = NULL,
+  names = "sv"
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 
 \item{fran, till}{Inklusiva gränser bland stödda valår, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
+
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
 }
 \value{
 En tibble där en rad är en källrad för en kandidatur eller
@@ -72,5 +75,5 @@ kandidaturer(fran = 2022, till = 2026, val = "RF")
 }
 }
 \seealso{
-\code{\link[=kandidater]{kandidater()}}, \link{swelections-package}
+\code{\link[=candidacies]{candidacies()}}, \code{\link[=kandidater]{kandidater()}}, \link{swelections-package}
 }

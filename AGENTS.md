@@ -35,16 +35,23 @@ The package is intended to be analysis-friendly for researchers and other users.
 - Package code is in R.
 - Use `snake_case`.
 - The canonical public data schema uses English column names.
-- English is the default naming language for the future public package API.
-- Swedish column names may be exposed through an explicit translation layer in R, for example through a function argument or package option.
-- Do not mechanically rename existing public columns or functions unless the task explicitly includes an approved schema/API migration.
-- Existing Swedish public functions may remain as aliases when English API names are introduced.
-- Internal parsing and build code may retain source-oriented or existing Swedish names where that reduces unnecessary churn; translate systematically at the canonical/public boundary.
-- Language-dependent data values should be stored explicitly where relevant, for example `party_name_sv` and `party_name_en`, rather than changing values according to a global language setting.
+- The public package API is English-first.
+- Swedish public function names are retained as supported wrappers/aliases.
+- Output column names may be selected explicitly with `names = "en"` or `names = "sv"`.
+- The English API defaults to English column names.
+- Existing Swedish API functions default to Swedish column names for backwards compatibility.
+- `options(swelections.names = "sv")` may be used to set Swedish column names as the default for the English API.
+- A per-call `names` argument overrides the package option.
+- Function/API language and output-column language are separate concerns.
+- Language selection for column names must not translate data values.
+- Language-dependent data values should be stored explicitly where relevant, for example `party_name_sv` and `party_name_en`.
 - Use an English party name only when an established English name is available; otherwise use `NA`. Do not invent translations.
+- Internal parsing and build code may retain source-oriented or existing Swedish names where that reduces unnecessary churn; translate systematically at the canonical/public boundary.
+- Do not mechanically rename existing internal/source-oriented columns unless the task explicitly includes an approved migration.
 - Identifiers and codes must retain leading zeroes and should use stable types.
 - Preserve the distinction between `NA`, zero and `FALSE`.
 - Prefer compact, descriptive names and stable semantics over literal translations of source-field names.
+- In the English public API and documentation, use the established term `preference vote(s)` for Swedish `personröst(er)`. Retain source-oriented Swedish identifiers such as `personroster` internally where appropriate; do not mechanically rename raw/source structures.
 
 ## R style
 
@@ -79,6 +86,7 @@ Canonical data are a public, language-independent data product, not merely an in
 - Canonical public column names use English `snake_case`.
 - Canonical assets must be usable independently of the R package, including from tools such as Python, DuckDB and Polars.
 - The R package may translate canonical English names to Swedish names as an explicit presentation/API layer; this must not change the stored canonical schema.
+- Canonical English column names are the source of truth; Swedish output names belong to the R API translation layer and are not stored as a second canonical schema.
 - Preserve stable observation units, identifiers, types, keys and missing-value semantics.
 - Do not inflate sparse structures unnecessarily. For example, small normalised person-vote bases may be preferable to storing national zero-filled panels when equivalent analysis views can be reconstructed deterministically.
 - Do not include raw source files in the Git repository or canonical release assets.
@@ -93,7 +101,9 @@ Canonical data are a public, language-independent data product, not merely an in
 
 ## Core data model
 
-### `valresultat`
+The headings below describe conceptual tables. Existing Swedish internal/source-oriented identifiers may remain until an explicitly approved schema migration; English public views should use the central naming translation layer.
+
+### Election results (`valresultat`)
 
 One row represents:
 
@@ -105,19 +115,19 @@ The same general schema should work for preliminary and final results where poss
 
 Use `rakningstillfalle` to distinguish preliminary and final counting.
 
-### `mandat`
+### Seats (`mandat`)
 
 Keep mandate data separate from `valresultat` because the observation level differs.
 
 `antal_tomma_stolar` belongs in `mandat`, not in candidate data.
 
-### `valdistriktskoppling`
+### District linkage (`valdistriktskoppling`)
 
 Connections between current and previous election districts belong in a separate helper table.
 
 Do not place list-valued previous-district links in `valresultat`.
 
-### `kandidaturer`
+### Candidacies (`kandidaturer`)
 
 Detailed source-oriented data about how a person stands for election.
 
@@ -134,7 +144,7 @@ Keep information such as:
 
 Preserve invalid candidacies in `kandidaturer`.
 
-### `kandidater`
+### Candidates (`kandidater`)
 
 Analysis-friendly candidate table.
 
@@ -158,8 +168,8 @@ It may contain analysis-friendly summaries such as:
 - number of constituencies
 - number of lists
 - indicators for multiple parties/levels
-- total personal votes
-- qualification for personal election
+- total preference votes
+- qualification through preference votes
 - elected status
 - elected constituency
 - order of election
@@ -179,11 +189,11 @@ For the analysis-facing `kandidater` table:
 - do not replace aliases/joke names with guessed legal names
 - if several normalised names remain, use a deterministic rule and retain `namn_varierar`
 
-### `valda()`
+### Elected candidates (`valda()`)
 
 `valda()` should be a convenient filtered view of `kandidater()` where `invald == TRUE`, not a separately maintained candidate dataset.
 
-### `ersattare`
+### Substitutes (`ersattare`)
 
 Substitute relationships are sufficiently special to have their own table.
 
@@ -196,9 +206,11 @@ Preserve the relation between:
 
 Do not reduce this to a simple `ersattare = TRUE` flag in `kandidater`, because that would lose the relationship structure.
 
-## Person votes
+## Preference votes
 
-Final vote-distribution files contain three useful levels:
+In English public API names and documentation, use **preference votes** for Swedish *personröster*. Existing source-oriented/internal Swedish identifiers may remain unchanged.
+
+Final vote-distribution files contain three useful source-oriented levels:
 - `listroster`
 - `personroster`
 - `personroster_summerade`
@@ -207,17 +219,19 @@ Keep all three for now.
 
 Interpretation:
 - `listroster`: list-level votes
-- `personroster`: candidate × list × district
-- `personroster_summerade`: candidate × district, summed over lists
+- `personroster`: candidate × list × district preference votes
+- `personroster_summerade`: candidate × district preference votes, summed over lists
 
 `personroster_summerade` is useful both analytically and for validation.
 
-In `kandidater`, use:
-- `antal_personroster_totalt` for total personal votes summed over relevant detailed result rows
+The public English analysis-facing function is `preference_votes()`. The existing Swedish equivalent `personroster()` remains fully supported. Both must use the same underlying implementation and the common `names = "en"` / `names = "sv"` mechanism. `preference_votes()` defaults to English column names; `personroster()` defaults to Swedish column names.
+
+In the current Swedish/internal `kandidater` schema, use:
+- `antal_personroster_totalt` for total preference votes summed over relevant detailed result rows
 - `kvalificerad_personval`
 - `antal_personvalsomraden`
 
-Do not insert a single ambiguous `andel_personroster` into `kandidater` when the percentage is constituency-specific.
+Do not insert a single ambiguous `andel_personroster` into `kandidater` when the percentage is constituency-specific. The eventual English public names for these fields must come from the central approved naming map, not ad-hoc renaming.
 
 ## Missing versus false
 
@@ -281,7 +295,7 @@ Preliminary results:
 
 Final results:
 - contain all parties individually
-- may contain list votes, personal votes, elected members and substitutes
+- may contain list votes, preference votes, elected members and substitutes
 
 Extra final-only structures should be parsed into separate tables rather than forced into `valresultat`.
 
@@ -368,10 +382,10 @@ Important invariants already used during development include:
 - when elected-member data are available, elected candidates should match valid candidate data in live production files
 - genrep/test data may contain known inconsistencies; do not distort production logic merely to make genrep internally perfect
 
-### Person votes
-- within a list, candidate personal votes should sum to `antal_roster_med_personrost`
-- candidate person votes summed over lists should match Valmyndigheten's `personroster_summerade`
-- candidates elected on personal votes should be marked as qualified for personal election when qualification data are available
+### Preference votes
+- within a list, candidate preference votes should sum to `antal_roster_med_personrost`
+- candidate preference votes summed over lists should match Valmyndigheten's `personroster_summerade`
+- candidates elected via preference votes should be marked as qualified through preference votes when qualification data are available
 
 
 ### Canonical data
@@ -399,32 +413,79 @@ It is intentionally messy and may contain temporary objects, manual checks and o
 Do not treat it as production code or user documentation, and do not refactor or clean it unless explicitly requested. 
 Stable logic belongs in R/ and stable checks in tests/testthat/.
 
-## Public API direction
+## Public API
 
-The package is moving toward an English-first public API under the package name `swelections`.
+`swelections` uses an English-first public API.
 
-Existing Swedish public functions include:
+Primary English public functions and their supported Swedish equivalents are:
 
-- `valresultat()`
-- `mandat()`
-- `kandidaturer()`
-- `kandidater()`
-- `valda()`
-- `ersattare()`
+- `results()` — `valresultat()`
+- `seats()` — `mandat()`
+- `candidacies()` — `kandidaturer()`
+- `candidates()` — `kandidater()`
+- `elected()` — `valda()`
+- `substitutes()` — `ersattare()`
+- `preference_votes()` — `personroster()`
 
-Do not remove or rename these functions silently.
+The Swedish functions are supported public wrappers/aliases and must preserve their existing behaviour. Do not remove or deprecate them without an explicit later decision.
 
-Future work may introduce English primary names with the Swedish functions retained as aliases. Exact English function names, deprecation policy and migration details require an explicit API decision before implementation.
+Use `preference_votes()` rather than `personal_votes()` as the English public name for Swedish `personroster()`. In English documentation and public column names, prefer `preference_vote`/`preference_votes` terminology where semantically appropriate.
 
-Canonical public datasets use English column names. The R API may offer Swedish column names through an explicit naming-language mechanism, potentially both through a per-call argument and a package option. Do not implement or change that mechanism unless explicitly requested.
+The English functions use English argument names and English argument values where appropriate. Keep official election codes `RD`, `RF` and `KF` unchanged.
 
-Language selection for column names must not silently translate data values. Multilingual values, such as party names, should use explicit fields such as `party_name_sv` and `party_name_en`.
+Core argument mappings include:
 
-For candidate functions:
-- `val = NULL` means all political levels
-- valid election types are `RD`, `RF`, `KF`
+- `year` ↔ `ar`
+- `election` ↔ `val`
+- `count` ↔ `rakning`
+- `level` ↔ `niva`
+- `include_results` ↔ `resultat`
+- `from` ↔ `fran`
+- `to` ↔ `till`
+- `by_list` ↔ `per_lista`
+- `include_zeros` ↔ `komplettera_nollor`
 
-Do not silently change public defaults or argument meanings.
+Use systematic mappings for argument values rather than scattered ad-hoc translations. Examples include:
+
+- `final` ↔ `slutlig`
+- `preliminary` ↔ `preliminar`
+- `district` ↔ `valdistrikt`
+- `municipality` ↔ `kommun`
+- `municipal_constituency` ↔ `kommunvalkrets`
+- `county` ↔ `lan`
+- `region` ↔ `region`
+- `parliamentary_constituency` ↔ `riksdagsvalkrets`
+- `regional_constituency` ↔ `regionvalkrets`
+- `national` ↔ `riket`
+
+Do not duplicate parsing or data-processing logic between the English and Swedish APIs. Both interfaces should use the same underlying implementation.
+
+### Output column names
+
+Public analysis-facing functions support:
+
+- `names = "en"` for English column names
+- `names = "sv"` for Swedish column names
+
+The English API defaults to English column names. Existing Swedish API functions default to Swedish column names for backwards compatibility.
+
+For the English API, the package-wide default may be set with:
+
+`options(swelections.names = "sv")`
+
+A per-call `names` argument overrides the package option.
+
+Language selection for column names must not alter actual data values. Multilingual values such as party names must be represented in explicit fields such as `party_name_sv` and `party_name_en`.
+
+For candidate functions and related year-range queries:
+- the English API uses `election = NULL` to mean all political levels
+- the Swedish API retains `val = NULL`
+- valid election-type codes are `RD`, `RF`, `KF`
+- `from` and `to` refer to the first and last election year where those arguments are supported
+
+Do not silently change existing Swedish defaults or argument meanings.
+
+Likely future functions may include status/mandate-period helpers. New public functions should follow the English-first API principle unless explicitly decided otherwise.
 
 ## Package development
 

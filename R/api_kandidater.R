@@ -44,6 +44,7 @@
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator vid läsning av resultatfiler.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
 #'
 #' @return En tibble med en rad per `kandidatnummer`, `valtyp` och `partikod`,
 #'   byggd från giltiga kandidaturer. Namn normaliseras deterministiskt och
@@ -78,7 +79,7 @@
 #' kandidater(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' kandidater(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidaturer()], [valda()], [swelections-package]
+#' @seealso [candidates()], [kandidaturer()], [valda()], [swelections-package]
 #' @export
 kandidater <- function(
     ar = 2026,
@@ -90,8 +91,10 @@ kandidater <- function(
     archive = FALSE,
     progress = interactive(),
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   val <- .valtyper(val)
   valar <- .resolve_valar(ar, fran, till, "kandidater",
@@ -109,7 +112,7 @@ kandidater <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
@@ -217,7 +220,7 @@ kandidater <- function(
 #' valda(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' valda(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidater()], [ersattare()], [swelections-package]
+#' @seealso [elected()], [kandidater()], [ersattare()], [swelections-package]
 #' @export
 valda <- function(
     ar = 2026,
@@ -228,8 +231,10 @@ valda <- function(
     archive = FALSE,
     progress = interactive(),
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   val <- .valtyper(val)
   val <- if (is.null(val)) c("RD", "RF", "KF") else val
@@ -249,5 +254,5 @@ valda <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }

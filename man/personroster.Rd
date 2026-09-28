@@ -16,7 +16,8 @@ personroster(
   per_lista = FALSE,
   komplettera_nollor = FALSE,
   fran = NULL,
-  till = NULL
+  till = NULL,
+  names = "sv"
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ utan lista ändras inte resultatet. Standard är \code{FALSE}.}
 
 \item{fran, till}{Inklusiva årsgränser bland stödda år, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
+
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
 }
 \value{
 En tibble med en rad per giltig kandidat, parti och
@@ -138,5 +141,5 @@ personroster(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{
-\code{\link[=kandidater]{kandidater()}}, \code{\link[=kandidaturer]{kandidaturer()}}, \link{swelections-package}
+\code{\link[=preference_votes]{preference_votes()}}, \code{\link[=kandidater]{kandidater()}}, \code{\link[=kandidaturer]{kandidaturer()}}, \link{swelections-package}
 }

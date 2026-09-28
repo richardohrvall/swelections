@@ -13,7 +13,8 @@ ersattare(
   archive = FALSE,
   progress = interactive(),
   fran = NULL,
-  till = NULL
+  till = NULL,
+  names = "sv"
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 
 \item{fran, till}{Inklusiva årsgränser bland stödda år, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
+
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
 }
 \value{
 En tibble där en rad är relationen mellan en vald ledamot och en
@@ -68,5 +71,5 @@ ersattare(ar = c(2022, 2026), val = "RD")
 }
 }
 \seealso{
-\code{\link[=valda]{valda()}}, \code{\link[=mandat]{mandat()}}, \link{swelections-package}
+\code{\link[=substitutes]{substitutes()}}, \code{\link[=valda]{valda()}}, \code{\link[=mandat]{mandat()}}, \link{swelections-package}
 }

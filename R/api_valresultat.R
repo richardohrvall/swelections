@@ -16,6 +16,8 @@
 #' @param rakning Exakt en räkning: `"slutlig"` (default) eller `"preliminar"`.
 #' @param niva En geografisk nivå. `NULL` ger valets huvudnivå: RD `"riket"`,
 #'   RF `"region"`, KF `"kommun"`. Se nivåerna nedan.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#'   Endast kolumnnamn ändras; datavärden och typer bevaras.
 #' @inheritParams mandat
 #'
 #' @details
@@ -128,7 +130,7 @@
 #'   kolumnkontrakt, `valar` som integer och unika val-/områdes-/partinycklar.
 #'   Inga mandat eller personröster ingår. `dplyr::bind_rows()` kan användas
 #'   för att skapa unionen av kolumner från flera nivåer.
-#' @seealso [mandat()], [swelections-package]
+#' @seealso [results()], [mandat()], [swelections-package]
 #' @examples
 #' \dontrun{
 #' valresultat(val = "RD", source = "local", data_dir = "mitt_arkiv")
@@ -142,8 +144,9 @@ valresultat <- function(
     ar = 2026, val = "RD", rakning = c("slutlig", "preliminar"),
     niva = NULL, source = c("auto", "local", "remote"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    fran = NULL, till = NULL
+    fran = NULL, till = NULL, names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   .check_text(val, "val")
   val <- toupper(val)
@@ -181,7 +184,7 @@ valresultat <- function(
                          update, archive, progress),
       error = function(e) stop("Val\u00e5r ", ar, ": ", conditionMessage(e), call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,

@@ -20,7 +20,7 @@ test_that("valda year selections retain exact-year order and long format", {
                    dplyr::bind_rows(a, b))
   expect_identical(names(a)[1:2], c("valtillfalle", "valar"))
   expect_type(a$valar, "integer")
-  expect_identical(tail(names(formals(valda)), 2), c("fran", "till"))
+  expect_identical(tail(names(formals(valda)), 3), c("fran", "till", "names"))
   expect_false("rakning" %in% names(formals(valda)))
 })
 

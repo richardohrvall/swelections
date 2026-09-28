@@ -1,5 +1,11 @@
 # swelections 0.3.0.9000
 
+* Adds English-first `results()`, `seats()`, `candidacies()`, `candidates()`,
+  `elected()`, `substitutes()` and `preference_votes()` while retaining the Swedish API. Public R
+  output column names can be selected with `names = "en"` or `"sv"`; English
+  calls also honour `options(swelections.names = "sv")`. Data values and
+  canonical assets are unchanged.
+
 * Completes final 2018 support in `kandidater()`, `valda()`, `ersattare()` and
   all four `personroster()` views using the official XML structures. The
   2018 candidate names remain `NA` in public data, even with an older named

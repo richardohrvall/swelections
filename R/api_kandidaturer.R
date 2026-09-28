@@ -15,6 +15,7 @@
 #' @param data_dir Lokal rotmapp för rådata.
 #' @param update Om `TRUE`, uppdateras den lokala arbetskopian.
 #' @param archive Om `TRUE`, sparas även en daterad snapshot.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
 #'
 #' @return En tibble där en rad är en källrad för en kandidatur eller
 #'   listrelation i ett valområde och eventuell valkrets. En giltig kandidat
@@ -45,7 +46,7 @@
 #' kandidaturer(ar = "alla", val = "RD")
 #' kandidaturer(fran = 2022, till = 2026, val = "RF")
 #' }
-#' @seealso [kandidater()], [swelections-package]
+#' @seealso [candidacies()], [kandidater()], [swelections-package]
 #' @export
 kandidaturer <- function(
     ar = 2026,
@@ -55,8 +56,10 @@ kandidaturer <- function(
     update = FALSE,
     archive = FALSE,
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   val <- .valtyper(val)
   valar <- .resolve_valar(ar, fran, till, "kandidaturer",
@@ -76,7 +79,7 @@ kandidaturer <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {

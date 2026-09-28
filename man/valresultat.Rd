@@ -15,7 +15,8 @@ valresultat(
   archive = FALSE,
   progress = interactive(),
   fran = NULL,
-  till = NULL
+  till = NULL,
+  names = "sv"
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ RF \code{"region"}, KF \code{"kommun"}. Se nivåerna nedan.}
 \item{fran, till}{Inklusiva gränser för ett intervall bland \strong{stödda} valår.
 Används som alternativ till \code{ar}; \verb{fran = 2021, till = 2026} väljer i
 nuläget 2022 och 2026. Utelämnad gräns är öppen.}
+
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.
+Endast kolumnnamn ändras; datavärden och typer bevaras.}
 }
 \value{
 En tibble i long format med ett nivåspecifikt publikt
@@ -174,5 +178,5 @@ valresultat(fran = 2010, till = 2026, val = "RD", niva = "riket")
 }
 }
 \seealso{
-\code{\link[=mandat]{mandat()}}, \link{swelections-package}
+\code{\link[=results]{results()}}, \code{\link[=mandat]{mandat()}}, \link{swelections-package}
 }

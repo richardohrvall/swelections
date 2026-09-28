@@ -59,6 +59,8 @@
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#'   Endast kolumnnamn ändras.
 #' @return En tibble där en rad avser val, räkning, geografisk nivå och
 #'   område samt parti. Områdestotaler upprepas på partirader och nivåerna
 #'   ska inte summeras tillsammans. Saknade totalsummor är `NA` när någon
@@ -85,7 +87,7 @@
 #' mandat(ar = "alla", val = "RF", niva = "region")
 #' mandat(fran = 2022, till = 2026, val = "KF", niva = "kommun")
 #' }
-#' @seealso [valda()], [ersattare()], [swelections-package]
+#' @seealso [seats()], [valda()], [ersattare()], [swelections-package]
 #' @export
 mandat <- function(
     ar = 2026,
@@ -98,8 +100,10 @@ mandat <- function(
     archive = FALSE,
     progress = interactive(),
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   if (missing(rakning)) rakning <- "slutlig"
   .check_text(rakning, "rakning")
@@ -124,7 +128,7 @@ mandat <- function(
       error = function(e) stop("Val\u00e5r ", valar_ett, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,

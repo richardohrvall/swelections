@@ -15,6 +15,7 @@
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #'
@@ -39,7 +40,7 @@
 #' ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")
 #' ersattare(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [valda()], [mandat()], [swelections-package]
+#' @seealso [substitutes()], [valda()], [mandat()], [swelections-package]
 #' @export
 ersattare <- function(
     ar = 2026,
@@ -50,8 +51,10 @@ ersattare <- function(
     archive = FALSE,
     progress = interactive(),
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   val <- .valtyper(val)
   val <- if (is.null(val)) c("RD", "RF", "KF") else val
@@ -72,5 +75,5 @@ ersattare <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }

@@ -15,7 +15,8 @@ mandat(
   archive = FALSE,
   progress = interactive(),
   fran = NULL,
-  till = NULL
+  till = NULL,
+  names = "sv"
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ används 2026.}
 
 \item{fran, till}{Inklusiva gränser bland stödda valår, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
+
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.
+Endast kolumnnamn ändras.}
 }
 \value{
 En tibble där en rad avser val, räkning, geografisk nivå och
@@ -78,5 +82,5 @@ mandat(fran = 2022, till = 2026, val = "KF", niva = "kommun")
 }
 }
 \seealso{
-\code{\link[=valda]{valda()}}, \code{\link[=ersattare]{ersattare()}}, \link{swelections-package}
+\code{\link[=seats]{seats()}}, \code{\link[=valda]{valda()}}, \code{\link[=ersattare]{ersattare()}}, \link{swelections-package}
 }

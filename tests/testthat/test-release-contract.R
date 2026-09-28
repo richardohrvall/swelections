@@ -267,8 +267,10 @@ test_that("ersattare has a stable public relationship schema and key", {
 
 test_that("the intended public namespace is fixed", {
   expect_setequal(getNamespaceExports("swelections"),
-                  c("valresultat", "mandat", "kandidaturer", "kandidater",
-                    "personroster", "valda", "ersattare"))
+                  c("results", "seats", "candidacies", "candidates",
+                    "elected", "substitutes", "valresultat", "mandat",
+                    "kandidaturer", "kandidater", "personroster", "valda",
+                    "ersattare", "preference_votes"))
 })
 
 test_that("candidacy parser preserves its public source-row schema", {

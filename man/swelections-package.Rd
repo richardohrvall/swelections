@@ -6,9 +6,12 @@
 \alias{swelections-package}
 \title{Svenska valdata från Valmyndigheten}
 \description{
-Läs harmoniserade valresultat, kandidaturer, kandidater, personröster,
-mandat och ersättarrelationer för valet 2026 med bland annat
-\code{\link[=valresultat]{valresultat()}} och \code{\link[=personroster]{personroster()}}.
+The English-first API provides \code{\link[=results]{results()}}, \code{\link[=seats]{seats()}}, \code{\link[=candidacies]{candidacies()}},
+\code{\link[=candidates]{candidates()}}, \code{\link[=elected]{elected()}}, \code{\link[=substitutes]{substitutes()}} and \code{\link[=preference_votes]{preference_votes()}}. The Swedish functions,
+including \code{\link[=valresultat]{valresultat()}} and \code{\link[=personroster]{personroster()}}, remain fully supported.
+English functions return English column names by default. Use \code{names = "sv"}
+or \code{options(swelections.names = "sv")} for Swedish output column names.
+Language selection changes column names, not data values.
 Resultatfiler väljs via \code{index.md5}. Optionen
 \code{swelections.resultatsamling_2026} väljer resultatsamling och har för närvarande
 standardvärdet \code{"val2026"}. Test-/utvecklingssamlingen \code{"genrep2026"} kan

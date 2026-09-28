@@ -1,8 +1,11 @@
 #' Svenska valdata från Valmyndigheten
 #'
-#' Läs harmoniserade valresultat, kandidaturer, kandidater, personröster,
-#' mandat och ersättarrelationer för valet 2026 med bland annat
-#' [valresultat()] och [personroster()].
+#' The English-first API provides [results()], [seats()], [candidacies()],
+#' [candidates()], [elected()], [substitutes()] and [preference_votes()]. The Swedish functions,
+#' including [valresultat()] and [personroster()], remain fully supported.
+#' English functions return English column names by default. Use `names = "sv"`
+#' or `options(swelections.names = "sv")` for Swedish output column names.
+#' Language selection changes column names, not data values.
 #' Resultatfiler väljs via `index.md5`. Optionen
 #' `swelections.resultatsamling_2026` väljer resultatsamling och har för närvarande
 #' standardvärdet `"val2026"`. Test-/utvecklingssamlingen `"genrep2026"` kan

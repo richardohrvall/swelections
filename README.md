@@ -2,7 +2,7 @@
 
 `swelections` is an R package for downloading, parsing and analysing Swedish election data from Valmyndigheten.
 
-The aim is to provide analysis-ready data on election results, mandates, candidates, candidacies, elected representatives and substitutes while preserving important information from the official source files.
+The aim is to provide analysis-ready data on election results, mandates, candidates, candidacies, elected representatives and substitutes while preserving important information from the official source files. The API is English-first; the Swedish functions remain fully supported.
 
 > [!WARNING]
 > `swelections` is under active development. Development currently focuses on
@@ -34,20 +34,37 @@ library(swelections)
 
 ## Main functions
 
-| Function | Description |
-| --- | --- |
-| `valresultat()` | Party vote results at different geographic levels |
-| `mandat()` | Mandate allocation by party |
-| `kandidaturer()` | Detailed candidacy data across electoral areas, constituencies and lists |
-| `kandidater()` | Analysis-ready candidate data |
-| `personroster()` | Personal votes by candidate, party and personal-vote area |
-| `valda()` | People in the official final elected-member result |
-| `ersattare()` | Official final substitute relationships for elected representatives |
+| English API | Supported Swedish function | Description |
+| --- | --- | --- |
+| `results()` | `valresultat()` | Party vote results at different geographic levels |
+| `seats()` | `mandat()` | Seat allocation by party |
+| `candidacies()` | `kandidaturer()` | Detailed candidacy records |
+| `candidates()` | `kandidater()` | Analysis-ready candidate data |
+| `preference_votes()` | `personroster()` | Personal votes by candidate and area |
+| `elected()` | `valda()` | Official final elected-member result |
+| `substitutes()` | `ersattare()` | Final substitute relationships |
+
+English functions return English column names by default. Pass `names = "sv"`
+for Swedish column names, or set `options(swelections.names = "sv")` as the
+default for English calls. An explicit `names` overrides the option. Swedish
+functions keep their existing Swedish columns by default and also accept
+`names = "en"`. This choice never translates data values.
+
+```r
+results(year = 2026, election = "KF", count = "final",
+        level = "municipality")
+valresultat(ar = 2026, val = "KF", rakning = "slutlig",
+            niva = "kommun")
+
+# Preference votes can retain the list dimension or add verified zero rows.
+preference_votes(election = "RD", level = "district", by_list = TRUE,
+                 include_zeros = FALSE)
+```
 
 The main functions currently target the 2026 parliamentary (`RD`), regional
-(`RF`) and municipal (`KF`) elections. All seven functions also support 2022
+(`RF`) and municipal (`KF`) elections. All seven data families also support 2022
 where their official source data are available.
-Final 2018 results are available through all seven functions using
+Final 2018 results are available through all seven data families using
 Valmyndigheten's XML and candidacy files. Public 2018 candidate names are
 always missing, including when a local historical
 snapshot retains names. The named snapshot is neither required nor bundled.

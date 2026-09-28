@@ -67,6 +67,7 @@
 #' @param komplettera_nollor Om `TRUE`, komplettera glesa distrikts- och
 #'   listvyer med verifierade nollrader. För standardvyn på personvalsområdesnivå
 #'   utan lista ändras inte resultatet. Standard är `FALSE`.
+#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
 #'
 #' @return En tibble med en rad per giltig kandidat, parti och
 #'   personvalsområde som standard. `valar` är integer direkt efter
@@ -102,7 +103,7 @@
 #'   dplyr::select(kandidatnummer, listnummer, antal_personroster)
 #' personroster(ar = c(2022, 2026), val = "RD")
 #' }
-#' @seealso [kandidater()], [kandidaturer()], [swelections-package]
+#' @seealso [preference_votes()], [kandidater()], [kandidaturer()], [swelections-package]
 #' @export
 personroster <- function(
     ar = 2026,
@@ -116,8 +117,10 @@ personroster <- function(
     per_lista = FALSE,
     komplettera_nollor = FALSE,
     fran = NULL,
-    till = NULL
+    till = NULL,
+    names = "sv"
 ) {
+  .check_output_language(names)
   ar_angivet <- !missing(ar)
   val <- .valtyper(val)
   val <- if (is.null(val)) c("RD", "RF", "KF") else val
@@ -157,7 +160,7 @@ personroster <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind()
+  }) |> purrr::list_rbind() |> .public_output_names(names)
 }
 
 .personroster_ett_ar_2026 <- function(ar, val, source, data_dir, update,
