@@ -1,6 +1,8 @@
 # English argument values are translated once, before entering the existing
 # Swedish API. Geographic support and all source validation remain there.
 .english_argument_values <- list(
+  election = c(parliamentary = "RD", regional = "RF", municipal = "KF",
+               RD = "RD", RF = "RF", KF = "KF"),
   count = c(final = "slutlig", preliminary = "preliminar"),
   level = c(
     district = "valdistrikt",
@@ -11,7 +13,7 @@
     regional_constituency = "regionvalkrets",
     parliamentary_constituency = "riksdagsvalkrets",
     national = "riket",
-    personal_vote_area = "personvalsomrade"
+    preference_vote_area = "personvalsomrade"
   )
 )
 
@@ -28,6 +30,7 @@
 
 .english_call <- function(fun, args, year, year_missing, names) {
   language <- .english_output_language(names)
+  args["val"] <- list(.english_argument_value(args$val, "election", nullable = TRUE))
   if (!year_missing) {
     if (identical(year, "all")) year <- "alla"
     args$ar <- year
@@ -43,7 +46,8 @@
 #'
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
-#' @param election Official election code: `"RD"`, `"RF"` or `"KF"`.
+#' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
+#'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
 #' @param count `"final"` or `"preliminary"`.
 #' @param level English geographic level. `NULL` selects the main level for
 #'   the election. Supported combinations depend on election and year;
@@ -60,13 +64,13 @@
 #' @return A tibble with the same rows, values and types as [valresultat()].
 #' @examples
 #' \dontrun{
-#' results(year = 2026, election = "KF", count = "final",
+#' results(year = 2026, election = "municipal", count = "final",
 #'         level = "municipality")
 #' }
 #' @seealso [valresultat()], [seats()]
 #' @export
 results <- function(
-    year = 2026, election = "RD", count = "final", level = NULL,
+    year = 2026, election = "parliamentary", count = "final", level = NULL,
     source = c("auto", "local", "remote"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
     from = NULL, to = NULL, names = NULL
@@ -85,7 +89,9 @@ results <- function(
 #' Read official seat allocations through [mandat()]. `election = NULL` and
 #' `level = NULL` retain the Swedish function's supported combinations.
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
+#' @param election One or more of `"parliamentary"`, `"regional"` and
+#'   `"municipal"`, or the official codes `"RD"`, `"RF"`, `"KF"`.
+#'   `NULL` selects all supported election types.
 #' @param level One or more English geographic levels, or `NULL` for all
 #'   relevant mandate levels.
 #' @return A tibble with the same rows, values and types as [mandat()].
@@ -109,8 +115,14 @@ seats <- function(
 #' Candidacies
 #'
 #' Read source-level candidate and ballot-list records through [kandidaturer()].
+#' `ballot_info` is optional candidate identification text printed on the
+#' ballot, such as occupation or age. `list_ballots_ordered` records the
+#' number of ballot papers ordered for the list, not votes cast. The logical
+#' `candidates_registered` and `candidate_declaration` fields retain the
+#' source's `NA` values. `registered_municipality_name` is a name, not a code.
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
+#' @param election One or more English election values or official codes;
+#'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [kandidaturer()].
 #' @seealso [kandidaturer()], [candidates()]
 #' @export
@@ -130,8 +142,9 @@ candidacies <- function(
 #'
 #' Read one row per candidate, election type and party through [kandidater()].
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
-#' @param include_results Include final personal-vote and elected-member
+#' @param election One or more English election values or official codes;
+#'   `NULL` selects all supported election types. See [results()].
+#' @param include_results Include final preference-vote and elected-member
 #'   results when `TRUE`; corresponds to `resultat` in [kandidater()].
 #' @return A tibble with the same rows, values and types as [kandidater()].
 #' @seealso [kandidater()], [elected()]
@@ -155,7 +168,8 @@ candidates <- function(
 #' Read the official final elected-member relation through [valda()]. No
 #' preliminary elected-member result is inferred.
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
+#' @param election One or more English election values or official codes;
+#'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [valda()].
 #' @seealso [valda()], [substitutes()]
 #' @export
@@ -176,7 +190,8 @@ elected <- function(
 #'
 #' Read final elected-member–substitute relationships through [ersattare()].
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
+#' @param election One or more English election values or official codes;
+#'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [ersattare()].
 #' @seealso [ersattare()], [elected()]
 #' @export
@@ -195,13 +210,14 @@ substitutes <- function(
 
 #' Preference votes
 #'
-#' Read candidate preference votes by personal-vote area or district through
+#' Read candidate preference votes by preference-vote area or district through
 #' [personroster()]. `by_list` retains the observed list dimension;
 #' `include_zeros` adds only verified zero combinations. The default view is
-#' one candidate–party–personal-vote-area row.
+#' one candidate–party–preference-vote-area row.
 #' @inheritParams results
-#' @param election One or more official election codes, or `NULL` for all.
-#' @param level `"personal_vote_area"` (default) or `"district"`.
+#' @param election One or more English election values or official codes;
+#'   `NULL` selects all supported election types. See [results()].
+#' @param level `"preference_vote_area"` (default) or `"district"`.
 #' @param by_list Retain the result-list dimension when `TRUE`.
 #' @param include_zeros Add verified zero combinations to sparse views when
 #'   `TRUE`; this never invents a zero from incomplete source data.
@@ -211,14 +227,14 @@ substitutes <- function(
 preference_votes <- function(
     year = 2026, election = NULL, source = c("auto", "local", "remote"),
     data_dir = NULL, update = FALSE, archive = FALSE,
-    progress = interactive(), level = "personal_vote_area",
+    progress = interactive(), level = "preference_vote_area",
     by_list = FALSE, include_zeros = FALSE,
     from = NULL, to = NULL, names = NULL
 ) {
   year_missing <- missing(year)
   if (!is.character(level) || length(level) != 1L || is.na(level) ||
-      !level %in% c("personal_vote_area", "district")) {
-    stop("Invalid `level`; use personal_vote_area or district.", call. = FALSE)
+      !level %in% c("preference_vote_area", "district")) {
+    stop("Invalid `level`; use preference_vote_area or district.", call. = FALSE)
   }
   .check_flag(by_list, "by_list")
   .check_flag(include_zeros, "include_zeros")

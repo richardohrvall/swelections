@@ -23,7 +23,9 @@ seats(
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.}
 
-\item{election}{One or more official election codes, or \code{NULL} for all.}
+\item{election}{One or more of \code{"parliamentary"}, \code{"regional"} and
+\code{"municipal"}, or the official codes \code{"RD"}, \code{"RF"}, \code{"KF"}.
+\code{NULL} selects all supported election types.}
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}
 

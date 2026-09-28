@@ -1,5 +1,13 @@
 # swelections 0.3.0.9000
 
+* Refines the English output schema before the first canonical 2018 rebuild:
+  preference-vote terminology, election-time `unfilled_seats`, source/area
+  reporting metadata and source-faithful candidacy fields. The official
+  `RD`/`RF`/`KF` values are now in `election_code`, with `election_kind`
+  separate; English `election` accepts descriptive values or official codes.
+  The existing
+  Swedish output schema and canonical assets are unchanged.
+
 * Adds English-first `results()`, `seats()`, `candidacies()`, `candidates()`,
   `elected()`, `substitutes()` and `preference_votes()` while retaining the Swedish API. Public R
   output column names can be selected with `names = "en"` or `"sv"`; English

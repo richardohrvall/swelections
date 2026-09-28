@@ -20,7 +20,8 @@ candidacies(
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.}
 
-\item{election}{One or more official election codes, or \code{NULL} for all.}
+\item{election}{One or more English election values or official codes;
+\code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
 
 \item{source}{\code{"auto"}, \code{"local"} or \code{"remote"}.}
 
@@ -41,6 +42,11 @@ A tibble with the same rows, values and types as \code{\link[=kandidaturer]{kand
 }
 \description{
 Read source-level candidate and ballot-list records through \code{\link[=kandidaturer]{kandidaturer()}}.
+\code{ballot_info} is optional candidate identification text printed on the
+ballot, such as occupation or age. \code{list_ballots_ordered} records the
+number of ballot papers ordered for the list, not votes cast. The logical
+\code{candidates_registered} and \code{candidate_declaration} fields retain the
+source's \code{NA} values. \code{registered_municipality_name} is a name, not a code.
 }
 \seealso{
 \code{\link[=kandidaturer]{kandidaturer()}}, \code{\link[=candidates]{candidates()}}

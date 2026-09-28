@@ -6,7 +6,7 @@
 \usage{
 results(
   year = 2026,
-  election = "RD",
+  election = "parliamentary",
   count = "final",
   level = NULL,
   source = c("auto", "local", "remote"),
@@ -23,7 +23,8 @@ results(
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.}
 
-\item{election}{Official election code: \code{"RD"}, \code{"RF"} or \code{"KF"}.}
+\item{election}{\code{"parliamentary"}, \code{"regional"} or \code{"municipal"};
+official codes \code{"RD"}, \code{"RF"} and \code{"KF"} are also accepted.}
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}
 
@@ -57,7 +58,7 @@ only; source values and data values are unchanged.
 }
 \examples{
 \dontrun{
-results(year = 2026, election = "KF", count = "final",
+results(year = 2026, election = "municipal", count = "final",
         level = "municipality")
 }
 }

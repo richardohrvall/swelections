@@ -12,7 +12,7 @@ preference_votes(
   update = FALSE,
   archive = FALSE,
   progress = interactive(),
-  level = "personal_vote_area",
+  level = "preference_vote_area",
   by_list = FALSE,
   include_zeros = FALSE,
   from = NULL,
@@ -24,7 +24,8 @@ preference_votes(
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.}
 
-\item{election}{One or more official election codes, or \code{NULL} for all.}
+\item{election}{One or more English election values or official codes;
+\code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
 
 \item{source}{\code{"auto"}, \code{"local"} or \code{"remote"}.}
 
@@ -36,7 +37,7 @@ preference_votes(
 
 \item{progress}{Show a progress indicator.}
 
-\item{level}{\code{"personal_vote_area"} (default) or \code{"district"}.}
+\item{level}{\code{"preference_vote_area"} (default) or \code{"district"}.}
 
 \item{by_list}{Retain the result-list dimension when \code{TRUE}.}
 
@@ -53,10 +54,10 @@ alternative to \code{year}.}
 A tibble with the same rows, values and types as \code{\link[=personroster]{personroster()}}.
 }
 \description{
-Read candidate preference votes by personal-vote area or district through
+Read candidate preference votes by preference-vote area or district through
 \code{\link[=personroster]{personroster()}}. \code{by_list} retains the observed list dimension;
 \code{include_zeros} adds only verified zero combinations. The default view is
-one candidate–party–personal-vote-area row.
+one candidate–party–preference-vote-area row.
 }
 \seealso{
 \code{\link[=personroster]{personroster()}}, \code{\link[=candidates]{candidates()}}

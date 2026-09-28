@@ -22,9 +22,10 @@ candidates(
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.}
 
-\item{election}{One or more official election codes, or \code{NULL} for all.}
+\item{election}{One or more English election values or official codes;
+\code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
 
-\item{include_results}{Include final personal-vote and elected-member
+\item{include_results}{Include final preference-vote and elected-member
 results when \code{TRUE}; corresponds to \code{resultat} in \code{\link[=kandidater]{kandidater()}}.}
 
 \item{source}{\code{"auto"}, \code{"local"} or \code{"remote"}.}
