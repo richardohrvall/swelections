@@ -2,11 +2,11 @@
 
 ## Project purpose
 
-This repository contains the R package `valresultat`, which downloads, archives, parses, harmonises, validates and exposes Swedish election data from Valmyndigheten.
+This repository contains the R package `swelections`, which downloads, archives, parses, harmonises, validates and exposes Swedish election data from Valmyndigheten.
 
-The current development focus is the 2026 election. Historical elections will be added later.
+The package covers current and historical Swedish elections. Current development includes the 2026 result-file architecture and canonical historical data, beginning with 2018.
 
-The package is intended to be analysis-friendly for researchers and other users. Preserve information from Valmyndigheten where useful, but do not over-normalise the public datasets.
+The package is intended to be analysis-friendly for researchers and other users. Canonical datasets should also be usable independently of R and the package. Preserve information from Valmyndigheten where useful, but do not over-normalise the public datasets.
 
 ## Repository scope
 
@@ -33,35 +33,18 @@ The package is intended to be analysis-friendly for researchers and other users.
 ## Language and naming
 
 - Package code is in R.
-- Use Swedish variable names where the project already does so.
 - Use `snake_case`.
-- Prefer compact, descriptive names.
-- Use Swedish compounds without unnecessary underscores:
-  - `valkretskod`, not `valkrets_kod`
-  - `valkretsnamn`, not `valkrets_namn`
-  - `valomradeskod`
-  - `valdistriktskod`
-  - `kommunkod`
-  - `lankod`
-  - `partikod`
-  - `kandidatnummer`
-- Use `antal`, `andel` and `ovriga` written out.
-- Use `valdel` for valdeltagande.
-- Use `_fg` for values from the previous election.
-- Use `diff_` as prefix for changes/differences.
-- `ovriga_partier` is a logical indicator.
-- `over_sparr` is a logical indicator for whether a party passes the relevant threshold for mandate allocation.
-- `geografiniva` is the standard variable for geographic level.
-
-Current `geografiniva` values include:
-- `valdistrikt`
-- `kommun`
-- `kommunvalkrets`
-- `lan`
-- `region`
-- `riket`
-- `riksdagsvalkrets`
-- `regionvalkrets`
+- The canonical public data schema uses English column names.
+- English is the default naming language for the future public package API.
+- Swedish column names may be exposed through an explicit translation layer in R, for example through a function argument or package option.
+- Do not mechanically rename existing public columns or functions unless the task explicitly includes an approved schema/API migration.
+- Existing Swedish public functions may remain as aliases when English API names are introduced.
+- Internal parsing and build code may retain source-oriented or existing Swedish names where that reduces unnecessary churn; translate systematically at the canonical/public boundary.
+- Language-dependent data values should be stored explicitly where relevant, for example `party_name_sv` and `party_name_en`, rather than changing values according to a global language setting.
+- Use an English party name only when an established English name is available; otherwise use `NA`. Do not invent translations.
+- Identifiers and codes must retain leading zeroes and should use stable types.
+- Preserve the distinction between `NA`, zero and `FALSE`.
+- Prefer compact, descriptive names and stable semantics over literal translations of source-field names.
 
 ## R style
 
@@ -86,6 +69,27 @@ Utility helpers already exist for scalar extraction:
 - `as_lgl_na()`
 
 Reuse them rather than inventing parallel helpers unless there is a strong reason.
+
+
+## Canonical data
+
+Canonical data are a public, language-independent data product, not merely an internal R-package cache.
+
+- Canonical tabular assets use Parquet.
+- Canonical public column names use English `snake_case`.
+- Canonical assets must be usable independently of the R package, including from tools such as Python, DuckDB and Polars.
+- The R package may translate canonical English names to Swedish names as an explicit presentation/API layer; this must not change the stored canonical schema.
+- Preserve stable observation units, identifiers, types, keys and missing-value semantics.
+- Do not inflate sparse structures unnecessarily. For example, small normalised person-vote bases may be preferable to storing national zero-filled panels when equivalent analysis views can be reconstructed deterministically.
+- Do not include raw source files in the Git repository or canonical release assets.
+- Do not expose personal names in canonical public assets unless explicitly approved for that dataset.
+- Canonical build metadata and provenance should include source filenames and checksums, data/schema version, build code version or Git SHA, build date/time, and whether the build tree was dirty.
+- Large generated canonical assets remain outside Git and are distributed separately, for example as versioned GitHub Release assets.
+- RDS may be used as a local build intermediate but is not the canonical public format.
+- Do not create duplicate CSV or DTA distributions unless explicitly requested.
+- `nanoparquet` may be used as an optional dependency for Parquet I/O; do not make Parquet support a mandatory dependency for users who do not use canonical-data functionality unless explicitly approved.
+- The existing public `source` API (`local`, `remote`, `auto`) is separate from canonical-data access. Do not add or change a canonical source mode without an explicit API decision.
+- Do not change the canonical schema, asset partitioning or release contract without an explicit approved schema decision.
 
 ## Core data model
 
@@ -287,14 +291,16 @@ The package must support both remote and local raw data.
 
 Users may specify a local archive through:
 - an explicit `data_dir` argument, or
-- `options(valresultat.data_dir = "...")`
+- `options(swelections.data_dir = "...")`
 
 Never hard-code a developer-specific path in package functions.
 
 Priority:
 1. explicit `data_dir`
-2. `options("valresultat.data_dir")`
+2. `options("swelections.data_dir")`
 3. no local directory configured
+
+Use the `swelections.` prefix for new package-scoped options. If legacy `valresultat.*` options already exist in released or user-facing code, do not remove compatibility without an explicit migration decision.
 
 Source behaviour:
 - `source = "local"`: require local file; error if missing
@@ -367,6 +373,15 @@ Important invariants already used during development include:
 - candidate person votes summed over lists should match Valmyndigheten's `personroster_summerade`
 - candidates elected on personal votes should be marked as qualified for personal election when qualification data are available
 
+
+### Canonical data
+- every published asset should match its manifest filename, file size and SHA256 checksum
+- canonical tables must match the validated source-built intermediate objects for their documented observation units and keys
+- representative direct checks against raw source data should be retained for important structures
+- zero-filled or reconstructed analysis views must be deterministically reproducible from their canonical normalised bases
+- public canonical assets must satisfy the approved anonymisation rules
+- full raw-to-canonical rebuild checks may be opt-in/slow integration tests when they are too expensive for the ordinary test suite
+
 ## Testing strategy
 
 Move stable checks out of exploratory QMD files and into `tests/testthat/`.
@@ -386,7 +401,9 @@ Stable logic belongs in R/ and stable checks in tests/testthat/.
 
 ## Public API direction
 
-Current intended public functions include:
+The package is moving toward an English-first public API under the package name `swelections`.
+
+Existing Swedish public functions include:
 
 - `valresultat()`
 - `mandat()`
@@ -395,7 +412,13 @@ Current intended public functions include:
 - `valda()`
 - `ersattare()`
 
-Likely future functions may include status/mandate-period helpers.
+Do not remove or rename these functions silently.
+
+Future work may introduce English primary names with the Swedish functions retained as aliases. Exact English function names, deprecation policy and migration details require an explicit API decision before implementation.
+
+Canonical public datasets use English column names. The R API may offer Swedish column names through an explicit naming-language mechanism, potentially both through a per-call argument and a package option. Do not implement or change that mechanism unless explicitly requested.
+
+Language selection for column names must not silently translate data values. Multilingual values, such as party names, should use explicit fields such as `party_name_sv` and `party_name_en`.
 
 For candidate functions:
 - `val = NULL` means all political levels
@@ -404,6 +427,8 @@ For candidate functions:
 Do not silently change public defaults or argument meanings.
 
 ## Package development
+
+The repository and package are named `swelections`. References to `valresultat` should remain only when they refer to the existing Swedish function/API, historical text, or deliberately supported legacy compatibility. Do not mechanically replace the Swedish common noun *valresultat* when it means election results rather than the former package name.
 
 As the package matures, maintain standard package infrastructure:
 - `DESCRIPTION`
@@ -426,6 +451,7 @@ The main goal is not merely to make code run.
 
 The package should:
 - preserve Valmyndigheten's information accurately
+- make canonical election data usable outside R and independently of the package
 - provide clear and stable analytical observation levels
 - make common political-science analyses easy
 - remain reproducible when source files change

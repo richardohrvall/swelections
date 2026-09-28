@@ -1,4 +1,4 @@
-Package: valresultat
+Package: swelections
 Title: Read and Harmonise Swedish Election Results
 Version: 0.3.0.9000
 Authors@R: person("Richard", "Öhrvall", email = "richard.ohrvall@gmail.com",
