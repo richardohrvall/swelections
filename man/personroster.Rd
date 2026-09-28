@@ -20,7 +20,7 @@ personroster(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -116,6 +116,12 @@ personröststruktur bekräftar detta och korsas då inte med kandidaturer.
 En saknad listnod kan ge 0 liströster i ett fullständigt
 avstämt slutresultat, men ger inte 0 under pågående räkning. Om
 personröstunderlaget är ofullständigt används \code{NA}, inte en gissad nolla.
+
+För 2018 används slutresultatets XML: kandidatens områdesvisa \code{PERSONVAL}
+och listvisa \code{VALSEDEL/PERSONVAL}. \code{PERSONKRYSS} används för avstämning;
+både valdagens och onsdagens distrikt ingår. Publika kandidatnamn är alltid
+\code{NA} för 2018. En lokal kopia av 2018 års slutresultat-ZIP krävs för
+resultatberoende anrop eftersom den publicerade fjärrlänken inte fungerar.
 
 För 2022 saknas \code{summeradePersonroster}. Områdesvyn använder de officiella
 slutliga \code{listRoster} inom personvalsområdet och distriktsvyn använder

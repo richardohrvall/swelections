@@ -40,7 +40,8 @@
       valomradeskod = kod(valomradeskod,
                           dplyr::if_else(valtyp == "KF", 4L, 2L)),
       valomradesnamn, valkretskod = kod(valkretskod, 2L), valkretsnamn,
-      partibeteckning, partiforkortning, partikod, valsedelsstatus,
+      partibeteckning, partiforkortning, partikod = kod(partikod, 4L),
+      valsedelsstatus,
       listnummer, ordning, anmaldakandidater = raw$anmkand, samtycke,
       forklaring, kandidatnummer,
       # Namnkontraktet är oberoende av lokal snapshot och används aldrig som nyckel.

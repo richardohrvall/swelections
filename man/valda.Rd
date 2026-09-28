@@ -17,7 +17,7 @@ valda(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -48,9 +48,11 @@ Kolumnerna motsvarar \code{kandidater(resultat = TRUE)} utom
 \code{valkretskod} och \code{valkretsnamn} kommer från invaldsrelationen och anger
 valkretsen där personen valdes, även vid kandidatur i flera valkretsar.
 I odelade valområden är dessa fält \code{NA}. \code{valar} är integer direkt efter
-\code{valtillfalle}; flera år staplas i angiven årsordning. För 2022 hämtas
-personröster från slutliga områdeslistor, för 2026 från verifierade
-områdessummeringar. Kandidatfilens metadata och dess \code{NA} bevaras.
+\code{valtillfalle}; flera år staplas i angiven årsordning. För 2018 hämtas
+personröster och invaldsrelation från slutresultatets XML, och publika
+namn är alltid \code{NA}. För 2022 hämtas personröster från slutliga
+områdeslistor, för 2026 från verifierade områdessummeringar.
+Kandidatfilens övriga metadata och dess \code{NA} bevaras.
 }
 \description{
 Läser personer i Valmyndighetens officiella slutliga invaldsrelation och

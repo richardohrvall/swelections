@@ -38,13 +38,19 @@
 #' avstämt slutresultat, men ger inte 0 under pågående räkning. Om
 #' personröstunderlaget är ofullständigt används `NA`, inte en gissad nolla.
 #'
+#' För 2018 används slutresultatets XML: kandidatens områdesvisa `PERSONVAL`
+#' och listvisa `VALSEDEL/PERSONVAL`. `PERSONKRYSS` används för avstämning;
+#' både valdagens och onsdagens distrikt ingår. Publika kandidatnamn är alltid
+#' `NA` för 2018. En lokal kopia av 2018 års slutresultat-ZIP krävs för
+#' resultatberoende anrop eftersom den publicerade fjärrlänken inte fungerar.
+#'
 #' För 2022 saknas `summeradePersonroster`. Områdesvyn använder de officiella
 #' slutliga `listRoster` inom personvalsområdet och distriktsvyn använder
 #' distriktets egna listor. Nivåernas tal kan skilja sig i 2022-materialet;
 #' de krävs därför inte summera exakt till varandra. Funktionen läser enbart
 #' slutliga resultatfiler och gör ingen preliminär personröstberäkning.
 #'
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -138,7 +144,10 @@ personroster <- function(
   }
   purrr::map(valar, function(ett_ar) {
     tryCatch(
-      if (ett_ar == 2022L) {
+      if (ett_ar == 2018L) {
+        .personroster_ett_ar_2018(ett_ar, val, source, data_dir, update,
+          archive, progress, niva, per_lista, komplettera_nollor)
+      } else if (ett_ar == 2022L) {
         .personroster_ett_ar_2022(ett_ar, val, source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)
       } else {

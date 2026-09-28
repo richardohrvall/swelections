@@ -6,13 +6,16 @@ test_that("valda year selections retain exact-year order and long format", {
       partikod = "P", invald = TRUE
     )
   })
+  c <- valda(ar = 2018, val = "RD")
   a <- valda(ar = 2022, val = "RD")
   b <- valda(ar = 2026, val = "RD")
   expect_identical(valda(ar = c(2022, 2026), val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(valda(ar = c(2026, 2022, 2026), val = "RD"),
                    dplyr::bind_rows(b, a))
-  expect_identical(valda(ar = "alla", val = "RD"), dplyr::bind_rows(a, b))
+  expect_identical(valda(ar = c(2026, 2018, 2022), val = "RD"),
+                   dplyr::bind_rows(b, c, a))
+  expect_identical(valda(ar = "alla", val = "RD"), dplyr::bind_rows(c, a, b))
   expect_identical(valda(fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(names(a)[1:2], c("valtillfalle", "valar"))
@@ -23,7 +26,7 @@ test_that("valda year selections retain exact-year order and long format", {
 
 test_that("valda rejects invalid year choices before sources are read", {
   local_mocked_bindings(.valda_ett_ar = function(...) stop("Unexpected source access"))
-  expect_error(valda(ar = 2018, val = "RD"), "2018")
+  expect_error(valda(ar = 2016, val = "RD"), "2016")
   expect_error(valda(ar = 2022, fran = 2022, val = "RD"), "alternativa")
   expect_error(valda(ar = 2025, val = "KF"), "2025")
 })

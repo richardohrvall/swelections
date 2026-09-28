@@ -28,14 +28,17 @@ test_that("candidate year selection preserves order and does not change old posi
   )
   expect_identical(kandidater(ar = c(2026, 2022, 2026), val = "RD")$valar,
                    c(2026L, 2022L))
+  expect_identical(kandidater(ar = c(2026, 2018, 2022), val = "RD")$valar,
+                   c(2026L, 2018L, 2022L))
   expect_identical(kandidater(ar = "alla", val = "RF")$valar,
-                   c(2022L, 2026L))
+                   c(2018L, 2022L, 2026L))
   expect_identical(kandidater(fran = 2022, val = "KF")$valar,
                    c(2022L, 2026L))
-  expect_identical(kandidater(till = 2022, val = "KF")$valar, 2022L)
+  expect_identical(kandidater(till = 2022, val = "KF")$valar,
+                   c(2018L, 2022L))
   expect_error(kandidater(ar = 2022, fran = 2022, val = "RD"),
                "alternativa")
-  expect_error(kandidater(ar = 2018, val = "RD"), "2018")
+  expect_error(kandidater(ar = 2016, val = "RD"), "2016")
 })
 
 test_that("public candidate years stack without changing the established columns", {

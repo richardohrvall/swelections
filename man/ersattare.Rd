@@ -17,7 +17,7 @@ ersattare(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -53,6 +53,8 @@ valkrets, inte ersättarens samtliga kandidaturer. Ett känt tomt resultat
 behåller samma typade schema; saknad eller ofärdig slutlig relation ger fel.
 För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \code{valomradeskod}; separata kommunfält dupliceras inte.
+För 2018 hämtas relationerna från slutresultatets XML och personnamn är
+alltid \code{NA}. Resultatberoende 2018-anrop kräver en lokal slutresultat-ZIP.
 }
 \description{
 Hämtar officiella relationer mellan valda ledamöter och deras ersättare

@@ -18,7 +18,7 @@ kandidater(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -62,7 +62,7 @@ ett okänt område ger \code{NA}. Antalsfält är integer och indikatorer logica
 inom kandidatens nyckel, även om flera listor används i samma valkrets.
 När antalet är större än ett är kandidatnivåns \code{valkretskod} och
 \code{valkretsnamn} \code{NA}; vid otillräcklig kandidaturgeografi är även antalet
-\code{NA}. Fältet är integer och gäller både 2022 och 2026.
+\code{NA}. Fältet är integer och gäller 2018, 2022 och 2026.
 Kandidatidentitet och parti följs av personröst-, personvals- och
 invaldsfält; tekniska kandidatursammanfattningar ligger sist.
 För KF är \code{valomradesnamn} paketets korta kommunnamn när kandidaten har
@@ -97,6 +97,11 @@ ytterligare redovisade kandidatpersonröster. Om en komplett områdesstruktur
 saknar en partirad är kandidatens redovisade personröster där 0; ett område
 vars resultatstruktur inte kan verifieras ger \code{NA}.
 Personvalskvalificering bedöms separat.
+
+För 2018 läses personröster och invaldsuppgifter från det slutliga
+XML-resultatet. Publika namn är alltid \code{NA}, även om en lokal historisk
+kandidatsnapshot innehåller namn. Resultatberoende 2018-anrop kräver en
+lokal kopia av slutresultat-ZIP.
 }
 \examples{
 \dontrun{

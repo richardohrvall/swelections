@@ -9,14 +9,14 @@
                   KF = c(2018L, 2022L, 2026L)),
     kandidaturer = list(RD = c(2018L, 2022L, 2026L), RF = c(2018L, 2022L, 2026L),
                        KF = c(2018L, 2022L, 2026L)),
-    kandidater = list(RD = c(2022L, 2026L), RF = c(2022L, 2026L),
-                      KF = c(2022L, 2026L)),
-    personroster = list(RD = c(2022L, 2026L), RF = c(2022L, 2026L),
-                       KF = c(2022L, 2026L)),
-    valda = list(RD = c(2022L, 2026L), RF = c(2022L, 2026L),
-                 KF = c(2022L, 2026L)),
-    ersattare = list(RD = c(2022L, 2026L), RF = c(2022L, 2026L),
-                    KF = c(2022L, 2026L))
+    kandidater = list(RD = c(2018L, 2022L, 2026L), RF = c(2018L, 2022L, 2026L),
+                      KF = c(2018L, 2022L, 2026L)),
+    personroster = list(RD = c(2018L, 2022L, 2026L), RF = c(2018L, 2022L, 2026L),
+                       KF = c(2018L, 2022L, 2026L)),
+    valda = list(RD = c(2018L, 2022L, 2026L), RF = c(2018L, 2022L, 2026L),
+                 KF = c(2018L, 2022L, 2026L)),
+    ersattare = list(RD = c(2018L, 2022L, 2026L), RF = c(2018L, 2022L, 2026L),
+                    KF = c(2018L, 2022L, 2026L))
   )
   out <- register[[funktion]][[val]]
   if (is.null(out)) stop("Ok\u00e4nd funktion eller valtyp i \u00e5rsregistret.", call. = FALSE)

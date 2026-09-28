@@ -4,7 +4,7 @@
 #' från slutliga mandatfiler. Preliminära filer används aldrig för att
 #' uppskatta ersättare.
 #'
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
@@ -32,6 +32,8 @@
 #'   behåller samma typade schema; saknad eller ofärdig slutlig relation ger fel.
 #'   För KF är `valomradesnamn` paketets korta kommunnamn, uppslaget via
 #'   `valomradeskod`; separata kommunfält dupliceras inte.
+#'   För 2018 hämtas relationerna från slutresultatets XML och personnamn är
+#'   alltid `NA`. Resultatberoende 2018-anrop kräver en lokal slutresultat-ZIP.
 #' @examples
 #' \dontrun{
 #' ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")

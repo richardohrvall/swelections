@@ -6,14 +6,17 @@ test_that("ersattare year selections stack exact-year results in requested order
       ersattare_kandidatnummer = paste0("e", ar), ersattarordning = 1L
     )
   })
+  c <- ersattare(ar = 2018, val = "RD")
   a <- ersattare(ar = 2022, val = "RD")
   b <- ersattare(ar = 2026, val = "RD")
   expect_identical(ersattare(ar = c(2022, 2026), val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(ersattare(ar = c(2026, 2022, 2026), val = "RD"),
                    dplyr::bind_rows(b, a))
+  expect_identical(ersattare(ar = c(2026, 2018, 2022), val = "RD"),
+                   dplyr::bind_rows(b, c, a))
   expect_identical(ersattare(ar = "alla", val = "RD"),
-                   dplyr::bind_rows(a, b))
+                   dplyr::bind_rows(c, a, b))
   expect_identical(ersattare(fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(names(a)[1:2], c("valtillfalle", "valar"))
@@ -24,7 +27,7 @@ test_that("ersattare year selections stack exact-year results in requested order
 
 test_that("ersattare rejects invalid years before source access", {
   local_mocked_bindings(.ersattare_ett_ar = function(...) stop("Unexpected IO"))
-  expect_error(ersattare(ar = 2018, val = "RD"), "2018")
+  expect_error(ersattare(ar = 2016, val = "RD"), "2016")
   expect_error(ersattare(ar = 2022, fran = 2022, val = "RD"), "alternativa")
   expect_error(ersattare(ar = 2025, val = "KF"), "2025")
 })

@@ -1,5 +1,13 @@
 # valresultat 0.3.0.9000
 
+* Completes final 2018 support in `kandidater()`, `valda()`, `ersattare()` and
+  all four `personroster()` views using the official XML structures. The
+  2018 candidate names remain `NA` in public data, even with an older named
+  local snapshot. Elected people and substitute relationships come from the
+  final XML `GRUPP_VALDA` structure; empty-seat placeholders are excluded.
+  Person votes preserve observed candidate votes, verify list totals and
+  reconcile area and district results including Wednesday districts. A local
+  copy of the unavailable 2018 final-result ZIP is required for these results.
 * Adds final 2018 results to `valresultat()` and `mandat()` through a separate
   XML reader and shared public schemas. Adds 2018 `kandidaturer()` from the
   official semicolon-separated source. Public 2018 candidacy names remain

@@ -24,7 +24,12 @@
 #' vars resultatstruktur inte kan verifieras ger `NA`.
 #' Personvalskvalificering bedöms separat.
 #'
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' För 2018 läses personröster och invaldsuppgifter från det slutliga
+#' XML-resultatet. Publika namn är alltid `NA`, även om en lokal historisk
+#' kandidatsnapshot innehåller namn. Resultatberoende 2018-anrop kräver en
+#' lokal kopia av slutresultat-ZIP.
+#'
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -59,7 +64,7 @@
 #'   inom kandidatens nyckel, även om flera listor används i samma valkrets.
 #'   När antalet är större än ett är kandidatnivåns `valkretskod` och
 #'   `valkretsnamn` `NA`; vid otillräcklig kandidaturgeografi är även antalet
-#'   `NA`. Fältet är integer och gäller både 2022 och 2026.
+#'   `NA`. Fältet är integer och gäller 2018, 2022 och 2026.
 #'   Kandidatidentitet och parti följs av personröst-, personvals- och
 #'   invaldsfält; tekniska kandidatursammanfattningar ligger sist.
 #'   För KF är `valomradesnamn` paketets korta kommunnamn när kandidaten har
@@ -131,8 +136,9 @@ kandidater <- function(
     return(out)
   }
 
-  add_resultat <- if (ar == 2022L) .add_kandidatresultat_2022 else
-    .add_kandidatresultat_2026
+  add_resultat <- if (ar == 2018L) .add_kandidatresultat_2018 else
+    if (ar == 2022L) .add_kandidatresultat_2022 else
+      .add_kandidatresultat_2026
   add_resultat(
     kandidater = out,
     kandidaturer = kandidaturdata,
@@ -187,7 +193,7 @@ kandidater <- function(
 #' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
-#' @param ar Ett eller flera exakta valår (2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -201,9 +207,11 @@ kandidater <- function(
 #'   `valkretskod` och `valkretsnamn` kommer från invaldsrelationen och anger
 #'   valkretsen där personen valdes, även vid kandidatur i flera valkretsar.
 #'   I odelade valområden är dessa fält `NA`. `valar` är integer direkt efter
-#'   `valtillfalle`; flera år staplas i angiven årsordning. För 2022 hämtas
-#'   personröster från slutliga områdeslistor, för 2026 från verifierade
-#'   områdessummeringar. Kandidatfilens metadata och dess `NA` bevaras.
+#'   `valtillfalle`; flera år staplas i angiven årsordning. För 2018 hämtas
+#'   personröster och invaldsrelation från slutresultatets XML, och publika
+#'   namn är alltid `NA`. För 2022 hämtas personröster från slutliga
+#'   områdeslistor, för 2026 från verifierade områdessummeringar.
+#'   Kandidatfilens övriga metadata och dess `NA` bevaras.
 #' @examples
 #' \dontrun{
 #' valda(val = "RD", source = "local", data_dir = "mitt_arkiv")

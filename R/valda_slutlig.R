@@ -47,6 +47,16 @@
 
 .valda_ett_ar <- function(ar, val, source, data_dir, update, archive,
                           progress) {
+  if (ar == 2018L) {
+    kandidaturdata <- kandidaturer(ar = ar, val = val, source = source,
+      data_dir = data_dir, update = update, archive = archive)
+    bas <- .kandidater_bas(kandidaturdata, ar)
+    valda_data <- .xml2018_valda_ersattare(val, source, data_dir,
+      update, archive, progress)$valda
+    .valda_validera_nycklar(valda_data, bas)
+    return(.xml2018_valda_public(valda_data, bas, kandidaturdata,
+      source, data_dir, update, archive, progress))
+  }
   index <- .read_resultatindex(ar, source, data_dir, update, archive)
   paths <- .valda_slutliga_paths(index, val)
   kandidaturdata <- kandidaturer(

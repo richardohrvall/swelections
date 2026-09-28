@@ -47,13 +47,14 @@ library(valresultat)
 The main functions currently target the 2026 parliamentary (`RD`), regional
 (`RF`) and municipal (`KF`) elections. All seven functions also support 2022
 where their official source data are available.
-Final 2018 results are available through `valresultat()`, `mandat()` and
-`kandidaturer()` using Valmyndigheten's XML and candidacy files. The public
-2018 candidacy name is always missing, including when a local historical
+Final 2018 results are available through all seven functions using
+Valmyndigheten's XML and candidacy files. Public 2018 candidate names are
+always missing, including when a local historical
 snapshot retains names. The named snapshot is neither required nor bundled.
 Valmyndigheten's 2018 XML ZIP is no longer downloadable from its published
-statistics page, so 2018 vote and mandate results currently require a local
-copy of that archive.
+statistics page, so 2018 result-dependent functions currently require a local
+copy of that archive. `kandidaturer()` can still read its official candidacy
+source remotely.
 
 ## Quick start
 
@@ -188,17 +189,17 @@ through `valomradeskod` use the same short name directly in
 
 ## Candidates and candidacies
 
-`kandidaturer()` preserves detailed source information about individual candidacies in 2022 and 2026. A person may appear several times because the same candidate can stand in several electoral areas, constituencies or lists. Exact year vectors, `ar = "alla"`, and `fran`/`till` work as in `valresultat()`; selected years are stacked in long format with integer `valar`.
+`kandidaturer()` preserves detailed source information about individual candidacies in 2018, 2022 and 2026. A person may appear several times because the same candidate can stand in several electoral areas, constituencies or lists. Exact year vectors, `ar = "alla"`, and `fran`/`till` work as in `valresultat()`; selected years are stacked in long format with integer `valar`.
 
 `oppen_lista` describes whether the party has an open candidate list in the election area. `pa_namnvalsedel` describes whether this particular candidacy appears on a name ballot sent to print (`VALSEDELSSTATUS = S`). They are separate properties: a valid candidate need not appear on a printed name ballot. A negative ballot status is `FALSE` only for a verified complete candidate-file snapshot, identified by the CSV content hash. An older or unknown local snapshot can return `NA` for the same election year. List numbers created during vote counting do not affect `pa_namnvalsedel`.
 
-`kandidater()` provides a more analysis-oriented candidate table for 2022 and 2026. Its observation level is candidate × election type × party. It accepts the same year selections as `kandidaturer()` and stacks years in long format. Here, `oppen_lista` is known only when all the candidate's valid candidacies agree; `pa_namnvalsedel` means the candidate appeared on **at least one** printed name ballot. This differs from `kandidaturer()`, where the field describes each candidacy. Older or unknown candidate-file snapshots can yield `NA` for a negative ballot status.
+`kandidater()` provides a more analysis-oriented candidate table for 2018, 2022 and 2026. Its observation level is candidate × election type × party. It accepts the same year selections as `kandidaturer()` and stacks years in long format. Here, `oppen_lista` is known only when all the candidate's valid candidacies agree; `pa_namnvalsedel` means the candidate appeared on **at least one** printed name ballot. This differs from `kandidaturer()`, where the field describes each candidacy. Older or unknown candidate-file snapshots can yield `NA` for a negative ballot status.
 
 `antal_valkretsar` counts the distinct constituencies in a candidate's valid candidacies, even when several lists occur in one constituency. If a candidate stands in several constituencies, `valkretskod` and `valkretsnamn` are `NA` at candidate level; the count explains why.
 
-`valda()` uses the official **final** elected-member relation for 2022 and 2026. It accepts exact year vectors, `ar = "alla"`, or `fran`/`till`, with 2026 as the default. Years are stacked with integer `valar` after `valtillfalle`. There is no preliminary `valda()` result: preliminary files do not identify elected people, and a missing or unfinished final source gives an error. The table omits the candidacy count `antal_valkretsar`; `valkretskod` and `valkretsnamn` instead identify where the person was elected.
+`valda()` uses the official **final** elected-member relation for 2018, 2022 and 2026. It accepts exact year vectors, `ar = "alla"`, or `fran`/`till`, with 2026 as the default. Years are stacked with integer `valar` after `valtillfalle`. There is no preliminary `valda()` result: preliminary files do not identify elected people, and a missing or unfinished final source gives an error. The table omits the candidacy count `antal_valkretsar`; `valkretskod` and `valkretsnamn` instead identify where the person was elected.
 
-`ersattare()` reads the official **final** substitute relations for RD, RF and KF in 2022 and 2026 and accepts the same year selections. One row links an elected member to a substitute at a specified order; the same substitute can appear on several rows. Its constituency fields describe the relation, and an absent or unfinished final relation gives an error. No preliminary substitute result is inferred.
+`ersattare()` reads the official **final** substitute relations for RD, RF and KF in 2018, 2022 and 2026 and accepts the same year selections. One row links an elected member to a substitute at a specified order; the same substitute can appear on several rows. Its constituency fields describe the relation, and an absent or unfinished final relation gives an error. No preliminary substitute result is inferred.
 
 ```r
 # Detailed candidacies

@@ -73,6 +73,30 @@
 
 .ersattare_ett_ar <- function(ar, val, source, data_dir, update, archive,
                               progress) {
+  if (ar == 2018L) {
+    out <- .xml2018_valda_ersattare(val, source, data_dir, update,
+      archive, progress)$ersattare
+    kd <- kandidaturer(ar = ar, val = val, source = source,
+      data_dir = data_dir, update = update, archive = archive)
+    .ersattare_validera_kandidater(out, kd)
+    out <- dplyr::mutate(out, valar = 2018L, .after = valtillfalle)
+    nyckel <- c("valar", "valtyp", "geografiniva", "valomradeskod",
+      "valkretskod", "partikod", "ledamot_kandidatnummer",
+      "ersattare_kandidatnummer", "ersattarordning")
+    if (anyDuplicated(out[nyckel])) {
+      stop("Dubbla officiella ers\u00e4ttarrelationer i 2018 \u00e5rs slutresultat.",
+           call. = FALSE)
+    }
+    return(.kort_kommunnamn_2026(out) |>
+      dplyr::select(dplyr::all_of(c(
+        "valtillfalle", "valar", "valtyp", "partikod", "partiforkortning",
+        "partibeteckning", "partifarg", "ledamot_kandidatnummer",
+        "ledamot_namn", "ersattare_kandidatnummer", "ersattare_namn",
+        "ersattarordning", "ersattargrupp", "valgrund_id", "valgrund_text",
+        "geografiniva", "valomradeskod", "valomradesnamn", "valkretskod",
+        "valkretsnamn", "valklass", "rakningstillfalle", "valdatum",
+        "valdatum_fg", "test"))))
+  }
   index <- .read_resultatindex(ar, source, data_dir, update, archive)
   paths <- .slutliga_mandat_paths(index, val, "ersattare")
   kandidaturdata <- kandidaturer(
