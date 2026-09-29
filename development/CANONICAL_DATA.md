@@ -1,137 +1,137 @@
-# Kanonisk datadistribution: RKL 2018, prototyp
+# Canonical data distribution: RKL 2018
 
-Detta är ett internt bygg- och läskontrakt. Ingen GitHub Release finns ännu och
-de publika funktionernas `source`-argument använder fortfarande enbart
-Valmyndighetens råkällor (`local`, `remote`, `auto`). `auto` ändras inte.
+The 2018 canonical collection is an independent Parquet data product. It uses
+English public column names from `R/output_names.R`, with schema version 2
+and data version `data-v0.1.0`. These versions are separate from the R package
+version. The current collection is a local pre-release build; no release or
+data tag has been published.
 
-## Vald modell
+## Asset inventory
 
-Parquet är det publika huvudformatet. Tillgångarna är fristående tabeller som
-också kan läsas utanför R. Det lilla paketet `nanoparquet` ligger i `Suggests`;
-råvägen får inget nytt obligatoriskt beroende. Inga CSV- eller DTA-dubbletter
-distribueras. RDS används enbart för lokala tekniska mellanobjekt och som
-benchmarkreferens.
+All filenames have the `.parquet` extension. The manifest records each file's
+row count, byte size, SHA256 checksum, role and original table layout.
 
-Distributionen är en hybrid. `valresultat` lagras som en Parquet-fil per
-valtyp, `mandat` i en fil och kandidatfunktionerna i var sin fil. Deras
-publika kolumner, ordning och typer bevaras via manifestet. För `personroster`
-lagras de glesa publika vyerna per valtyp/nivå; områdesvyerna omfattar även
-nollkompletterade varianter. Små normaliserade basobjekt (`geo`, `parti`,
-`lista`, `roster`, `listroster`) finns separat för att återskapa de stora
-nollkompletterade distriktsvyerna med samma adapter som råvägen. Ingen
-förgenererad nationell kandidat × valdistrikt-panel behövs.
+| Asset | Rows |
+| --- | ---: |
+| `rkl2018-results-rd` | 108,948 |
+| `rkl2018-results-rf` | 87,759 |
+| `rkl2018-results-kf` | 84,972 |
+| `rkl2018-seats` | 4,374 |
+| `rkl2018-candidacies` | 184,197 |
+| `rkl2018-candidates` | 72,255 |
+| `rkl2018-elected` | 14,723 |
+| `rkl2018-substitutes` | 76,297 |
+| `rkl2018-preference-votes-base-area-rd` | 34,253 |
+| `rkl2018-preference-votes-area-rd` | 122,876 |
+| `rkl2018-preference-votes-base-district-rd` | 951,606 |
+| `rkl2018-preference-votes-district-rd` | 685,502 |
+| `rkl2018-preference-votes-base-area-rf` | 52,968 |
+| `rkl2018-preference-votes-area-rf` | 202,174 |
+| `rkl2018-preference-votes-base-district-rf` | 1,143,157 |
+| `rkl2018-preference-votes-district-rf` | 905,633 |
+| `rkl2018-preference-votes-base-area-kf` | 129,275 |
+| `rkl2018-preference-votes-area-kf` | 262,335 |
+| `rkl2018-preference-votes-base-district-kf` | 1,224,345 |
+| `rkl2018-preference-votes-district-kf` | 1,006,364 |
 
-En helt normaliserad modell även för övriga funktioner skulle kräva en
-andra, mer komplex adapter för deras publika kontrakt. Endast färdiga
-personrösttabeller skulle i stället duplicera miljontals nollrader. Den valda
-hybriden bevarar explicita nollor, genuina `NA`, listnummer, kompletthet och
-90000-semantik i små filer. I varje Parquet-fil anger `.table`, `.component`
-eller `.person_view` undertabellen när flera delar delar fil.
+Results are partitioned by election code. Seat allocations and candidate
+tables each have one asset. Preference-vote data have a public sparse view
+and five small normalized components (`geo`, `parti`, `lista`, `roster`,
+`listroster`) per election and level. Completed district panels are
+reconstructed from those bases, avoiding millions of prewritten zero rows.
+The technical `.component` values remain source-oriented Swedish labels;
+their data values have not been translated. The English names of shared
+columns are identical in bases and public analysis tables.
 
-RD:s valdistriktsresultat (100 199 rader, 51,4 MB i R) gav följande mätning:
+## Explicit package backend
 
-| Format | Byte | Skrivtid | Lästid |
-|---|---:|---:|---:|
-| Parquet gzip | 2 345 722 | 0,24 s | 0,09 s |
-| Parquet snappy | 2 887 464 | 0,15 s | 0,29 s |
-| Parquet zstd | 3 547 313 | 0,12 s | 0,11 s |
-| RDS gzip, teknisk referens | 2 746 423 | 0,61 s | 0,32 s |
-| RDS xz, teknisk referens | 1 831 584 | 5,68 s | 0,89 s |
+The distribution is a GitHub Release with tag `data-v0.1.0` in
+`richardohrvall/swelections`. `manifest.json` and the 20 Parquet files above
+are release assets, **not Git files**. The manifest is the canonical entry
+point at
+`https://github.com/richardohrvall/swelections/releases/download/data-v0.1.0/manifest.json`.
+It records every asset filename, byte size and SHA256 digest. The package
+downloads and validates the manifest, then downloads only needed assets and
+validates their sizes and SHA256 digests before use. The manifest and assets
+are cached under the separate canonical data version and checksums. A cached
+Parquet asset remains `source = "canonical"`, never raw `"local"`.
 
-Parquet gzip valdes. Provade tabeller rundturstestades för kolumnordning,
-R-typ, värden och `NA`.
+Explicit `source = "canonical"` resolves that release by default. For a
+local build or mirror, set `swelections.canonical_manifest` to its manifest;
+assets are then looked up beside it. `swelections.canonical_assets_dir` and
+`swelections.canonical_base_url` may override the asset location for explicit
+canonical requests. `swelections.canonical_cache_dir` changes the cache root.
+`nanoparquet` remains optional. Canonical mode rejects raw `data_dir`,
+`update` and `archive` and never falls back to raw files on a missing or
+invalid asset. Explicit `"local"` and `"remote"` always use official raw data.
 
-## Assets och manifest
+## Automatic source selection
 
-`data-raw/build-canonical-2018.R` skapar lokala RDS-mellanobjekt i
-`.local-data/canonical-build/data-v0.1.0/`.
-`data-raw/export-canonical-parquet-2018.R` konverterar dem till 20 Parquet-
-tillgångar (totalt cirka 40,7 MB) i
-`.local-data/canonical-build/parquet-data-v0.1.0/`. Endast
-Parquet-tillgångarna och `manifest.json` är avsedda för en framtida release.
-`mandat` behöver inte hämta personröstdata och ett distriktsuttag behöver
-bara relevant valtyp. Båda byggkatalogerna är Git-ignorerade.
-RDS-mellanobjekten upptar 13,6 MB tillsammans, men är R-specifika och
-saknar de färdiga fristående personrösttabeller som ingår i Parquet-samlingen.
+The central registry in `R/canonical_distribution.R` names each approved
+year, series, data version, schema version, release URL and `auto_eligible`
+flag. Its initial row explicitly enables 2018 / `data-v0.1.0`; no 2022 or
+2026 row exists. A calendar-year threshold is never used. For each requested
+year and public table, `source = "auto"` follows this order:
 
-| Asset (`.parquet`) | Rader | Byte |
-|---|---:|---:|
-| rkl2018-valresultat-rd | 108 948 | 2 632 579 |
-| rkl2018-valresultat-rf | 87 759 | 2 482 288 |
-| rkl2018-valresultat-kf | 84 972 | 2 473 403 |
-| rkl2018-mandat | 4 374 | 39 062 |
-| rkl2018-kandidaturer | 184 197 | 1 334 452 |
-| rkl2018-kandidater | 72 255 | 478 905 |
-| rkl2018-valda | 14 723 | 137 656 |
-| rkl2018-ersattare | 76 297 | 189 619 |
-| rkl2018-person-bas-omrade-rd | 34 253 | 114 846 |
-| rkl2018-person-publik-omrade-rd | 122 876 | 503 386 |
-| rkl2018-person-bas-distrikt-rd | 951 606 | 1 880 752 |
-| rkl2018-person-publik-distrikt-rd | 685 502 | 5 002 063 |
-| rkl2018-person-bas-omrade-rf | 52 968 | 185 667 |
-| rkl2018-person-publik-omrade-rf | 202 174 | 1 139 765 |
-| rkl2018-person-bas-distrikt-rf | 1 143 157 | 2 311 762 |
-| rkl2018-person-publik-distrikt-rf | 905 633 | 6 560 335 |
-| rkl2018-person-bas-omrade-kf | 129 275 | 533 301 |
-| rkl2018-person-publik-omrade-kf | 262 335 | 2 568 504 |
-| rkl2018-person-bas-distrikt-kf | 1 224 345 | 2 830 987 |
-| rkl2018-person-publik-distrikt-kf | 1 006 364 | 7 285 052 |
+1. If all raw files required by that table exist with nonzero size in the
+   configured local archive, use `local`. The parser still validates their
+   contents; a malformed local source errors rather than silently falling
+   back. Results and seats require the 2018 result ZIP and party register;
+   candidacies require the candidacy file; result-enriched candidate, elected,
+   substitute and preference-vote tables require all three. Candidates with
+   `include_results = FALSE` require only candidacies.
+2. Otherwise, if the registry marks coverage eligible **and** the versioned
+   published release manifest can be retrieved and validated (or was already
+   retrieved into the release cache), use `canonical` when optional
+   `nanoparquet` is installed. A local build selected with
+   `swelections.canonical_manifest` does not by itself qualify for auto.
+3. Otherwise use `remote`, the official raw source. Some 2018 raw URLs are no
+   longer available, so this route may give the existing informative error.
 
-`manifest.json` innehåller `schema_version`, `data_version`, `valserie`,
-`valar`, UTC-byggtid, byggande paketversion, byggkodens Git-SHA, publika
-dataytor och per asset namn, roll, radantal, filnamn, byte och SHA256. Det
-innehåller även undertabellernas ursprungliga kolumner och ordning. Råkällorna
-anges med officiell identitet/URL, klassning, MD5 och SHA256. Slutresultatets
-klassning är `official_archived_snapshot`. Inga lokala sökvägar ingår. Dataversionen
-är en version för hela kollektionen; senare år kan läggas till en ny release av
-samma format. Paketversionen är separat.
+`update = TRUE` or `archive = TRUE` retains the existing raw-data path and
+does not select canonical. Explicit `source` always overrides `auto`. Each
+year in a multi-year call is resolved separately. A later 2022 release needs
+its own reviewed registry row; the current 2026 election remains on the raw
+path until explicitly approved.
 
-Råkällornas verifierade kontrollsummor i detta bygge:
+## Build and provenance
 
-| Källa | MD5 | SHA256 |
-|---|---|---|
-| Slutresultatets ZIP, officiell arkiverad snapshot | `f8f0e87f7652c8ef258d011bd645c943` | `cb4a490b576e5a57b42b5ca26d38fa1074c692b4cd7eeb2aca2c3de80560b3a6` |
-| Deltagande partier, officiell SKV | `44f9ce072b0035c8d79439752c75f54a` | `5b2ea5698b131ddbb92dd102629110e52cc6d75b9b77d4d0f3567759d191c01e4` |
-| Kandidaturer, nu publicerad gallrad officiell SKV | `9855ac4280c2a5165389a88c647ae49f` | `8d9fa91b0c7257e0c8bec840209fabf23a78b7837aadb58a849cf47cbb7aabb5` |
+`data-raw/build-canonical-2018.R` rebuilds RDS intermediates from the
+verified official 2018 result ZIP, participating-party file and currently
+published redacted candidacy file. They are technical build inputs, not
+distribution assets. `data-raw/export-canonical-parquet-2018.R` writes
+the 20 English-schema Parquet files and `manifest.json`. The named local
+research snapshot is not a build input and candidate names are never
+released in this collection.
 
-Första byggsteget kräver arkiverad officiell
-`slutresultat.zip`, Valmyndighetens `deltagande_partier.skv` och den nu
-publicerade **gallrade** `kandidaturer.skv`. Den namngivna lokala
-forskningssnapshoten och dess README ändras inte och används inte som
-byggkälla. Skriptet kontrollerar kandidatfilens verifierade MD5 och
-slutresultatets SHA256 innan det skriver assets. Byggsteget använder en
-temporär byggrot; varken råfilerna eller deras tillfälliga kopior distribueras.
+The manifest contains the independent data and schema versions, UTC build
+time, package version, build Git SHA, clean/dirty tree flag, build-code
+checksums, source identities and MD5/SHA256 values, and per-asset sizes and
+SHA256 checksums. Assets are gzip-compressed Parquet, usable from R, Python,
+DuckDB, Polars and other Parquet readers. No CSV, DTA or public RDS duplicate
+is built. The local build artifacts are Git-ignored.
 
-Byggordningen är `Rscript data-raw/build-canonical-2018.R RAW_ROOT
-OFFICIAL_CANDIDATE_FILE` följt av `Rscript
-data-raw/export-canonical-parquet-2018.R STAGE_DIR OUTPUT_DIR`. Det andra
-steget kräver `nanoparquet` vid byggning. En ny dataversion ska byggas om och
-checksummeverifieras efter att byggkoden har committats, så att manifestets
-Git-SHA pekar på just den kod som skapade tillgångarna.
+## Validation and release boundary
 
-Läsprototypen `.canonical_manifest()`, `.canonical_asset()` och
-`.canonical_public_2018()` är intern.
-Cache-nyckeln innehåller dataversion, assetnamn och checksumma. Cacheträff
-kontrolleras mot både byte och SHA256; skadade filer underkänns och kan hämtas
-om från en explicit given URL. Standardcache är
-`tools::R_user_dir("swelections", "cache")`; tester injicerar en isolerad
-cache. Ingen nedladdning sker utan URL. Parquet-läsning kräver `nanoparquet`
-först när ett sådant asset används; installationen kräver inte `.local-data`
-eller utvecklingsfiler.
+The exporter round-trips every Parquet file and validates values, order,
+types and missingness. Integration tests verify manifest checksums,
+English column names, normalized components and equivalence to raw-built
+2018 intermediates. A separate opt-in test can reparse the official raw
+archive and compare public outputs. The public `source = "canonical"` route
+must agree for both `names = "en"` and `names = "sv"`.
 
-En framtida release kan använda taggen `data-v0.1.0` och adresser av formen
-`https://github.com/richardohrvall/swelections/releases/download/data-v0.1.0/<asset>`.
-Paketet bör läsa en **explicit** dataversion från ett litet versionsregister,
-aldrig `latest`. En framtida publik `source = "canonical"` bör föreslås och
-beslutas separat; nuvarande råkällebetydelse bevaras.
+No `data-v0.1.0` Git tag, GitHub release or asset publication is created by
+this work. The release procedure is:
 
-Integrationen har två nivåer. Det ordinarie nätfria testet är deterministiskt
-och använder små fixtures. Den separata 2018-integrationen jämför alla
-Parquet-vyer exakt med de RDS-mellanobjekt som byggts av råvägen, inklusive
-personrösternas fyra områdesvarianter och båda glesa distriktsvarianterna.
-Den kan aktiveras med `SWELECTIONS_TEST_CANONICAL_DIR` och
-`SWELECTIONS_TEST_CANONICAL_STAGE_DIR`. En full omparsning av rå-XML för
-varje variant är dessutom möjlig med `SWELECTIONS_TEST_CANONICAL_FULL_RAW=1`,
-men är ett separat långsamt test. För nollkompletterade distriktsvyer verifieras
-de fem normaliserade grundtabellerna per valtyp/nivå exakt; samma interna
-adapter körs sedan som på råvägen.
+1. Commit and review the package code, schema, tests and this document while
+   leaving generated assets outside Git.
+2. From that clean commit, rebuild the raw RDS intermediates and export the
+   20 Parquet assets and manifest. Confirm the manifest's build Git SHA equals
+   the reviewed commit and `build_tree_dirty` is `false`.
+3. Validate the schema, source hashes, every asset's size and SHA256, the
+   direct raw/public API equivalence sweep, the full tests and `R CMD check`.
+4. Create the `data-v0.1.0` tag/release from the reviewed code commit and
+   upload `manifest.json` plus exactly the 20 listed Parquet files. Do not
+   replace published assets in place; a change requires a new data version.
+5. Test explicit canonical and `auto` with no local raw archive against the
+   published release, then record the release URL and checksums.

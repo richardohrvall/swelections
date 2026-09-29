@@ -1,9 +1,10 @@
-# Proposed English canonical schema for RKL 2018
+# English canonical schema for RKL 2018
 
-This is a schema proposal, not a rebuilt data distribution. The existing
-Parquet assets, asset names, manifest, exporter and reader still use the
-prototype's Swedish columns. Do not publish a new canonical collection until
-the open decisions below and the English export/read migration are resolved.
+This is the approved schema for the local 2018 canonical Parquet build
+(`schema_version = 2`). Stored public columns are English; Swedish names are
+provided by the R output layer on request. The data collection has not yet
+been published. Asset names and build status are recorded in
+`development/CANONICAL_DATA.md` and the local manifest.
 
 ## Analysis-facing tables
 
@@ -14,7 +15,7 @@ the seven public analysis families: `results()`, `seats()`, `candidacies()`,
 The established column order, types, observation units, keys, values and
 `NA`/zero/`FALSE` semantics remain unchanged by the name translation.
 
-The following names are fixed for the proposed canonical analysis tables:
+The following names are fixed for the canonical analysis tables:
 
 | Swedish source/public field | English canonical field | Meaning |
 |---|---|---|
@@ -83,12 +84,11 @@ Only these current base-specific fields need their own definitions:
 | `list_complete` | `list_complete` | Boolean used by the verified-zero reconstruction for a list node. |
 
 The technical discriminator columns `.table`, `.component` and
-`.person_view` are separate from analysis columns. Their column names are
-already English; the `.component` **values** are currently Swedish and need
-an explicit migration/compatibility decision before rebuilding. Asset
-filenames are unchanged in this proposal.
+`.person_view` are separate from analysis columns. Their names are already
+English. The `.component` **values** remain Swedish source-oriented labels;
+this column-name migration does not translate data values.
 
-## Evidence and outstanding decision
+## Evidence and naming decisions
 
 The archived local 2018 candidate snapshot has 184,197 rows. Its
 `FOLKBOKFÖRINGSORT` has 180,945 nonempty values, none numeric. The 291
@@ -126,8 +126,9 @@ Official source descriptions:
 - https://historik.val.se/val/val2018/statistik/
 - https://www.val.se/english/running-in-elections/running-for-office
 
-The existing prototype export script writes Swedish columns to Parquet and
-to the manifest; its reader expects them. Rebuilding the canonical assets
-therefore requires a coordinated exporter, manifest, base-component and
-reader migration. This document does not
-perform that migration or modify any existing Parquet file.
+The export pipeline translates all public and normalized-base column names
+through the central map before writing Parquet, and records those English
+names in the manifest. The package reader maps them back to the existing
+Swedish internal adapter before optional public output-name selection. No
+parallel Swedish Parquet collection is written. The `data-v0.1.0` collection
+must be rebuilt from a clean committed tree before publication.

@@ -27,7 +27,8 @@
 #' För 2018 läses personröster och invaldsuppgifter från det slutliga
 #' XML-resultatet. Publika namn är alltid `NA`, även om en lokal historisk
 #' kandidatsnapshot innehåller namn. Resultatberoende 2018-anrop kräver en
-#' lokal kopia av slutresultat-ZIP.
+#' lokal kopia av slutresultat-ZIP på rådatavägen, eller den separat
+#' versionerade kanoniska Parquet-samlingen med `source = "canonical"`.
 #'
 #' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
@@ -37,7 +38,13 @@
 #'   `NULL` ger alla.
 #' @param resultat Om `TRUE`, kompletteras kandidaterna med personröster,
 #'   personval och invaldsuppgifter från slutliga resultatfiler.
-#' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
+#' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet.
+#'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+#'   väljas via `options(swelections.canonical_manifest = "...")`.
+#'   `"auto"` väljer kompletta lokala officiella råfiler först, därefter en
+#'   publicerad kanonisk samling som uttryckligen godkänts för automatiskt
+#'   bruk, annars officiell fjärrkälla. För 2022/2026 används rådatavägen.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
 #'   Lokal arkivering kräver en redan befintlig lokal fil.
 #' @param data_dir Lokal rotmapp för rådata.
@@ -85,7 +92,7 @@ kandidater <- function(
     ar = 2026,
     val = NULL,
     resultat = TRUE,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -103,6 +110,7 @@ kandidater <- function(
     valar[[1]], "kandidater", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   .check_flag(resultat, "resultat")
 
   purrr::map(valar, function(ett_ar) {
@@ -117,6 +125,11 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
+  source <- .select_public_source(source, ar, "kandidater", data_dir,
+                                  update, archive, include_results = resultat)
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_2018_source("kandidater", val, resultat = resultat,
+      auto_selected = identical(source, "canonical_auto")))
   kandidaturdata <- kandidaturer(
     ar = ar,
     val = val,
@@ -225,7 +238,7 @@ kandidater <- function(
 valda <- function(
     ar = 2026,
     val = NULL,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -248,6 +261,7 @@ valda <- function(
     valar[[1]], "valda", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   purrr::map(valar, function(ett_ar) {
     tryCatch(
       .valda_ett_ar(ett_ar, val, source, data_dir, update, archive, progress),

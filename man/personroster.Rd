@@ -7,7 +7,7 @@
 personroster(
   ar = 2026,
   val = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -27,7 +27,10 @@ Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.}
 
 \item{data_dir}{Lokal rotmapp för rådata.}
@@ -123,8 +126,8 @@ personröstunderlaget är ofullständigt används \code{NA}, inte en gissad noll
 För 2018 används slutresultatets XML: kandidatens områdesvisa \code{PERSONVAL}
 och listvisa \code{VALSEDEL/PERSONVAL}. \code{PERSONKRYSS} används för avstämning;
 både valdagens och onsdagens distrikt ingår. Publika kandidatnamn är alltid
-\code{NA} för 2018. En lokal kopia av 2018 års slutresultat-ZIP krävs för
-resultatberoende anrop eftersom den publicerade fjärrlänken inte fungerar.
+\code{NA} för 2018. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
+\code{source = "canonical"} läser i stället den versionerade Parquet-samlingen.
 
 För 2022 saknas \code{summeradePersonroster}. Områdesvyn använder de officiella
 slutliga \code{listRoster} inom personvalsområdet och distriktsvyn använder

@@ -47,6 +47,11 @@
 
 .valda_ett_ar <- function(ar, val, source, data_dir, update, archive,
                           progress) {
+  source <- .select_public_source(source, ar, "valda", data_dir,
+                                  update, archive)
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_2018_source("valda", val,
+      auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
     kandidaturdata <- kandidaturer(ar = ar, val = val, source = source,
       data_dir = data_dir, update = update, archive = archive)

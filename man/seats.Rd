@@ -9,7 +9,7 @@ seats(
   election = NULL,
   count = "final",
   level = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -32,7 +32,14 @@ seats(
 \item{level}{One or more English geographic levels, or \code{NULL} for all
 relevant mandate levels.}
 
-\item{source}{\code{"auto"}, \code{"local"} or \code{"remote"}.}
+\item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
+For 2018, \code{"auto"} prefers a complete configured local raw set, then an
+explicitly auto-eligible published canonical release, then the official
+remote raw source. Other years retain the official raw-data route.
+Explicit \code{"canonical"} currently covers 2018 and resolves the published
+English-schema Parquet release; a local build may be selected through
+\code{options(swelections.canonical_manifest = "path/to/manifest.json")}.
+Canonical Parquet reading requires optional package \code{nanoparquet}.}
 
 \item{data_dir}{Local root directory for raw files.}
 

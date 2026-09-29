@@ -1,18 +1,26 @@
 # swelections 0.3.0.9000
 
-* Refines the English output schema before the first canonical 2018 rebuild:
+* Adds a 2018 `source = "canonical"` backend and prepares distribution through
+  a versioned GitHub Release manifest and 20 Parquet assets. The stored schema
+  uses the approved English column names across public and normalized
+  preference-vote assets; Swedish output names remain available. Canonical
+  data have separate schema/data versions and are not yet published. For 2018,
+  `source = "auto"` prefers complete local raw files, then a published release
+  explicitly marked auto-eligible, then the official remote raw source.
+  Other years remain on the raw-data route.
+
+* Refines the English output schema for the 2018 canonical rebuild:
   preference-vote terminology, election-time `unfilled_seats`, source/area
   reporting metadata and source-faithful candidacy fields. The official
   `RD`/`RF`/`KF` values are now in `election_code`, with `election_kind`
   separate; English `election` accepts descriptive values or official codes.
-  The existing
-  Swedish output schema and canonical assets are unchanged.
+  The existing Swedish output schema is unchanged.
 
 * Adds English-first `results()`, `seats()`, `candidacies()`, `candidates()`,
   `elected()`, `substitutes()` and `preference_votes()` while retaining the Swedish API. Public R
   output column names can be selected with `names = "en"` or `"sv"`; English
-  calls also honour `options(swelections.names = "sv")`. Data values and
-  canonical assets are unchanged.
+  calls also honour `options(swelections.names = "sv")`. Data values are
+  unchanged by column-language selection.
 
 * Completes final 2018 support in `kandidater()`, `valda()`, `ersattare()` and
   all four `personroster()` views using the official XML structures. The
@@ -21,7 +29,8 @@
   final XML `GRUPP_VALDA` structure; empty-seat placeholders are excluded.
   Person votes preserve observed candidate votes, verify list totals and
   reconcile area and district results including Wednesday districts. A local
-  copy of the unavailable 2018 final-result ZIP is required for these results.
+  copy of the 2018 final-result ZIP is required on the raw-data route; the
+  explicit canonical route is an alternative.
 * Adds final 2018 results to `valresultat()` and `mandat()` through a separate
   XML reader and shared public schemas. Adds 2018 `kandidaturer()` from the
   official semicolon-separated source. Public 2018 candidacy names remain

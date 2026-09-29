@@ -9,7 +9,7 @@ valresultat(
   val = "RD",
   rakning = c("slutlig", "preliminar"),
   niva = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -32,7 +32,10 @@ intervallgränser anges.}
 \item{niva}{En geografisk nivå. \code{NULL} ger valets huvudnivå: RD \code{"riket"},
 RF \code{"region"}, KF \code{"kommun"}. Se nivåerna nedan.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.}
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
 \item{data_dir}{Lokal rotmapp för rådata.}
 

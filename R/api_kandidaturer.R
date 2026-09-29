@@ -9,7 +9,10 @@
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
-#' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
+#' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+#'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
 #'   Lokal arkivering kräver en redan befintlig lokal fil.
 #' @param data_dir Lokal rotmapp för rådata.
@@ -51,7 +54,7 @@
 kandidaturer <- function(
     ar = 2026,
     val = NULL,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -73,6 +76,7 @@ kandidaturer <- function(
     valar[[1]], "kandidaturer", source, data_dir, update, archive,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   purrr::map(valar, function(ett_ar) {
     tryCatch(
       .kandidaturer_ett_ar(ett_ar, val, source, data_dir, update, archive),
@@ -83,7 +87,12 @@ kandidaturer <- function(
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
+  source <- .select_public_source(source, ar, "kandidaturer", data_dir,
+                                  update, archive)
   if (ar == 2018L) {
+    if (source %in% c("canonical", "canonical_auto"))
+      return(.canonical_2018_source("kandidaturer", val,
+        auto_selected = identical(source, "canonical_auto")))
     file <- .kalla_2018("kandidaturer", source, data_dir, update, archive)
     out <- .read_kandidaturer_2018(file)
     if (!is.null(val)) out <- dplyr::filter(out, valtyp %in% val)

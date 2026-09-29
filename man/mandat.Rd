@@ -9,7 +9,7 @@ mandat(
   val = NULL,
   rakning = c("slutlig", "preliminar"),
   niva = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -33,7 +33,10 @@ används 2026.}
 \code{"riksdagsvalkrets"}, RF \code{"region"} och \code{"regionvalkrets"}, och KF
 \code{"kommun"} och \code{"kommunvalkrets"}. \code{NULL} ger alla relevanta nivåer.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.}
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
 \item{data_dir}{Lokal rotmapp för rådata.}
 

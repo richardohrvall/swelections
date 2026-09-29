@@ -41,8 +41,8 @@
 #' För 2018 används slutresultatets XML: kandidatens områdesvisa `PERSONVAL`
 #' och listvisa `VALSEDEL/PERSONVAL`. `PERSONKRYSS` används för avstämning;
 #' både valdagens och onsdagens distrikt ingår. Publika kandidatnamn är alltid
-#' `NA` för 2018. En lokal kopia av 2018 års slutresultat-ZIP krävs för
-#' resultatberoende anrop eftersom den publicerade fjärrlänken inte fungerar.
+#' `NA` för 2018. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
+#' `source = "canonical"` läser i stället den versionerade Parquet-samlingen.
 #'
 #' För 2022 saknas `summeradePersonroster`. Områdesvyn använder de officiella
 #' slutliga `listRoster` inom personvalsområdet och distriktsvyn använder
@@ -56,7 +56,10 @@
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
-#' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
+#' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+#'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
 #' @param data_dir Lokal rotmapp för rådata.
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
@@ -108,7 +111,7 @@
 personroster <- function(
     ar = 2026,
     val = NULL,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -134,6 +137,7 @@ personroster <- function(
     valar[[1]], "personroster", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   .check_text(niva, "niva")
   if (length(niva) != 1L || !niva %in% c("personvalsomrade", "valdistrikt")) {
     stop("`niva` ska vara `personvalsomrade` eller `valdistrikt`.", call. = FALSE)
@@ -147,14 +151,23 @@ personroster <- function(
   }
   purrr::map(valar, function(ett_ar) {
     tryCatch(
-      if (ett_ar == 2018L) {
-        .personroster_ett_ar_2018(ett_ar, val, source, data_dir, update,
+      if ({
+        selected_source <- .select_public_source(source, ett_ar,
+          "personroster", data_dir, update, archive)
+        selected_source %in% c("canonical", "canonical_auto")
+      }) {
+        purrr::list_rbind(lapply(val, function(v)
+          .canonical_2018_source("personroster", v, niva, per_lista,
+            komplettera_nollor,
+            auto_selected = identical(selected_source, "canonical_auto"))))
+      } else if (ett_ar == 2018L) {
+        .personroster_ett_ar_2018(ett_ar, val, selected_source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)
       } else if (ett_ar == 2022L) {
-        .personroster_ett_ar_2022(ett_ar, val, source, data_dir, update,
+        .personroster_ett_ar_2022(ett_ar, val, selected_source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)
       } else {
-        .personroster_ett_ar_2026(ett_ar, val, source, data_dir, update,
+        .personroster_ett_ar_2026(ett_ar, val, selected_source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)
       },
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),

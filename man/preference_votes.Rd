@@ -7,7 +7,7 @@
 preference_votes(
   year = 2026,
   election = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -27,7 +27,14 @@ preference_votes(
 \item{election}{One or more English election values or official codes;
 \code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
 
-\item{source}{\code{"auto"}, \code{"local"} or \code{"remote"}.}
+\item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
+For 2018, \code{"auto"} prefers a complete configured local raw set, then an
+explicitly auto-eligible published canonical release, then the official
+remote raw source. Other years retain the official raw-data route.
+Explicit \code{"canonical"} currently covers 2018 and resolves the published
+English-schema Parquet release; a local build may be selected through
+\code{options(swelections.canonical_manifest = "path/to/manifest.json")}.
+Canonical Parquet reading requires optional package \code{nanoparquet}.}
 
 \item{data_dir}{Local root directory for raw files.}
 

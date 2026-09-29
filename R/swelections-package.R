@@ -13,7 +13,10 @@
 #'
 #' En lokal rådatamapp anges med `data_dir` eller optionen
 #' `swelections.data_dir`. Explicit `data_dir` har företräde.
-#' Med `source = "auto"` används en befintlig lokal fil, annars fjärrkällan.
+#' Med `source = "auto"` används kompletta lokala råfiler först. Om 2018 års
+#' råfiler saknas används den publicerade kanoniska samlingen när dess version
+#' uttryckligen är godkänd för automatiskt bruk; annars används fjärrkällan.
+#' För 2022/2026 används fortsatt den officiella rådatavägen.
 #' Med `source = "local"` krävs en befintlig lokal fil och nätåtkomst används aldrig.
 #' Med `source = "remote"` används fjärrkällan vid vanlig läsning.
 #'

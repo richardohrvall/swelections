@@ -7,7 +7,7 @@
 ersattare(
   ar = 2026,
   val = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -24,7 +24,10 @@ Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
 Lokal arkivering kräver en redan befintlig lokal fil.}
 
@@ -57,7 +60,8 @@ behåller samma typade schema; saknad eller ofärdig slutlig relation ger fel.
 För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \code{valomradeskod}; separata kommunfält dupliceras inte.
 För 2018 hämtas relationerna från slutresultatets XML och personnamn är
-alltid \code{NA}. Resultatberoende 2018-anrop kräver en lokal slutresultat-ZIP.
+alltid \code{NA}. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
+\code{source = "canonical"} använder i stället den versionerade Parquet-samlingen.
 }
 \description{
 Hämtar officiella relationer mellan valda ledamöter och deras ersättare

@@ -8,7 +8,10 @@
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
-#' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
+#' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+#'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
 #'   Lokal arkivering kräver en redan befintlig lokal fil.
 #' @param data_dir Lokal rotmapp för rådata.
@@ -34,7 +37,8 @@
 #'   För KF är `valomradesnamn` paketets korta kommunnamn, uppslaget via
 #'   `valomradeskod`; separata kommunfält dupliceras inte.
 #'   För 2018 hämtas relationerna från slutresultatets XML och personnamn är
-#'   alltid `NA`. Resultatberoende 2018-anrop kräver en lokal slutresultat-ZIP.
+#'   alltid `NA`. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
+#'   `source = "canonical"` använder i stället den versionerade Parquet-samlingen.
 #' @examples
 #' \dontrun{
 #' ersattare(val = "RD", source = "local", data_dir = "mitt_arkiv")
@@ -45,7 +49,7 @@
 ersattare <- function(
     ar = 2026,
     val = NULL,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -68,6 +72,7 @@ ersattare <- function(
     valar[[1]], "ersattare", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   purrr::map(valar, function(ett_ar) {
     tryCatch(
       .ersattare_ett_ar(ett_ar, val, source, data_dir, update, archive,

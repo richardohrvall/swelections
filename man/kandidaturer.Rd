@@ -7,7 +7,7 @@
 kandidaturer(
   ar = 2026,
   val = NULL,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -24,7 +24,10 @@ används 2026.}
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
 \code{NULL} ger alla.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
 Lokal arkivering kräver en redan befintlig lokal fil.}
 

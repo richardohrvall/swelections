@@ -192,15 +192,38 @@ Rehearsal files can be selected explicitly for development with
 
 All main functions accept `source` and `data_dir`:
 
-- `source = "auto"` uses a local source file if available, otherwise the remote source.
+- `source = "auto"` prefers the required official raw files in the configured
+  local archive. If they are unavailable, it uses a published canonical
+  release only when that election and release are explicitly approved for
+  automatic use; otherwise it uses the official remote source. The 2022 and
+  2026 elections stay on the raw-data route until separately approved.
 - `source = "local"` requires local files and never accesses the network.
 - `source = "remote"` selects the remote source.
+- `source = "canonical"` explicitly reads the versioned `swelections` Parquet
+  collection, currently for 2018 only. It is separate from locally stored
+  official raw files.
 
 Set `data_dir` per call or configure a local archive for the R session with
 `options(swelections.data_dir = "C:/path/to/valdata")`. `update` and `archive`
 control working-copy updates and dated raw-file snapshots where applicable.
-Raw source files are kept outside the package repository. The `source`
-argument does not select canonical Parquet assets.
+Raw source files are kept outside the package repository. `data_dir` applies
+to official raw files, not canonical Parquet assets.
+
+For 2018, an explicit canonical request resolves the versioned GitHub Release
+manifest and downloads only the required Parquet assets. To use a local build
+instead, configure its manifest:
+
+```r
+options(swelections.canonical_manifest = "path/to/manifest.json")
+results(year = 2018, election = "parliamentary", level = "national",
+        source = "canonical")
+```
+
+Canonical assets are read next to the manifest by default and cached with
+checksum verification. `nanoparquet` is needed only for Parquet use. The
+explicit canonical request does not fall back to raw files when an asset is
+missing. `update` and `archive` keep their official raw-data meaning; they do
+not select canonical data automatically.
 
 ## Development status
 

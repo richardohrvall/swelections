@@ -1,5 +1,5 @@
-# The canonical collection is deliberately independent of the raw `source`
-# argument. Until a data release exists, these helpers are internal only.
+# The canonical collection is a separate, versioned source. It is not a local
+# copy of Valmyndigheten's raw files.
 .canonical_sha256 <- function(path) {
   if (!file.exists(path)) stop("Kanonisk fil saknas: ", path, call. = FALSE)
   if (!exists("sha256sum", envir = asNamespace("tools"), inherits = FALSE)) {
@@ -21,7 +21,7 @@
   }
   if (length(manifest$data_version) != 1L ||
       !grepl("^data-v[0-9]+\\.[0-9]+\\.[0-9]+$", manifest$data_version) ||
-      !identical(as.integer(manifest$schema_version), 1L) ||
+      !as.integer(manifest$schema_version) %in% c(1L, 2L) ||
       anyDuplicated(manifest$assets$asset) ||
       anyDuplicated(manifest$assets$file) ||
       any(!grepl("^[a-z0-9][a-z0-9_.-]*$", manifest$assets$asset)) ||
@@ -97,12 +97,49 @@
                              call. = FALSE)
   columns <- strsplit(entry$columns[[1L]], ",", fixed = TRUE)[[1L]]
   out <- data[data[[discriminator]] == table, columns, drop = FALSE]
-  tibble::as_tibble(out)
+  out <- tibble::as_tibble(out)
+  if (identical(as.integer(manifest$schema_version), 2L))
+    out <- .canonical_names_sv(out)
+  out
+}
+
+.canonical_2018_source <- function(surface, val = NULL, niva = NULL,
+                                   per_lista = FALSE,
+                                   komplettera_nollor = FALSE,
+                                   resultat = TRUE, auto_selected = FALSE) {
+  release <- .canonical_release(2018L)
+  path <- if (auto_selected) .canonical_release_manifest(release) else
+    getOption("swelections.canonical_manifest", NULL)
+  if (is.null(path)) path <- .canonical_release_manifest(release)
+  if (!is.character(path) || length(path) != 1L || !file.exists(path))
+    stop("Configure a valid canonical manifest or use the published release.",
+         call. = FALSE)
+  manifest <- .canonical_manifest(path)
+  if (!identical(as.integer(manifest$schema_version), 2L) ||
+      !identical(manifest$format, "parquet")) {
+    stop("The canonical source requires the English Parquet schema (version 2).",
+         call. = FALSE)
+  }
+  assets_dir <- if (auto_selected) dirname(path) else
+    getOption("swelections.canonical_assets_dir", dirname(path))
+  base_url <- if (auto_selected) release$base_url else
+    getOption("swelections.canonical_base_url", release$base_url)
+  urls <- stats::setNames(lapply(manifest$assets$file, function(file) {
+    local <- file.path(assets_dir, file)
+    if (file.exists(local)) {
+      paste0("file:///", gsub("\\\\", "/", normalizePath(local)))
+    } else if (!is.null(base_url)) {
+      paste0(sub("/+$", "", base_url), "/", file)
+    } else NULL
+  }), manifest$assets$asset)
+  .canonical_public_2018(manifest, surface, val, niva, per_lista,
+                         komplettera_nollor, resultat,
+                         getOption("swelections.canonical_cache_dir", NULL), urls)
 }
 
 .canonical_person_base <- function(manifest, fetch, val, level) {
-  short <- if (level == "personvalsomrade") "omrade" else "distrikt"
-  asset <- paste0("rkl2018-person-bas-", short, "-", tolower(val))
+  short <- if (level == "personvalsomrade") "area" else "district"
+  asset <- paste0("rkl2018-preference-votes-base-", short, "-", tolower(val))
   x <- fetch(asset)
   components <- c("geo", "parti", "lista", "roster", "listroster")
   out <- lapply(components, function(component)
@@ -130,11 +167,11 @@
   if (identical(surface, "valresultat")) {
     if (length(val) != 1L || length(niva) != 1L)
       stop("Specify election type and level for valresultat.", call. = FALSE)
-    asset <- paste0("rkl2018-valresultat-", tolower(val))
+    asset <- paste0("rkl2018-results-", tolower(val))
     return(.canonical_table(manifest, fetch(asset), asset, niva))
   }
   if (identical(surface, "mandat")) {
-    asset <- "rkl2018-mandat"
+    asset <- "rkl2018-seats"
     data <- fetch(asset)
     values <- if (is.null(val)) c("RD", "RF", "KF") else val
     if (!all(values %in% c("RD", "RF", "KF"))) stop("Valtyp saknas.", call. = FALSE)
@@ -144,10 +181,12 @@
     return(out)
   }
   if (surface %in% c("kandidaturer", "kandidater", "valda", "ersattare")) {
-    out <- fetch(paste0("rkl2018-", surface))
+    asset <- c(kandidaturer = "candidacies", kandidater = "candidates",
+               valda = "elected", ersattare = "substitutes")[[surface]]
+    out <- .canonical_names_sv(fetch(paste0("rkl2018-", asset)))
     if (!is.null(val)) out <- dplyr::filter(out, .data$valtyp %in% val)
     if (surface == "kandidater" && (!isTRUE(resultat) || !is.null(val))) {
-      kd <- fetch("rkl2018-kandidaturer")
+      kd <- .canonical_names_sv(fetch("rkl2018-candidacies"))
       if (!is.null(val)) kd <- dplyr::filter(kd, .data$valtyp %in% val)
       base <- .kandidater_bas(kd, 2018L)
       if (!isTRUE(resultat)) return(base)
@@ -160,7 +199,8 @@
     }
     if (surface == "valda" && !is.null(val) &&
         all(c("antal_valtyper", "flera_valtyper") %in% names(out))) {
-      kd <- dplyr::filter(fetch("rkl2018-kandidaturer"), .data$valtyp %in% val)
+      kd <- dplyr::filter(.canonical_names_sv(fetch("rkl2018-candidacies")),
+                          .data$valtyp %in% val)
       base <- .kandidater_bas(kd, 2018L)
       key <- c("kandidatnummer", "valtyp", "partikod")
       index <- match(do.call(paste, c(out[key], sep = "\r")),
@@ -178,11 +218,11 @@
       length(niva) != 1L || !niva %in% c("personvalsomrade", "valdistrikt")) {
     stop("Specify one election type and person-vote level.", call. = FALSE)
   }
-  kd <- fetch("rkl2018-kandidaturer") |>
+  kd <- .canonical_names_sv(fetch("rkl2018-candidacies")) |>
     dplyr::filter(.data$valtyp == val)
-  short <- if (niva == "personvalsomrade") "omrade" else "distrikt"
+  short <- if (niva == "personvalsomrade") "area" else "district"
   if (niva == "personvalsomrade" || !isTRUE(komplettera_nollor)) {
-    asset <- paste0("rkl2018-person-publik-", short, "-", tolower(val))
+    asset <- paste0("rkl2018-preference-votes-", short, "-", tolower(val))
     table <- paste(isTRUE(per_lista), isTRUE(komplettera_nollor), sep = "__")
     out <- .canonical_table(manifest, fetch(asset), asset, table,
                             ".person_view")

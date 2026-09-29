@@ -142,7 +142,7 @@
 #' @export
 valresultat <- function(
     ar = 2026, val = "RD", rakning = c("slutlig", "preliminar"),
-    niva = NULL, source = c("auto", "local", "remote"), data_dir = NULL,
+    niva = NULL, source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
     fran = NULL, till = NULL, names = "sv"
 ) {
@@ -178,6 +178,7 @@ valresultat <- function(
     valar[[1]], "valresultat", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   purrr::map2(valar, kallor, function(ar, kalla) {
     tryCatch(
       .valresultat_ett_ar(ar, val, rakning, niva, kalla, source, data_dir,
@@ -189,11 +190,16 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  if (ar == 2018L && rakning != "slutlig") {
+    stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
+         call. = FALSE)
+  }
+  source <- .select_public_source(source, ar, "valresultat", data_dir,
+                                  update, archive)
   if (ar == 2018L) {
-    if (rakning != "slutlig") {
-      stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
-           call. = FALSE)
-    }
+    if (source %in% c("canonical", "canonical_auto"))
+      return(.canonical_2018_source("valresultat", val, niva,
+        auto_selected = identical(source, "canonical_auto")))
     return(.valresultat_2018(val, niva, source, data_dir, update, archive, progress))
   }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)

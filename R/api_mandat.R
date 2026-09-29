@@ -54,7 +54,10 @@
 #' @param niva En eller flera geografiska nivåer. RD stöder `"riket"` och
 #'   `"riksdagsvalkrets"`, RF `"region"` och `"regionvalkrets"`, och KF
 #'   `"kommun"` och `"kommunvalkrets"`. `NULL` ger alla relevanta nivåer.
-#' @param source Datakälla: `"auto"`, `"local"` eller `"remote"`.
+#' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+#'   väljas via `options(swelections.canonical_manifest = "...")`.
 #' @param data_dir Lokal rotmapp för rådata.
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
@@ -94,7 +97,7 @@ mandat <- function(
     val = NULL,
     rakning = c("slutlig", "preliminar"),
     niva = NULL,
-    source = c("auto", "local", "remote"),
+    source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL,
     update = FALSE,
     archive = FALSE,
@@ -121,6 +124,7 @@ mandat <- function(
     valar[[1]], "mandat", source, data_dir, update, archive, progress,
     valar_resolved = TRUE
   )
+  .check_canonical_years(source, valar)
   purrr::map(valar, function(valar_ett) {
     tryCatch(
       .mandat_ett_ar(valar_ett, val, rakning, par, source, data_dir,
@@ -133,11 +137,17 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
+  if (ar == 2018L && rakning != "slutlig") {
+    stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
+         call. = FALSE)
+  }
+  source <- .select_public_source(source, ar, "mandat", data_dir,
+                                  update, archive)
   if (ar == 2018L) {
-    if (rakning != "slutlig") {
-      stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
-           call. = FALSE)
-    }
+    if (source %in% c("canonical", "canonical_auto"))
+      return(.canonical_2018_source("mandat", val,
+        unique(par$geografiniva),
+        auto_selected = identical(source, "canonical_auto")))
     return(.mandat_2018(val, par, source, data_dir, update, archive, progress))
   }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)

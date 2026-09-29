@@ -8,7 +8,7 @@ kandidater(
   ar = 2026,
   val = NULL,
   resultat = TRUE,
-  source = c("auto", "local", "remote"),
+  source = c("auto", "local", "remote", "canonical"),
   data_dir = NULL,
   update = FALSE,
   archive = FALSE,
@@ -28,7 +28,13 @@ Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 \item{resultat}{Om \code{TRUE}, kompletteras kandidaterna med personröster,
 personval och invaldsuppgifter från slutliga resultatfiler.}
 
-\item{source}{Datakälla: \code{"auto"}, \code{"local"} eller \code{"remote"}.
+\item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet.
+Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
+väljas via \code{options(swelections.canonical_manifest = "...")}.
+\code{"auto"} väljer kompletta lokala officiella råfiler först, därefter en
+publicerad kanonisk samling som uttryckligen godkänts för automatiskt
+bruk, annars officiell fjärrkälla. För 2022/2026 används rådatavägen.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
 Lokal arkivering kräver en redan befintlig lokal fil.}
 
@@ -104,7 +110,8 @@ Personvalskvalificering bedöms separat.
 För 2018 läses personröster och invaldsuppgifter från det slutliga
 XML-resultatet. Publika namn är alltid \code{NA}, även om en lokal historisk
 kandidatsnapshot innehåller namn. Resultatberoende 2018-anrop kräver en
-lokal kopia av slutresultat-ZIP.
+lokal kopia av slutresultat-ZIP på rådatavägen, eller den separat
+versionerade kanoniska Parquet-samlingen med \code{source = "canonical"}.
 }
 \examples{
 \dontrun{

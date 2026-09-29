@@ -7,7 +7,12 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
           "Read-only canonical integration needs build and raw archive")
   skip_if_not_installed("nanoparquet")
   manifest <- .canonical_manifest(file.path(build, "manifest.json"))
+  manifest_text <- paste(readLines(file.path(build, "manifest.json"),
+                               warn = FALSE), collapse = "\n")
+  expect_false(grepl('"_row"', manifest_text, fixed = TRUE))
+  expect_false(grepl("C:\\\\", manifest_text, fixed = TRUE))
   expect_identical(manifest$data_version, "data-v0.1.0")
+  expect_identical(as.integer(manifest$schema_version), 2L)
   expect_identical(manifest$valserie, "rkl")
   expect_identical(as.integer(manifest$valar), 2018L)
   expect_identical(manifest$sources$sha256[
@@ -20,7 +25,7 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
   inspect_names <- function(x) {
     if (is.data.frame(x)) {
       for (field in intersect(names(x),
-        c("namn", "ledamot_namn", "ersattare_namn")))
+        c("name", "member_name", "substitute_name")))
         expect_true(all(is.na(x[[field]])), info = field)
       for (field in names(x)) if (is.character(x[[field]]))
         expect_false(any(x[[field]] == "Namnet gallrat", na.rm = TRUE))
@@ -32,7 +37,12 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
     expect_identical(as.numeric(file.info(file)$size),
                      as.numeric(manifest$assets$bytes[[i]]))
     expect_identical(.canonical_sha256(file), manifest$assets$sha256[[i]])
-    inspect_names(nanoparquet::read_parquet(file))
+    asset_data <- nanoparquet::read_parquet(file)
+    expect_true("election_code" %in% names(asset_data))
+    expect_false("valtyp" %in% names(asset_data))
+    expect_identical(names(.canonical_names_en(.canonical_names_sv(asset_data))),
+                     names(asset_data))
+    inspect_names(asset_data)
   }
   urls <- setNames(lapply(manifest$assets$file, function(file) {
     paste0("file:///", gsub("\\\\", "/", normalizePath(file.path(build, file))))
@@ -88,6 +98,33 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
     compare(ersattare(ar = 2018L, val = val, source = "local",
                       data_dir = root, progress = FALSE), "ersattare", val)
   }
+  old <- options(swelections.canonical_manifest = file.path(build, "manifest.json"),
+                 swelections.canonical_assets_dir = build,
+                 swelections.canonical_cache_dir = cache)
+  on.exit(options(old), add = TRUE)
+  for (language in c("sv", "en")) {
+    check_public <- function(raw, canonical)
+      expect_identical(canonical, raw, info = paste("public", language))
+    check_public(results(2018, "parliamentary", level = "national",
+                         source = "local", data_dir = root, names = language),
+                 results(2018, "parliamentary", level = "national",
+                         source = "canonical", names = language))
+    check_public(seats(2018, "parliamentary", source = "local",
+                       data_dir = root, names = language),
+                 seats(2018, "parliamentary", source = "canonical",
+                       names = language))
+    for (pair in list(list(candidacies, "candidacies"),
+                      list(candidates, "candidates"),
+                      list(elected, "elected"),
+                      list(substitutes, "substitutes"),
+                      list(preference_votes, "preference_votes"))) {
+      fun <- pair[[1L]]
+      check_public(fun(2018, "parliamentary", source = "local",
+                       data_dir = root, names = language),
+                   fun(2018, "parliamentary", source = "canonical",
+                       names = language))
+    }
+  }
 })
 
 test_that("canonical RKL 2018 reproduces all staged raw-path outputs", {
@@ -97,8 +134,16 @@ test_that("canonical RKL 2018 reproduces all staged raw-path outputs", {
           "Read-only canonical integration needs assets and raw-path stage")
   skip_if_not_installed("nanoparquet")
   manifest <- .canonical_manifest(file.path(build, "manifest.json"))
+  manifest_text <- paste(readLines(file.path(build, "manifest.json"),
+                               warn = FALSE), collapse = "\n")
+  expect_false(grepl('"_row"', manifest_text, fixed = TRUE))
+  expect_false(grepl("C:\\\\", manifest_text, fixed = TRUE))
   expect_identical(manifest$format, "parquet")
   expect_identical(manifest$data_version, "data-v0.1.0")
+  expect_identical(as.integer(manifest$schema_version), 2L)
+  expect_equal(nrow(manifest$assets), 20L)
+  expect_true(all(startsWith(manifest$assets$asset, "rkl2018-")))
+  expect_true(all(grepl("^[a-z0-9-]+[.]parquet$", manifest$assets$file)))
   expect_identical(as.integer(manifest$valar), 2018L)
   expect_identical(manifest$sources$sha256[
     manifest$sources$source == "slutresultat.zip"],
@@ -113,8 +158,10 @@ test_that("canonical RKL 2018 reproduces all staged raw-path outputs", {
                      as.numeric(manifest$assets$bytes[[i]]))
     expect_identical(.canonical_sha256(file), manifest$assets$sha256[[i]])
     x <- nanoparquet::read_parquet(file)
-    for (field in intersect(names(x), c("namn", "ledamot_namn",
-                                           "ersattare_namn")))
+    expect_true("election_code" %in% names(x))
+    expect_false("valtyp" %in% names(x))
+    for (field in intersect(names(x), c("name", "member_name",
+                                           "substitute_name")))
       expect_true(all(is.na(x[[field]])), info = paste(basename(file), field))
     for (field in names(x)) if (is.character(x[[field]]))
       expect_false(any(x[[field]] == "Namnet gallrat", na.rm = TRUE))
@@ -201,4 +248,114 @@ test_that("canonical RKL 2018 reproduces all staged raw-path outputs", {
     expect_identical(actual, expected,
                      info = paste("RD 1010 completed district", per_lista))
   }
+})
+
+test_that("public 2018 APIs preserve raw-built values in both name languages", {
+  build <- swelections_test_env("CANONICAL_DIR")
+  stage <- swelections_test_env("CANONICAL_STAGE_DIR")
+  skip_if(!nzchar(build) || !nzchar(stage),
+          "Canonical public integration needs local assets and raw-built stage")
+  skip_if_not_installed("nanoparquet")
+  cache <- tempfile("canonical-public-cache-")
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  old <- options(swelections.canonical_manifest = file.path(build, "manifest.json"),
+                 swelections.canonical_assets_dir = build,
+                 swelections.canonical_cache_dir = cache)
+  on.exit(options(old), add = TRUE)
+  manifest <- .canonical_manifest(file.path(build, "manifest.json"))
+  urls <- stats::setNames(lapply(manifest$assets$file, function(file)
+    paste0("file:///", gsub("\\\\", "/", normalizePath(file.path(build, file))))),
+    manifest$assets$asset)
+  expected <- function(surface, val, level = NULL) .canonical_public_2018(
+    manifest, surface, val, level, cache_dir = cache, urls = urls)
+  check <- function(actual_sv, actual_en, raw_built) {
+    expect_identical(actual_sv, raw_built)
+    expect_identical(actual_en, .public_output_names(raw_built, "en"))
+    expect_identical(unname(vapply(actual_sv, typeof, "")),
+                     unname(vapply(actual_en, typeof, "")))
+  }
+  for (pair in list(c("RD", "parliamentary", "riket", "national"),
+                    c("RF", "regional", "region", "region"),
+                    c("KF", "municipal", "kommun", "municipality"))) {
+    val <- pair[[1L]]; election <- pair[[2L]]
+    check(results(2018, election, level = pair[[4L]], source = "canonical",
+                  names = "sv"),
+          results(2018, election, level = pair[[4L]], source = "canonical",
+                  names = "en"), expected("valresultat", val, pair[[3L]]))
+    check(seats(2018, election, source = "canonical", names = "sv"),
+          seats(2018, election, source = "canonical", names = "en"),
+          expected("mandat", val))
+    for (entry in list(
+      list(fun = candidacies, surface = "kandidaturer"),
+      list(fun = candidates, surface = "kandidater"),
+      list(fun = elected, surface = "valda"),
+      list(fun = substitutes, surface = "ersattare"))) {
+      check(entry$fun(2018, election, source = "canonical", names = "sv"),
+            entry$fun(2018, election, source = "canonical", names = "en"),
+            expected(entry$surface, val))
+    }
+    check(preference_votes(2018, election, source = "canonical", names = "sv"),
+          preference_votes(2018, election, source = "canonical", names = "en"),
+          expected("personroster", val, "personvalsomrade"))
+  }
+  check(candidates(2018, "parliamentary", include_results = FALSE,
+                   source = "canonical", names = "sv"),
+        candidates(2018, "parliamentary", include_results = FALSE,
+                   source = "canonical", names = "en"),
+        .canonical_public_2018(manifest, "kandidater", "RD", resultat = FALSE,
+                               cache_dir = cache, urls = urls))
+  for (level in c("preference_vote_area", "district")) {
+    swedish_level <- if (level == "district") "valdistrikt" else "personvalsomrade"
+    check(preference_votes(2018, "parliamentary", level = level,
+                           by_list = TRUE, source = "canonical", names = "sv"),
+          preference_votes(2018, "parliamentary", level = level,
+                           by_list = TRUE, source = "canonical", names = "en"),
+          .canonical_public_2018(manifest, "personroster", "RD", swedish_level,
+                                 per_lista = TRUE, cache_dir = cache,
+                                 urls = urls))
+  }
+})
+
+test_that("auto uses the published release path, not a local build override", {
+  build <- swelections_test_env("CANONICAL_DIR")
+  skip_if(!nzchar(build), "Canonical integration needs local release assets")
+  skip_if_not_installed("nanoparquet")
+  root <- tempfile("canonical-auto-raw-")
+  dir.create(root)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
+  cache <- tempfile("canonical-auto-cache-")
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  old <- options(swelections.data_dir = root,
+                 swelections.canonical_manifest = "unpublished-local-build.json",
+                 swelections.canonical_cache_dir = cache)
+  on.exit(options(old), add = TRUE)
+  local_mocked_bindings(.canonical_release_manifest = function(release,
+      missing_ok = FALSE) file.path(build, "manifest.json"))
+  calls <- list(
+    list(fun = results, args = list(year = 2018, election = "parliamentary",
+                                    level = "national")),
+    list(fun = seats, args = list(year = 2018, election = "parliamentary")),
+    list(fun = candidacies, args = list(year = 2018,
+                                       election = "parliamentary")),
+    list(fun = candidates, args = list(year = 2018,
+                                      election = "parliamentary")),
+    list(fun = elected, args = list(year = 2018, election = "parliamentary")),
+    list(fun = substitutes, args = list(year = 2018,
+                                       election = "parliamentary")),
+    list(fun = preference_votes, args = list(year = 2018,
+                                             election = "parliamentary"))
+  )
+  for (entry in calls) {
+    options(swelections.canonical_manifest = "unpublished-local-build.json")
+    actual <- do.call(entry$fun, c(entry$args, list(source = "auto")))
+    options(swelections.canonical_manifest = file.path(build, "manifest.json"))
+    expected <- do.call(entry$fun, c(entry$args, list(source = "canonical")))
+    expect_identical(actual, expected)
+  }
+  options(swelections.canonical_manifest = NULL)
+  expect_identical(
+    results(2018, "parliamentary", level = "national",
+            source = "canonical"),
+    results(2018, "parliamentary", level = "national",
+            source = "auto"))
 })

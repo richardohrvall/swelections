@@ -20,7 +20,10 @@ väljas uttryckligen.
 \details{
 En lokal rådatamapp anges med \code{data_dir} eller optionen
 \code{swelections.data_dir}. Explicit \code{data_dir} har företräde.
-Med \code{source = "auto"} används en befintlig lokal fil, annars fjärrkällan.
+Med \code{source = "auto"} används kompletta lokala råfiler först. Om 2018 års
+råfiler saknas används den publicerade kanoniska samlingen när dess version
+uttryckligen är godkänd för automatiskt bruk; annars används fjärrkällan.
+För 2022/2026 används fortsatt den officiella rådatavägen.
 Med \code{source = "local"} krävs en befintlig lokal fil och nätåtkomst används aldrig.
 Med \code{source = "remote"} används fjärrkällan vid vanlig läsning.
 

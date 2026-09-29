@@ -158,6 +158,45 @@
   data
 }
 
+# Canonical Parquet has one English vocabulary. The three base-only columns
+# below are technical fields; every shared concept uses the public name map.
+.canonical_base_names_en <- c(node_id = "node_id",
+                              parti_complete = "party_complete",
+                              list_complete = "list_complete")
+
+.canonical_names_en <- function(data) {
+  original <- base::names(data)
+  technical <- startsWith(original, ".")
+  base_only <- original %in% base::names(.canonical_base_names_en)
+  translated <- original
+  translated[base_only] <- unname(.canonical_base_names_en[original[base_only]])
+  translated[!technical & !base_only] <- .public_name_en(
+    original[!technical & !base_only])
+  if (anyDuplicated(translated)) stop("Ambiguous canonical column mapping.", call. = FALSE)
+  base::names(data) <- translated
+  data
+}
+
+.canonical_names_sv <- function(data) {
+  swedish <- base::names(.public_name_base_en)
+  derived <- c(paste0(swedish, "_fg"), paste0("diff_", swedish))
+  candidates <- c(swedish, derived)
+  english <- .public_name_en(candidates)
+  inverse <- stats::setNames(candidates, english)
+  inverse <- c(inverse, stats::setNames(base::names(.canonical_base_names_en),
+                                       .canonical_base_names_en))
+  current <- base::names(data)
+  technical <- startsWith(current, ".")
+  if (any(!technical & !current %in% base::names(inverse))) {
+    stop("Unknown English canonical column: ",
+         paste(current[!technical & !current %in% base::names(inverse)],
+               collapse = ", "), call. = FALSE)
+  }
+  current[!technical] <- unname(inverse[current[!technical]])
+  base::names(data) <- current
+  data
+}
+
 .english_output_language <- function(names) {
   if (is.null(names)) names <- getOption("swelections.names", "en")
   .check_output_language(names)

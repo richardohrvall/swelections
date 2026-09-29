@@ -52,7 +52,14 @@
 #' @param level English geographic level. `NULL` selects the main level for
 #'   the election. Supported combinations depend on election and year;
 #'   unsupported combinations give an error.
-#' @param source `"auto"`, `"local"` or `"remote"`.
+#' @param source `"auto"`, `"local"`, `"remote"` or `"canonical"`.
+#'   For 2018, `"auto"` prefers a complete configured local raw set, then an
+#'   explicitly auto-eligible published canonical release, then the official
+#'   remote raw source. Other years retain the official raw-data route.
+#'   Explicit `"canonical"` currently covers 2018 and resolves the published
+#'   English-schema Parquet release; a local build may be selected through
+#'   `options(swelections.canonical_manifest = "path/to/manifest.json")`.
+#'   Canonical Parquet reading requires optional package `nanoparquet`.
 #' @param data_dir Local root directory for raw files.
 #' @param update Update the local working copy when `TRUE`.
 #' @param archive Save a dated raw-data snapshot when `TRUE`.
@@ -71,7 +78,7 @@
 #' @export
 results <- function(
     year = 2026, election = "parliamentary", count = "final", level = NULL,
-    source = c("auto", "local", "remote"), data_dir = NULL,
+    source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
     from = NULL, to = NULL, names = NULL
 ) {
@@ -99,7 +106,7 @@ results <- function(
 #' @export
 seats <- function(
     year = 2026, election = NULL, count = "final", level = NULL,
-    source = c("auto", "local", "remote"), data_dir = NULL,
+    source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
     from = NULL, to = NULL, names = NULL
 ) {
@@ -127,7 +134,7 @@ seats <- function(
 #' @seealso [kandidaturer()], [candidates()]
 #' @export
 candidacies <- function(
-    year = 2026, election = NULL, source = c("auto", "local", "remote"),
+    year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
     from = NULL, to = NULL, names = NULL
 ) {
@@ -151,7 +158,7 @@ candidacies <- function(
 #' @export
 candidates <- function(
     year = 2026, election = NULL, include_results = TRUE,
-    source = c("auto", "local", "remote"), data_dir = NULL,
+    source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
     from = NULL, to = NULL, names = NULL
 ) {
@@ -174,7 +181,7 @@ candidates <- function(
 #' @seealso [valda()], [substitutes()]
 #' @export
 elected <- function(
-    year = 2026, election = NULL, source = c("auto", "local", "remote"),
+    year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
     progress = interactive(), from = NULL, to = NULL, names = NULL
 ) {
@@ -196,7 +203,7 @@ elected <- function(
 #' @seealso [ersattare()], [elected()]
 #' @export
 substitutes <- function(
-    year = 2026, election = NULL, source = c("auto", "local", "remote"),
+    year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
     progress = interactive(), from = NULL, to = NULL, names = NULL
 ) {
@@ -225,7 +232,7 @@ substitutes <- function(
 #' @seealso [personroster()], [candidates()]
 #' @export
 preference_votes <- function(
-    year = 2026, election = NULL, source = c("auto", "local", "remote"),
+    year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
     progress = interactive(), level = "preference_vote_area",
     by_list = FALSE, include_zeros = FALSE,

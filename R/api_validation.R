@@ -34,7 +34,20 @@
   .check_flag(update, "update")
   .check_flag(archive, "archive")
   if (!is.null(progress)) .check_flag(progress, "progress")
-  source <- match.arg(source, c("auto", "local", "remote"))
+  source <- match.arg(source, c("auto", "local", "remote", "canonical"))
+  if (identical(source, "canonical") &&
+      (!is.null(data_dir) || update || archive)) {
+    stop("`source = 'canonical'` uses canonical manifest/cache options; ",
+         "do not combine it with `data_dir`, `update` or `archive`.",
+         call. = FALSE)
+  }
   .check_source_update(source, update)
   source
+}
+
+.check_canonical_years <- function(source, years) {
+  if (identical(source, "canonical") && any(years != 2018L)) {
+    stop("`source = 'canonical'` currently supports only 2018.", call. = FALSE)
+  }
+  invisible(years)
 }
