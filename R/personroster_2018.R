@@ -142,7 +142,7 @@
   score <- dplyr::inner_join(raw, entydiga, by = dplyr::join_by(raw),
     relationship = "many-to-one") |>
     dplyr::summarise(roster = sum(.data$roster),
-                     .by = .data$valkretskod) |>
+                     .by = "valkretskod") |>
     dplyr::arrange(dplyr::desc(.data$roster))
   if (!nrow(score)) {
     stop("Riksdagsvalkrets kan inte kopplas via officiella listnummer f\u00f6r kommun ",
@@ -164,7 +164,7 @@
       "valkretskod"))) |>
     dplyr::distinct() |>
     dplyr::mutate(raw = paste(.data$partikod, .data$listnummer, sep = "-")) |>
-    dplyr::mutate(n = dplyr::n_distinct(.data$valkretskod), .by = .data$raw) |>
+    dplyr::mutate(n = dplyr::n_distinct(.data$valkretskod), .by = "raw") |>
     dplyr::filter(.data$n == 1L) |>
     dplyr::select(dplyr::all_of(c("raw", "valkretskod"))) |>
     dplyr::distinct()
@@ -469,7 +469,7 @@
         .by = dplyr::all_of(key))
     area <- omraden$roster |>
       dplyr::select(dplyr::all_of(key),
-                    omrade = .data$antal_personroster)
+                    omrade = "antal_personroster")
     kontroll <- dplyr::full_join(area, dist, by = key,
       relationship = "one-to-one")
     if (any(dplyr::coalesce(kontroll$omrade, 0L) !=
