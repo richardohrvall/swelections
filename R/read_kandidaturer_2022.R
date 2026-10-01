@@ -2,7 +2,7 @@ read_kandidaturer_2022 <- function(file) {
   if (grepl("^https?://", file)) {
     tmp <- tempfile(fileext = ".zip")
     on.exit(unlink(tmp), add = TRUE)
-    utils::download.file(file, tmp, mode = "wb", quiet = TRUE)
+    .download_file(file, tmp)
     file <- tmp
   }
   if (!"kandidaturer.csv" %in% utils::unzip(file, list = TRUE)$Name) {

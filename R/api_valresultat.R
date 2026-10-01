@@ -292,7 +292,7 @@ valresultat <- function(
   if (grepl("^https?://", file)) {
     lokal <- tempfile(fileext = ".zip")
     on.exit(unlink(lokal), add = TRUE)
-    utils::download.file(file, lokal, mode = "wb", quiet = TRUE)
+    .download_file(file, lokal)
     file <- lokal
   }
   filer <- utils::unzip(file, list = TRUE)$Name

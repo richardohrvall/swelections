@@ -294,13 +294,12 @@ download_val_file <- function(
   )
 
   if (!file.exists(local_path)) {
-
-    download.file(
-      remote_url,
-      local_path,
-      mode = "wb",
-      quiet = TRUE
-    )
+    tmp <- tempfile(tmpdir = dirname(local_path),
+                    fileext = paste0(".", tools::file_ext(local_path)))
+    on.exit(unlink(tmp), add = TRUE)
+    .download_file(remote_url, tmp)
+    if (!file.rename(tmp, local_path))
+      stop("Kunde inte spara den lokala filen: ", local_path, call. = FALSE)
 
   } else if (update) {
 
@@ -314,12 +313,7 @@ download_val_file <- function(
       add = TRUE
     )
 
-    download.file(
-      remote_url,
-      tmp,
-      mode = "wb",
-      quiet = TRUE
-    )
+    .download_file(remote_url, tmp)
 
     if (!same_file_md5(local_path, tmp)) {
 

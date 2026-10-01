@@ -2,7 +2,7 @@ read_kandidaturer_2026 <- function(file) {
   if (grepl("^https?://", file)) {
     tmp <- tempfile(fileext = ".csv")
     on.exit(unlink(tmp), add = TRUE)
-    utils::download.file(file, tmp, mode = "wb", quiet = TRUE)
+    .download_file(file, tmp)
     file <- tmp
   }
   readr::read_delim(

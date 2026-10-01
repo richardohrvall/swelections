@@ -19,12 +19,7 @@ read_raw_json_zip_2026 <- function(
       add = TRUE
     )
 
-    download.file(
-      zip_file,
-      local_zip,
-      mode = "wb",
-      quiet = TRUE
-    )
+    .download_file(zip_file, local_zip)
   } else {
     local_zip <- zip_file
   }

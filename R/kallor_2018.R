@@ -38,7 +38,7 @@
   dir.create(dirname(lokal), recursive = TRUE, showWarnings = FALSE)
   tmp <- tempfile(fileext = paste0(".", tools::file_ext(spec$path)))
   on.exit(unlink(tmp), add = TRUE)
-  utils::download.file(spec$url, tmp, mode = "wb", quiet = TRUE)
+    .download_file(spec$url, tmp)
   if (!file.exists(lokal) || !same_file_md5(tmp, lokal)) {
     if (!file.copy(tmp, lokal, overwrite = TRUE)) {
       stop("Kunde inte uppdatera den lokala 2018-filen.", call. = FALSE)
@@ -62,6 +62,6 @@
 .lokal_zip_2018 <- function(file) {
   if (!grepl("^https?://", file)) return(file)
   tmp <- tempfile(fileext = ".zip")
-  utils::download.file(file, tmp, mode = "wb", quiet = TRUE)
+    .download_file(file, tmp)
   tmp
 }

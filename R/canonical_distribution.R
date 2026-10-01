@@ -42,10 +42,14 @@
         source_path <- sub("^/([A-Za-z]:)", "\\1", source_path)
       file.copy(source_path, tmp, overwrite = TRUE)
     } else {
-      identical(suppressWarnings(utils::download.file(
-        url, tmp, mode = "wb", quiet = TRUE)), 0L)
+      .download_file(url, tmp)
+      TRUE
     }
-  }, error = function(e) FALSE)
+  }, error = function(e) e)
+  if (inherits(downloaded, "error")) {
+    if (missing_ok) return(NULL)
+    stop(conditionMessage(downloaded), call. = FALSE)
+  }
   if (!downloaded || !valid(tmp)) {
     if (missing_ok) return(NULL)
     stop("Published canonical manifest is unavailable or invalid: ", url,

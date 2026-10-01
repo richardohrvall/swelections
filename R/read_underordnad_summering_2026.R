@@ -8,12 +8,7 @@ read_underordnad_summering_zip_2026 <- function(zip_file) {
 
       if (is_url) {
         tmp_zip <- tempfile(fileext = ".zip")
-        utils::download.file(
-          zip_file,
-          tmp_zip,
-          mode = "wb",
-          quiet = TRUE
-        )
+        .download_file(zip_file, tmp_zip)
         zip_file <- tmp_zip
         on.exit(unlink(tmp_zip), add = TRUE)
       }

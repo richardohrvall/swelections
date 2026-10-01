@@ -11,6 +11,12 @@
     path = "index.md5", ar = ar, samling = .resultatsamling(ar),
     source = source, data_dir = data_dir, update = update, archive = archive
   )
+  if (grepl("^https?://", file)) {
+    tmp <- tempfile(fileext = ".md5")
+    on.exit(unlink(tmp), add = TRUE)
+    .download_file(file, tmp)
+    file <- tmp
+  }
   readLines(file, warn = FALSE, encoding = "UTF-8") |> parse_index_2026()
 }
 

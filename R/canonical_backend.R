@@ -72,7 +72,7 @@
       if (!file.copy(source_path, tmp, overwrite = TRUE))
         stop("Could not read local canonical asset.", call. = FALSE)
     } else {
-      utils::download.file(url, tmp, mode = "wb", quiet = TRUE)
+      .download_file(url, tmp, expected_bytes = entry$bytes)
     }
     if (!valid(tmp)) stop("Incorrect SHA256 or size for canonical asset: ",
                           asset, call. = FALSE)

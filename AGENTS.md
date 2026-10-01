@@ -2,11 +2,21 @@
 
 ## Project purpose
 
-This repository contains the R package `swelections`, which downloads, archives, parses, harmonises, validates and exposes Swedish election data from Valmyndigheten.
+This repository contains the R package `swelections`, which downloads, archives, parses, harmonises, validates and exposes Swedish election data from Valmyndigheten (the Swedish Election Authority).
 
-The package covers current and historical Swedish elections. Current development includes the 2026 result-file architecture and canonical historical data, beginning with 2018.
+The package is intended to provide analysis-friendly election datasets for researchers and other users. Preserve information from Valmyndigheten where useful, but do not reproduce source structures unnecessarily in the public analytical interface.
 
-The package is intended to be analysis-friendly for researchers and other users. Canonical datasets should also be usable independently of R and the package. Preserve information from Valmyndigheten where useful, but do not over-normalise the public datasets.
+The package has two distinct but connected roles:
+
+1. provide stable, analysis-friendly data through the public API; and
+2. maintain reproducible, versioned canonical data products behind that API.
+
+The current development focus includes:
+- reliable support for current/live election data, especially 2026;
+- canonical historical data, with 2018 established as the first canonical release and 2022 the next planned historical year;
+- a later, separate layer for mandate-period changes such as departures, entries and vacant seats.
+
+Do not conflate the fixed election result with changes during the subsequent mandate period.
 
 ## Repository scope
 
@@ -25,85 +35,134 @@ The package is intended to be analysis-friendly for researchers and other users.
 
 - Do not run destructive commands outside the repository.
 - Do not delete repository files unless they are clearly generated files or deletion is explicitly requested.
-- Do not silently change the package data model, observations units, naming conventions or public API.
+- Do not silently change the package data model, observation units, naming conventions or public API.
 - If a task appears to require a conceptual change to the data model or public API, explain the proposed change and ask for approval before implementing it.
 - Prefer small, reviewable changes over broad rewrites.
 - Preserve already validated behaviour unless there is a clear bug or an approved design change.
+- Do not commit, push, tag or publish data releases unless explicitly instructed.
 
 ## Language and naming
 
+### General code conventions
+
 - Package code is in R.
 - Use `snake_case`.
-- The canonical public data schema uses English column names.
-- The public package API is English-first.
-- Swedish public function names are retained as supported wrappers/aliases.
-- Output column names may be selected explicitly with `names = "en"` or `names = "sv"`.
-- The English API defaults to English column names.
-- Existing Swedish API functions default to Swedish column names for backwards compatibility.
-- `options(swelections.names = "sv")` may be used to set Swedish column names as the default for the English API.
-- A per-call `names` argument overrides the package option.
-- Function/API language and output-column language are separate concerns.
-- Language selection for column names must not translate data values.
-- Language-dependent data values should be stored explicitly where relevant, for example `party_name_sv` and `party_name_en`.
-- Use an English party name only when an established English name is available; otherwise use `NA`. Do not invent translations.
-- Internal parsing and build code may retain source-oriented or existing Swedish names where that reduces unnecessary churn; translate systematically at the canonical/public boundary.
-- Do not mechanically rename existing internal/source-oriented columns unless the task explicitly includes an approved migration.
-- Identifiers and codes must retain leading zeroes and should use stable types.
-- Preserve the distinction between `NA`, zero and `FALSE`.
-- Prefer compact, descriptive names and stable semantics over literal translations of source-field names.
-- In the English public API and documentation, use the established term `preference vote(s)` for Swedish `personröst(er)`. Retain source-oriented Swedish identifiers such as `personroster` internally where appropriate; do not mechanically rename raw/source structures.
+- Prefer compact, descriptive names.
+- Internal/source-facing R objects may retain the established Swedish naming conventions.
+- The public English API and canonical Parquet schema use English names.
+- The Swedish public API remains supported and returns Swedish column names by default.
+- Do not mechanically translate Swedish source values merely because column names are English.
 
-## R style
+### Established Swedish internal/public names
 
-- Prefer modern tidyverse/dplyr syntax.
-- Prefer the native pipe `|>`.
-- Prefer `.by =` where it makes code clearer.
-- Prefer `join_by()` for joins.
-- Do not use deprecated dplyr syntax.
-- In `case_when()`, use `.default` rather than a final `TRUE ~ ...` branch.
-- Use `recode_values()` rather than deprecated `case_match()` where appropriate.
-- Use formula syntax with `recode_values()`, e.g. `"ja" ~ TRUE`.
-- Avoid unnecessary namespace prefixes in analysis examples, but package/internal code may use explicit namespaces where helpful.
-- Keep parentheses on the same line when practical.
-- Avoid unnecessary line breaks.
-- Do not create list-columns in final analysis-facing outputs unless the data model explicitly requires them.
-- Use typed `NA` values consistently.
+Where the existing Swedish API or internal data model uses Swedish names, preserve the established conventions unless a deliberate API change has been approved.
 
-Utility helpers already exist for scalar extraction:
-- `as_chr_na()`
-- `as_int_na()`
-- `as_dbl_na()`
-- `as_lgl_na()`
+Use Swedish compounds without unnecessary underscores:
+- `valkretskod`, not `valkrets_kod`
+- `valkretsnamn`, not `valkrets_namn`
+- `valomradeskod`
+- `valdistriktskod`
+- `kommunkod`
+- `lankod`
+- `partikod`
+- `kandidatnummer`
 
-Reuse them rather than inventing parallel helpers unless there is a strong reason.
+Use `antal`, `andel` and `ovriga` written out.
 
+Use:
+- `valdel` for valdeltagande
+- `_fg` for values from the previous election
+- `diff_` as prefix for changes/differences
+- `ovriga_partier` as a logical indicator
+- `over_sparr` as a logical indicator for whether a party passes the relevant threshold for mandate allocation
+- `geografiniva` as the standard Swedish variable for geographic level
 
-## Canonical data
+Current `geografiniva` values include:
+- `valdistrikt`
+- `kommun`
+- `kommunvalkrets`
+- `lan`
+- `region`
+- `riket`
+- `riksdagsvalkrets`
+- `regionvalkrets`
 
-Canonical data are a public, language-independent data product, not merely an internal R-package cache.
+### English public API
 
-- Canonical tabular assets use Parquet.
-- Canonical public column names use English `snake_case`.
-- Canonical assets must be usable independently of the R package, including from tools such as Python, DuckDB and Polars.
-- The R package may translate canonical English names to Swedish names as an explicit presentation/API layer; this must not change the stored canonical schema.
-- Canonical English column names are the source of truth; Swedish output names belong to the R API translation layer and are not stored as a second canonical schema.
-- Preserve stable observation units, identifiers, types, keys and missing-value semantics.
-- Do not inflate sparse structures unnecessarily. For example, small normalised person-vote bases may be preferable to storing national zero-filled panels when equivalent analysis views can be reconstructed deterministically.
-- Do not include raw source files in the Git repository or canonical release assets.
-- Do not expose personal names in canonical public assets unless explicitly approved for that dataset.
-- Canonical build metadata and provenance should include source filenames and checksums, data/schema version, build code version or Git SHA, build date/time, and whether the build tree was dirty.
-- Large generated canonical assets remain outside Git and are distributed separately, for example as versioned GitHub Release assets.
-- RDS may be used as a local build intermediate but is not the canonical public format.
-- Do not create duplicate CSV or DTA distributions unless explicitly requested.
-- `nanoparquet` may be used as an optional dependency for Parquet I/O; do not make Parquet support a mandatory dependency for users who do not use canonical-data functionality unless explicitly approved.
-- The existing public `source` API (`local`, `remote`, `auto`) is separate from canonical-data access. Do not add or change a canonical source mode without an explicit API decision.
-- Do not change the canonical schema, asset partitioning or release contract without an explicit approved schema decision.
+The English-first public API consists of:
+
+- `results()`
+- `seats()`
+- `candidacies()`
+- `candidates()`
+- `elected()`
+- `substitutes()`
+- `preference_votes()`
+
+The Swedish functions remain supported:
+
+- `valresultat()`
+- `mandat()`
+- `kandidaturer()`
+- `kandidater()`
+- `valda()`
+- `ersattare()`
+- `personroster()`
+
+English is the primary terminology for new public documentation and examples. Swedish remains a fully supported interface, not merely a legacy compatibility layer.
+
+For English election arguments, use the descriptive values:
+- `"parliamentary"`
+- `"regional"`
+- `"municipal"`
+
+The official Valmyndigheten codes `RD`, `RF` and `KF` are also accepted directly.
+
+The English canonical result column for these codes is `election_code`. `election_kind` describes the election class such as ordinary election, re-election or extra election. Do not conflate `election_code` with `election_kind`.
+
+For `preference_votes()`, the English geographic argument value is `level = "preference_vote_area"`.
+
+Do not silently change public defaults or argument meanings.
+
+## User-facing output and detail levels
+
+The canonical data schema and user-facing output schema are distinct.
+
+Canonical assets provide a stable, general backend representation with English column names suitable for reproducible storage and backend processing.
+### `detail = "standard"`
+
+`detail = "standard"` is the default user-facing output.
+
+It should contain the variables most relevant for ordinary analysis and should prioritise a useful and reasonably consistent analytical schema across election years rather than reproducing every field available in the source.
+
+Standard output should use geographic identifiers that match the actual observation level.
+
+For example:
+- municipality-level data should normally use `municipality_code` and `municipality_name`;
+- district-level data should normally use `district_code` and `district_name`;
+- district-level data may and generally should also include hierarchical context such as `municipality_code`, `municipality_name`, `region_code` and `region_name` where available.
+
+A dataset at a given level should remain at that observation level. Adding geographic context must not create additional rows.
+
+Do not include technical source/reporting variables in standard output merely because they are available in the source.
+
+### `detail = "full"`
+
+`detail = "full"` should expose all information available for the requested result level in the selected source.
+
+For `source = "remote"`, this may closely reflect the information in the current Valmyndigheten source structures, including reporting/status metadata.
+
+For `source = "canonical"`, `full` is limited to the fields represented in the canonical data product for that request. Older canonical data may therefore provide less information than current remote source files.
+
+`detail = "full"` does not mean "return the raw source file unchanged". It remains a harmonised `swelections` output.
+
+Do not imply that historical data contain information that cannot be recovered from their historical sources.
+
+Differences in available `full` fields across election years should be documented where relevant, while `standard` should remain as consistent as reasonably possible.
 
 ## Core data model
 
-The headings below describe conceptual tables. Existing Swedish internal/source-oriented identifiers may remain until an explicitly approved schema migration; English public views should use the central naming translation layer.
-
-### Election results (`valresultat`)
+### `valresultat` / `results`
 
 One row represents:
 
@@ -113,26 +172,28 @@ The table may contain repeated area-level totals/context because the package pri
 
 The same general schema should work for preliminary and final results where possible.
 
-Use `rakningstillfalle` to distinguish preliminary and final counting.
+Use rakningstillfalle in the Swedish layer and count in the English layer to distinguish preliminary and final counting.
 
-### Seats (`mandat`)
+### `mandat` / `seats`
 
-Keep mandate data separate from `valresultat` because the observation level differs.
+Keep mandate data separate from vote results because the observation level differs.
 
-`antal_tomma_stolar` belongs in `mandat`, not in candidate data.
+`antal_tomma_stolar` in the election-result context refers to seats that could not be filled after the election. In the English canonical schema, keep this distinct from later mandate-period vacancies; the agreed English concept is `unfilled_seats` where that distinction is required.
 
-### District linkage (`valdistriktskoppling`)
+Do not put mandate-period vacancies into the fixed election-result seat field.
+
+### `valdistriktskoppling`
 
 Connections between current and previous election districts belong in a separate helper table.
 
-Do not place list-valued previous-district links in `valresultat`.
+Do not place list-valued previous-district links in vote-result tables.
 
-### Candidacies (`kandidaturer`)
+### `kandidaturer` / `candidacies`
 
 Detailed source-oriented data about how a person stands for election.
 
 Keep information such as:
-- election type
+- election type/code
 - election area
 - constituency
 - party
@@ -142,9 +203,9 @@ Keep information such as:
 - consent/status information
 - validity
 
-Preserve invalid candidacies in `kandidaturer`.
+Preserve invalid candidacies in `kandidaturer` / `candidacies`.
 
-### Candidates (`kandidater`)
+### `kandidater` / `candidates`
 
 Analysis-friendly candidate table.
 
@@ -169,31 +230,33 @@ It may contain analysis-friendly summaries such as:
 - number of lists
 - indicators for multiple parties/levels
 - total preference votes
-- qualification through preference votes
+- qualification for election by preference votes
 - elected status
 - elected constituency
 - order of election
-- basis for election (`valgrund`)
+- basis for election
 - substitute group
 
 Do not choose a single "main party" for multi-party candidates.
 
 ### Candidate names
 
-The exact source name belongs in `kandidaturer`.
+The exact source name belongs in `kandidaturer` / `candidacies`.
 
-For the analysis-facing `kandidater` table:
-- normalise whitespace
-- simple `"Surname, Given name"` forms may be converted to `"Given name Surname"`
-- do not silently correct spelling differences
-- do not replace aliases/joke names with guessed legal names
-- if several normalised names remain, use a deterministic rule and retain `namn_varierar`
+For the analysis-facing candidate table:
+- normalise whitespace;
+- simple `"Surname, Given name"` forms may be converted to `"Given name Surname"`;
+- do not silently correct spelling differences;
+- do not replace aliases/joke names with guessed legal names;
+- if several normalised names remain, use a deterministic rule and retain `namn_varierar`.
 
-### Elected candidates (`valda()`)
+### `valda()` / `elected()`
 
-`valda()` should be a convenient filtered view of `kandidater()` where `invald == TRUE`, not a separately maintained candidate dataset.
+`valda()` / `elected()` should be a convenient filtered view of the candidate data where elected status is true, not a separately maintained candidate dataset.
 
-### Substitutes (`ersattare`)
+The fixed election result represented by `elected()` must not be conflated with subsequent mandate-period membership.
+
+### `ersattare` / `substitutes`
 
 Substitute relationships are sufficiently special to have their own table.
 
@@ -204,13 +267,11 @@ Preserve the relation between:
 - substitute group
 - basis for election
 
-Do not reduce this to a simple `ersattare = TRUE` flag in `kandidater`, because that would lose the relationship structure.
+Do not reduce this to a simple substitute flag in the candidate table, because that would lose the relationship structure.
 
-## Preference votes
+## Person votes
 
-In English public API names and documentation, use **preference votes** for Swedish *personröster*. Existing source-oriented/internal Swedish identifiers may remain unchanged.
-
-Final vote-distribution files contain three useful source-oriented levels:
+Final vote-distribution files contain three useful levels:
 - `listroster`
 - `personroster`
 - `personroster_summerade`
@@ -219,19 +280,17 @@ Keep all three for now.
 
 Interpretation:
 - `listroster`: list-level votes
-- `personroster`: candidate × list × district preference votes
-- `personroster_summerade`: candidate × district preference votes, summed over lists
+- `personroster`: candidate × list × district
+- `personroster_summerade`: candidate × district, summed over lists
 
-`personroster_summerade` is useful both analytically and for validation.
+The English public terminology is **preference votes**, not "personal votes".
 
-The public English analysis-facing function is `preference_votes()`. The existing Swedish equivalent `personroster()` remains fully supported. Both must use the same underlying implementation and the common `names = "en"` / `names = "sv"` mechanism. `preference_votes()` defaults to English column names; `personroster()` defaults to Swedish column names.
+In `kandidater`, use:
+- `antal_personroster_totalt` / corresponding English `total_preference_votes` for total preference votes summed over relevant detailed result rows;
+- `kvalificerad_personval` / corresponding English qualification field;
+- `antal_personvalsomraden` / corresponding English count field.
 
-In the current Swedish/internal `kandidater` schema, use:
-- `antal_personroster_totalt` for total preference votes summed over relevant detailed result rows
-- `kvalificerad_personval`
-- `antal_personvalsomraden`
-
-Do not insert a single ambiguous `andel_personroster` into `kandidater` when the percentage is constituency-specific. The eventual English public names for these fields must come from the central approved naming map, not ad-hoc renaming.
+Do not insert a single ambiguous personal/preference-vote share into the candidate table when the percentage is constituency-specific.
 
 ## Missing versus false
 
@@ -240,22 +299,53 @@ This is important.
 If a result field is unavailable because the result is not yet final/established, use `NA`, not `FALSE` or zero.
 
 Examples:
-- `invald = NA` if elected-member data are not yet available
-- `kvalificerad_personval = NA` if qualification data are not yet available
+- `invald = NA` / corresponding English elected field = `NA` if elected-member data are not yet available;
+- `kvalificerad_personval = NA` / corresponding English qualification field = `NA` if qualification data are not yet available.
 
 Use `FALSE` only when the relevant result information is available and the candidate did not satisfy the condition.
 
-This distinction is especially important in 2026 genrep/test data.
+This distinction is especially important in 2026 test/preliminary data.
+
+## Canonical data
+
+Canonical data are a versioned, harmonised distribution layer behind the public API.
+
+Current canonical principles:
+- canonical Parquet files use the approved English column schema;
+- Swedish source-language values are not translated merely because column names are English;
+- canonical assets are distributed outside Git, with a manifest containing data version, schema version, provenance, asset sizes and SHA256 checksums;
+- canonical data versioning is separate from the R package version;
+- the manifest is the entry point for a canonical release;
+- downloaded canonical assets remain conceptually `source = "canonical"` even when cached locally;
+- canonical assets should not contain raw source files.
+
+The canonical schema should be stable and general enough to support the public API, but it does not need to be identical to the standard user-facing analysis schema.
+
+### Canonical releases
+
+A canonical release is explicitly versioned and may be marked as eligible for automatic selection.
+
+Do not infer canonical eligibility merely from election year or age.
+
+The current `source = "auto"` priority is:
+
+1. complete suitable official raw data available locally;
+2. a published canonical release explicitly marked as eligible for `auto`;
+3. the official remote source.
+
+An explicit `source` argument always overrides this rule.
+
+The canonical distribution registry should make eligibility explicit per election year/data release.
+
+Do not treat a locally cached canonical file as `source = "local"`.
+
+Do not publish or tag a canonical release without explicit instruction.
 
 ## 2026 result-file architecture
 
 Current development uses Valmyndigheten's 2026 result files.
 
-The result collection is currently configurable. During genrep development it is typically:
-
-`genrep2026`
-
-Do not hard-code the assumption that genrep is permanent. The live result collection will replace it later.
+The result collection is configurable. During development it may be `genrep2026`; do not hard-code the assumption that genrep is permanent.
 
 The package uses `index.md5` as the entry point for result files.
 
@@ -265,6 +355,8 @@ Typical result ZIP layout:
 - election types: `rd`, `rf`, `kf`
 
 Strict file matching is important so aggregate summary ZIP files are not accidentally treated as individual election files.
+
+For current/live elections, `source = "remote"` must remain a reliable path even before canonical data are available.
 
 ## Geographic principles
 
@@ -283,6 +375,8 @@ Relevant public geographic levels may include:
 
 Not every level is meaningful for every election type. Public API functions should reject nonsensical combinations rather than silently returning misleading data.
 
+The user-facing output should describe the actual observation level. Geographic hierarchy may be repeated as context for analysis convenience.
+
 ## Preliminary versus final results
 
 Preliminary and final result files should share parsers and schemas where feasible.
@@ -290,68 +384,100 @@ Preliminary and final result files should share parsers and schemas where feasib
 Do not build parallel systems unless source structure genuinely requires it.
 
 Preliminary results:
-- contain only parties reported individually plus aggregated "other parties"
-- do not contain person-vote results
+- contain only parties reported individually plus aggregated "other parties";
+- do not contain person-vote results.
 
 Final results:
-- contain all parties individually
-- may contain list votes, preference votes, elected members and substitutes
+- contain all parties individually;
+- may contain list votes, preference votes, elected members and substitutes.
 
-Extra final-only structures should be parsed into separate tables rather than forced into `valresultat`.
+Extra final-only structures should be parsed into separate tables rather than forced into `valresultat` / `results`.
 
-## Local raw-data archive
+## Local raw-data archive and source behaviour
 
-The package must support both remote and local raw data.
+The package must support local, remote and canonical data sources.
 
 Users may specify a local archive through:
-- an explicit `data_dir` argument, or
-- `options(swelections.data_dir = "...")`
+- an explicit `data_dir` argument; or
+- the package's current `swelections.data_dir` option.
+
+The older `valresultat.data_dir` option may remain as compatibility support where already implemented, but new documentation and code should use `swelections.*` options.
 
 Never hard-code a developer-specific path in package functions.
 
-Priority:
-1. explicit `data_dir`
-2. `options("swelections.data_dir")`
-3. no local directory configured
+Source semantics:
+- `source = "local"`: require suitable local official raw data; error if unavailable.
+- `source = "remote"`: use the official Valmyndigheten source.
+- `source = "canonical"`: use a published/configured canonical release.
+- `source = "auto"`: use the priority rule defined in the Canonical data section above.
 
-Use the `swelections.` prefix for new package-scoped options. If legacy `valresultat.*` options already exist in released or user-facing code, do not remove compatibility without an explicit migration decision.
-
-Source behaviour:
-- `source = "local"`: require local file; error if missing
-- `source = "remote"`: use Valmyndigheten
-- `source = "auto"`: use local file if present, otherwise remote
-
-Readers should accept either URLs or local files.
+Readers should accept either URLs or local files where the relevant source path supports both.
 
 ### Updating and archiving
 
 Distinguish current working copies from historical snapshots.
 
 Normal working behaviour:
-- `update = FALSE`: reuse local copy if present
-- `update = TRUE`: download current remote file and replace the working copy only if content changed
+- `update = FALSE`: reuse an appropriate local copy if present;
+- `update = TRUE`: download current remote data and replace the working copy only if content changed.
 
 Archiving:
-- `archive = TRUE` creates a dated snapshot
-- do not create a new archived copy on every technical update by default
-- archive analytically meaningful versions, not every transient revision
-- preserve source files in original form
+- `archive = TRUE` creates a dated snapshot;
+- do not create a new archived copy on every technical update by default;
+- archive analytically meaningful versions, not every transient revision;
+- preserve source files in original form.
 
 The local archive is separate from the Git repository.
+
+## Remote download robustness
+
+Remote access is particularly important for current/live elections, where canonical data may not yet exist.
+
+Remote download code should:
+- avoid unnecessary repeated downloads;
+- handle transient individual download failures robustly;
+- avoid treating incomplete or zero-byte files as valid;
+- preserve successfully downloaded files when a later request fails;
+- provide informative errors identifying the failed source file;
+- not silently serve stale data when current remote data were requested.
+
+Do not introduce aggressive parallel downloading merely to improve speed without measuring the current bottleneck and considering effects on reliability and the Valmyndigheten source.
+
+For requests requiring many small official files, such as KF data at municipality or district level, performance should be assessed separately from parsing performance.
 
 ## Mutable mandate-period data
 
 Valmyndigheten also publishes data during the mandate period about:
-- current elected members
-- resignations
-- vacant seats
-- changes over time
+- current elected members;
+- resignations;
+- entries/replacements;
+- vacant seats;
+- changes over time.
 
 These files contain `fran_datum` and `till_datum`.
 
-Support for these data will be added later.
+Support for these data will be added as a separate layer and must not overwrite the fixed election result.
 
-When implemented, model them as validity intervals rather than overwriting history.
+The preferred underlying model is a validity-interval/history table based on the source's start and end dates.
+
+The user-facing purpose is primarily to compare:
+- the fixed election result at the start of the mandate period;
+- the current/latest situation during an ongoing mandate period;
+- the final situation at the end of a completed mandate period.
+
+For a completed mandate period, the default user-facing status should represent the situation at the end of the mandate period. For an ongoing mandate period, the default should represent the latest available situation.
+
+Users should also be able to request a historical reference date where the implementation supports it.
+
+The analysis-facing layer should make it possible to identify:
+- originally elected members who remained;
+- members who left;
+- members who entered during the mandate period;
+- seats that became vacant.
+
+Vacant/unfilled seats are an area-level concept, not a candidate-level property. Do not add mandate-period `vacant_seats` as a candidate attribute.
+
+If the source explicitly identifies vacant seats, preserve that information and use derived counts as appropriate. Keep election-time unfilled seats conceptually separate from later mandate-period vacancies.
 
 Do not conflate mandate-period status with the fixed election result.
 
@@ -362,134 +488,111 @@ Run tests after changes.
 Important invariants already used during development include:
 
 ### Vote results
-- total votes = valid votes + invalid votes
-- sum of party rows including "other parties" = valid votes
-- invalid votes = sum of invalid subcategories where applicable
+- total votes = valid votes + invalid votes;
+- sum of party rows including "other parties" = valid votes;
+- invalid votes = sum of invalid subcategories where applicable.
 
 ### Mandates
-- party mandates satisfy relevant fixed/equalisation mandate identities
-- constituency mandates sum to election-area mandates where applicable
-- total national RD mandates = 349
+- party mandates satisfy relevant fixed/equalisation mandate identities;
+- constituency mandates sum to election-area mandates where applicable;
+- total national RD mandates = 349.
 
 ### Geography
-- lower-level party vote totals should aggregate to official higher-level totals
-- district-to-municipality, municipality-to-region/county and region/county-to-national checks should match where structurally applicable
+- lower-level party vote totals should aggregate to official higher-level totals;
+- district-to-municipality, municipality-to-region/county and region/county-to-national checks should match where structurally applicable.
 
 ### Candidates
-- no duplicate rows on the intended `kandidater` key
-- all source columns intended for analysis have stable types
-- no unintended list-columns
-- when elected-member data are available, elected candidates should match valid candidate data in live production files
-- genrep/test data may contain known inconsistencies; do not distort production logic merely to make genrep internally perfect
+- no duplicate rows on the intended candidate key;
+- all source columns intended for analysis have stable types;
+- no unintended list-columns;
+- when elected-member data are available, elected candidates should match valid candidate data in live production files;
+- test/genrep data may contain known inconsistencies; do not distort production logic merely to make test data internally perfect.
 
-### Preference votes
-- within a list, candidate preference votes should sum to `antal_roster_med_personrost`
-- candidate preference votes summed over lists should match Valmyndigheten's `personroster_summerade`
-- candidates elected via preference votes should be marked as qualified through preference votes when qualification data are available
-
-
-### Canonical data
-- every published asset should match its manifest filename, file size and SHA256 checksum
-- canonical tables must match the validated source-built intermediate objects for their documented observation units and keys
-- representative direct checks against raw source data should be retained for important structures
-- zero-filled or reconstructed analysis views must be deterministically reproducible from their canonical normalised bases
-- public canonical assets must satisfy the approved anonymisation rules
-- full raw-to-canonical rebuild checks may be opt-in/slow integration tests when they are too expensive for the ordinary test suite
+### Person votes
+- within a list, candidate preference votes should sum to the relevant list total with preference votes;
+- candidate preference votes summed over lists should match Valmyndigheten's `personroster_summerade`;
+- candidates elected on preference votes should be marked as qualified for election by preference votes when qualification data are available.
 
 ## Testing strategy
 
 Move stable checks out of exploratory QMD files and into `tests/testthat/`.
 
-Use the exploratory QMD only as a development workbench. It is not part of the package's production API and does not need to be polished.
+Use exploratory QMD files only as development workbenches. They are not part of the package's production API and do not need to be polished.
 
 When adding tests:
-- prefer small deterministic fixtures or selected source files
-- test schemas, keys, invariants and error handling
-- avoid unnecessary network dependence in unit tests
-- separate slow/integration tests from ordinary unit tests when appropriate
+- prefer small deterministic fixtures or selected source files;
+- test schemas, keys, invariants and error handling;
+- avoid unnecessary network dependence in unit tests;
+- separate slow/integration tests from ordinary unit tests when appropriate.
 
-inlasning_valmyndigheten_2026.qmd is an exploratory development workbench and log. 
-It is intentionally messy and may contain temporary objects, manual checks and obsolete experiments. 
-Do not treat it as production code or user documentation, and do not refactor or clean it unless explicitly requested. 
-Stable logic belongs in R/ and stable checks in tests/testthat/.
+`inlasning_valmyndigheten_2026.qmd` is an exploratory development workbench and log. It is intentionally messy and may contain temporary objects, manual checks and obsolete experiments. Do not treat it as production code or user documentation, and do not refactor or clean it unless explicitly requested. Stable logic belongs in `R/` and stable checks in `tests/testthat/`.
 
-## Public API
+## Public API direction
 
-`swelections` uses an English-first public API.
+The current English-first public functions are:
 
-Primary English public functions and their supported Swedish equivalents are:
+- `results()`
+- `seats()`
+- `candidacies()`
+- `candidates()`
+- `elected()`
+- `substitutes()`
+- `preference_votes()`
 
-- `results()` — `valresultat()`
-- `seats()` — `mandat()`
-- `candidacies()` — `kandidaturer()`
-- `candidates()` — `kandidater()`
-- `elected()` — `valda()`
-- `substitutes()` — `ersattare()`
-- `preference_votes()` — `personroster()`
+The Swedish functions remain supported:
 
-The Swedish functions are supported public wrappers/aliases and must preserve their existing behaviour. Do not remove or deprecate them without an explicit later decision.
+- `valresultat()`
+- `mandat()`
+- `kandidaturer()`
+- `kandidater()`
+- `valda()`
+- `ersattare()`
+- `personroster()`
 
-Use `preference_votes()` rather than `personal_votes()` as the English public name for Swedish `personroster()`. In English documentation and public column names, prefer `preference_vote`/`preference_votes` terminology where semantically appropriate.
+Likely future public functionality includes mandate-period/status helpers.
 
-The English functions use English argument names and English argument values where appropriate. Keep official election codes `RD`, `RF` and `KF` unchanged.
+For English candidate functions:
+- the relevant `election` argument may use `"parliamentary"`, `"regional"`, `"municipal"` or the official `RD`, `RF`, `KF` codes where supported.
 
-Core argument mappings include:
+Do not silently change public defaults or argument meanings.
 
-- `year` ↔ `ar`
-- `election` ↔ `val`
-- `count` ↔ `rakning`
-- `level` ↔ `niva`
-- `include_results` ↔ `resultat`
-- `from` ↔ `fran`
-- `to` ↔ `till`
-- `by_list` ↔ `per_lista`
-- `include_zeros` ↔ `komplettera_nollor`
+### English/Swedish output names
 
-Use systematic mappings for argument values rather than scattered ad-hoc translations. Examples include:
+The English API uses English column names by default.
 
-- `final` ↔ `slutlig`
-- `preliminary` ↔ `preliminar`
-- `district` ↔ `valdistrikt`
-- `municipality` ↔ `kommun`
-- `municipal_constituency` ↔ `kommunvalkrets`
-- `county` ↔ `lan`
-- `region` ↔ `region`
-- `parliamentary_constituency` ↔ `riksdagsvalkrets`
-- `regional_constituency` ↔ `regionvalkrets`
-- `national` ↔ `riket`
+The Swedish API returns Swedish column names by default.
 
-Do not duplicate parsing or data-processing logic between the English and Swedish APIs. Both interfaces should use the same underlying implementation.
+For English API calls:
+- `names = "en"` gives English names;
+- `names = "sv"` gives Swedish names;
+- `options(swelections.names = "sv")` sets the Swedish default for English API calls;
+- an explicit `names` argument overrides the option.
 
-### Output column names
+The stored canonical Parquet schema remains English. Swedish output names are an API-level transformation, not a second canonical storage schema.
 
-Public analysis-facing functions support:
+## Package documentation
 
-- `names = "en"` for English column names
-- `names = "sv"` for Swedish column names
+The README should remain a concise GitHub landing page rather than a complete manual.
 
-The English API defaults to English column names. Existing Swedish API functions default to Swedish column names for backwards compatibility.
+The package should have a fuller documentation site, preferably generated with pkgdown, covering:
+- getting started;
+- election results;
+- seats and representation;
+- candidates, elected members and substitutes;
+- preference votes;
+- geographic levels;
+- local, remote and canonical sources;
+- standard versus full detail;
+- the Swedish interface;
+- canonical data and reproducibility;
+- later, mandate-period changes;
+- function reference.
 
-For the English API, the package-wide default may be set with:
+Prefer task-oriented examples as well as function-oriented reference pages.
 
-`options(swelections.names = "sv")`
-
-A per-call `names` argument overrides the package option.
-
-Language selection for column names must not alter actual data values. Multilingual values such as party names must be represented in explicit fields such as `party_name_sv` and `party_name_en`.
-
-For candidate functions and related year-range queries:
-- the English API uses `election = NULL` to mean all political levels
-- the Swedish API retains `val = NULL`
-- valid election-type codes are `RD`, `RF`, `KF`
-- `from` and `to` refer to the first and last election year where those arguments are supported
-
-Do not silently change existing Swedish defaults or argument meanings.
-
-Likely future functions may include status/mandate-period helpers. New public functions should follow the English-first API principle unless explicitly decided otherwise.
+Do not expand the README into a full manual merely to compensate for missing package-site documentation.
 
 ## Package development
-
-The repository and package are named `swelections`. References to `valresultat` should remain only when they refer to the existing Swedish function/API, historical text, or deliberately supported legacy compatibility. Do not mechanically replace the Swedish common noun *valresultat* when it means election results rather than the former package name.
 
 As the package matures, maintain standard package infrastructure:
 - `DESCRIPTION`
@@ -500,21 +603,35 @@ As the package matures, maintain standard package infrastructure:
 - `R CMD check`
 
 Before large refactors:
-1. inspect the current parsers and tests
-2. identify the validated behaviour that must remain unchanged
-3. make the smallest reasonable change
-4. run relevant tests
-5. report any conceptual ambiguity rather than guessing
+1. inspect the current parsers and tests;
+2. identify the validated behaviour that must remain unchanged;
+3. make the smallest reasonable change;
+4. run relevant tests;
+5. report any conceptual ambiguity rather than guessing.
+
+Before a canonical release:
+1. ensure the release code is committed and the worktree is clean;
+2. rebuild canonical assets from that exact commit;
+3. verify manifest SHA, `build_tree_dirty`, asset sizes and checksums;
+4. run canonical/raw equivalence checks;
+5. run the full test suite and `R CMD check`;
+6. publish only after explicit instruction.
+
+Do not commit canonical Parquet release assets to Git.
 
 ## Working principle
 
 The main goal is not merely to make code run.
 
 The package should:
-- preserve Valmyndigheten's information accurately
-- make canonical election data usable outside R and independently of the package
-- provide clear and stable analytical observation levels
-- make common political-science analyses easy
-- remain reproducible when source files change
-- keep raw source data separate from package code
-- avoid hiding genuine source ambiguity behind arbitrary transformations
+- preserve Valmyndigheten's information accurately;
+- provide clear and stable analytical observation levels;
+- make common political-science analyses easy;
+- provide analysis-friendly standard output rather than simply mirroring source files;
+- make fuller source information available where the selected source supports it;
+- keep the canonical storage schema distinct from user-facing analytical schemas;
+- remain reproducible when source files change;
+- keep raw source data separate from package code;
+- avoid hiding genuine source ambiguity behind arbitrary transformations;
+- support current/live election data reliably before canonical data are available;
+- provide versioned canonical data for stable historical use.

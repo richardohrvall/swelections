@@ -328,7 +328,7 @@
   if (niva == "valdistrikt" && grepl("^https?://", file)) {
     lokal_zip <- tempfile(fileext = ".zip")
     on.exit(unlink(lokal_zip), add = TRUE)
-    utils::download.file(file, lokal_zip, mode = "wb", quiet = TRUE)
+    .download_file(file, lokal_zip)
     file <- lokal_zip
   }
   raw <- read_raw_json_zip_2026(file, type = "mandatfordelning")
