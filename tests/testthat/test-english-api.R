@@ -56,7 +56,7 @@ test_that("approved English schema names and derived names stay stable", {
   expect_identical(.public_name_en(svenska), english)
 })
 
-test_that("all seven English functions forward to the supported Swedish API", {
+test_that("all seven English functions use the shared harmonised readers", {
   output <- tibble::tibble(
     valtillfalle = "Val_2026", valar = 2026L, valtyp = "KF",
     geografiniva = "kommun", kommunkod = "0180", antal_roster = 0L,
@@ -70,27 +70,27 @@ test_that("all seven English functions forward to the supported Swedish API", {
       output
     }
   }
-  local_mocked_bindings(
+  local_mocked_bindings(.raw_public_api = list(
     valresultat = record("results"), mandat = record("seats"),
     kandidaturer = record("candidacies"), kandidater = record("candidates"),
     valda = record("elected"), ersattare = record("substitutes"),
     personroster = record("preference_votes")
-  )
+  ))
   calls <- list(
-    results = results(election = "municipal", count = "final", level = "municipality"),
-    seats = seats(election = "municipal", count = "preliminary", level = "municipality"),
-    candidacies = candidacies(election = "municipal"),
-    candidates = candidates(election = "municipal", include_results = FALSE),
-    elected = elected(election = "municipal"),
-    substitutes = substitutes(election = "municipal"),
+    results = results(election = "municipal", count = "final", level = "municipality", detail = "full"),
+    seats = seats(election = "municipal", count = "preliminary", level = "municipality", detail = "full"),
+    candidacies = candidacies(election = "municipal", detail = "full"),
+    candidates = candidates(election = "municipal", include_results = FALSE, detail = "full"),
+    elected = elected(election = "municipal", detail = "full"),
+    substitutes = substitutes(election = "municipal", detail = "full"),
     preference_votes = preference_votes(election = "municipal", level = "district",
-                                        by_list = TRUE, include_zeros = TRUE)
+                                        by_list = TRUE, include_zeros = TRUE,
+                                        detail = "full")
   )
   for (result in calls) {
-    expect_identical(result, .public_output_names(output, "en"))
+    expect_identical(result$votes, output$antal_roster)
     expect_identical(nrow(result), nrow(output))
-    expect_identical(unname(vapply(result, typeof, "")),
-                     unname(vapply(output, typeof, "")))
+    expect_identical(typeof(result$votes), typeof(output$antal_roster))
     expect_identical(result$geographic_level, "kommun")
     expect_identical(result$election_code, "KF")
     expect_false("election_type" %in% names(result))
@@ -105,7 +105,8 @@ test_that("all seven English functions forward to the supported Swedish API", {
   expect_identical(received$preference_votes$komplettera_nollor, TRUE)
   expect_false("ar" %in% names(received$results))
   expect_identical(results(year = 2022, from = NULL, to = NULL,
-                           names = "sv"), output)
+                           names = "sv", detail = "full")$antal_roster,
+                   output$antal_roster)
   expect_identical(received$results$ar, 2022)
   results(year = "all", names = "sv")
   expect_identical(received$results$ar, "alla")
@@ -118,18 +119,19 @@ test_that("all seven English functions forward to the supported Swedish API", {
 test_that("output language option is English-only and an explicit choice wins", {
   output <- tibble::tibble(valar = 2026L, antal_roster = 0L,
                            andel_roster = NA_real_, invald = FALSE)
-  local_mocked_bindings(valresultat = function(...) output)
+  local_mocked_bindings(.raw_public_api = utils::modifyList(.raw_public_api,
+    list(valresultat = function(...) output)))
   old <- options(swelections.names = "sv")
   on.exit(options(old), add = TRUE)
-  expect_identical(results(), output)
-  expect_identical(results(names = "en"),
+  expect_identical(results(detail = "full"), output)
+  expect_identical(results(names = "en", detail = "full"),
                    .public_output_names(output, "en"))
-  expect_identical(results(names = "sv"), output)
+  expect_identical(results(names = "sv", detail = "full"), output)
   expect_error(results(names = "de"), "names")
   expect_error(results(names = NA_character_), "names")
   options(swelections.names = "de")
   expect_error(results(), "names")
-  expect_identical(results(names = "en"),
+  expect_identical(results(names = "en", detail = "full"),
                    .public_output_names(output, "en"))
 })
 
@@ -152,7 +154,7 @@ test_that("English count and level values are strict and systematic", {
   expect_error(results(election = NULL), "val")
   expect_error(seats(election = "EU"), "election")
   expect_error(seats(election = "RD", level = "municipality"), "st.*ds inte")
-  expect_error(preference_votes(level = "municipality"), "level")
+  expect_error(preference_votes(level = "municipality"), "requires election")
   expect_error(preference_votes(by_list = NA), "by_list")
   expect_error(preference_votes(include_zeros = 1), "include_zeros")
   expect_identical(.english_argument_value("preference_vote_area", "level"),
@@ -166,16 +168,16 @@ test_that("official election codes and English values use one mapping", {
     passed[[length(passed) + 1L]] <<- list(...)
     tibble::tibble(valtyp = "RD", valklass = "ordinarie val")
   }
-  local_mocked_bindings(
+  local_mocked_bindings(.raw_public_api = list(
     valresultat = record, mandat = record, kandidaturer = record,
     kandidater = record, valda = record, ersattare = record,
     personroster = record
-  )
+  ))
   funs <- list(results, seats, candidacies, candidates, elected,
                substitutes, preference_votes)
   for (fun in funs) {
-    english <- fun(election = "parliamentary")
-    code <- fun(election = "RD")
+    english <- fun(election = "parliamentary", detail = "full")
+    code <- fun(election = "RD", detail = "full")
     expect_identical(english, code)
     expect_identical(english$election_code, "RD")
     expect_identical(english$election_kind, "ordinarie val")

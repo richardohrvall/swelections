@@ -38,9 +38,9 @@ test_that("all public functions use the same basic argument validation", {
   for (fun in list(valresultat, mandat, kandidater, personroster, valda, ersattare)) {
     expect_error(fun(progress = NA), "progress")
   }
-  expect_error(kandidater(resultat = NA), "resultat")
-  expect_error(kandidater(resultat = 1), "resultat")
-  expect_error(kandidaturer(val = c("RD", NA)), "val")
+  expect_error(kandidater(detaljniva = "full", resultat = NA), "resultat")
+  expect_error(kandidater(detaljniva = "full", resultat = 1), "resultat")
+  expect_error(kandidaturer(detaljniva = "full", val = c("RD", NA)), "val")
 })
 
 test_that("mandate level matrix filters valid pairs rather than a Cartesian product", {
@@ -60,7 +60,7 @@ test_that("mandat accepts a valid level selected from val NULL", {
     .resultat_file_2026 = function(...) "fixture.zip",
     read_raw_json_zip_2026 = function(...) raw
   )
-  out <- mandat(val = NULL, niva = "kommun", progress = FALSE)
+  out <- mandat(detaljniva = "full", val = NULL, niva = "kommun", progress = FALSE)
   expect_identical(unique(out$valtyp), "KF")
   expect_identical(unique(out$geografiniva), "kommun")
   expect_identical(unique(out$valomradeskod), "0180")
@@ -71,9 +71,10 @@ test_that("mandat accepts a valid level selected from val NULL", {
   mandat_contract <- readLines(
     test_path("fixtures", "mandat-public-columns.txt"), encoding = "UTF-8"
   )
-  expect_identical(names(out), mandat_contract)
-  expect_identical(vapply(out, typeof, ""),
+  expect_identical(names(out)[seq_along(mandat_contract)], mandat_contract)
+  expect_identical(vapply(out[mandat_contract], typeof, ""),
                    vapply(.mandat_public_schema_2026(), typeof, ""))
+  expect_identical(out$kommunkod, out$valomradeskod)
   expect_false(any(vapply(out, is.list, logical(1))))
 })
 
@@ -88,7 +89,7 @@ test_that("mandat accepts live preliminary counting metadata", {
     .resultat_file_2026 = function(...) "fixture.zip",
     read_raw_json_zip_2026 = function(...) raw
   )
-  out <- mandat(
+  out <- mandat(detaljniva = "full",
     val = "RD", niva = "riket", rakning = "preliminar", progress = FALSE
   )
   expect_identical(unique(out$rakningstillfalle), "preliminar")
@@ -244,7 +245,7 @@ test_that("ersattare has a stable public relationship schema and key", {
     read_raw_json_zip_2026 = function(...) raw,
     kandidaturer = function(...) kd
   )
-  out <- ersattare(val = "RD", progress = FALSE)
+  out <- ersattare(detaljniva = "full", val = "RD", progress = FALSE)
   expect_equal(nrow(out), 2L)
   key <- c("valtillfalle", "valtyp", "geografiniva", "valomradeskod",
            "valkretskod", "partikod", "ledamot_kandidatnummer",
@@ -260,7 +261,7 @@ test_that("ersattare has a stable public relationship schema and key", {
     "ersattarordning", "ersattargrupp", "valgrund_id", "valgrund_text",
     "geografiniva", "valomradeskod", "valomradesnamn", "valkretskod", "valkretsnamn",
     "valklass", "rakningstillfalle", "valdatum",
-    "valdatum_fg", "test"
+    "valdatum_fg", "test", "kall_valomradeskod", "kall_valomradesnamn"
   ))
   expect_identical(out$valar, c(2026L, 2026L))
 })

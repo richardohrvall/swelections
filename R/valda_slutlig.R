@@ -53,7 +53,7 @@
     return(.canonical_2018_source("valda", val,
       auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
-    kandidaturdata <- kandidaturer(ar = ar, val = val, source = source,
+    kandidaturdata <- kandidaturer(detaljniva = "full", ar = ar, val = val, source = source,
       data_dir = data_dir, update = update, archive = archive)
     bas <- .kandidater_bas(kandidaturdata, ar)
     valda_data <- .xml2018_valda_ersattare(val, source, data_dir,
@@ -64,7 +64,7 @@
   }
   index <- .read_resultatindex(ar, source, data_dir, update, archive)
   paths <- .valda_slutliga_paths(index, val)
-  kandidaturdata <- kandidaturer(
+  kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar, val = val, source = source, data_dir = data_dir,
     update = update, archive = archive
   )

@@ -21,7 +21,7 @@ test_that("official 2022 candidacies preserve rows, validity and keys", {
   csv <- utils::unzip(zip, "kandidaturer.csv", exdir = extracted)
   expect_identical(unname(tools::md5sum(csv)),
                    "639daa9630a1f2554f1c6839473448ee")
-  a <- kandidaturer(ar = 2022, source = "local", data_dir = root)
+  a <- kandidaturer(detaljniva = "full", ar = 2022, source = "local", data_dir = root)
   expect_equal(nrow(a), 170781L)
   expect_equal(sum(a$giltig %in% TRUE), 168233L)
   expect_equal(sum(a$giltig %in% FALSE), 2548L)
@@ -84,14 +84,14 @@ test_that("official 2022 candidacies preserve rows, validity and keys", {
     expect_identical(blank(a)$pa_namnvalsedel, FALSE)
   }
   if (file.exists(current)) {
-    b <- kandidaturer(ar = 2026, source = "local", data_dir = root)
+    b <- kandidaturer(detaljniva = "full", ar = 2026, source = "local", data_dir = root)
     if (identical(unname(tools::md5sum(current)),
                   .verifierade_kandidatur_csv_md5(2026L))) {
       expect_equal(sum(b$pa_namnvalsedel %in% TRUE), 173196L)
       expect_equal(sum(b$pa_namnvalsedel %in% FALSE), 5497L)
       expect_false(anyNA(b$pa_namnvalsedel))
     }
-    ab <- kandidaturer(ar = c(2022, 2026), source = "local", data_dir = root)
+    ab <- kandidaturer(detaljniva = "full", ar = c(2022, 2026), source = "local", data_dir = root)
     expect_identical(ab, dplyr::bind_rows(a, b))
     expect_equal(nrow(dplyr::distinct(b, dplyr::across(dplyr::all_of(key)))), nrow(b))
   }

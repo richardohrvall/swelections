@@ -1,4 +1,4 @@
-#' Personröster per personvalsområde eller valdistrikt
+#' Personröster per personvalsområde, valdistrikt eller större valområde
 #'
 #' Skapar en analysvänlig tabell med personröster för giltiga kandidaturer.
 #'
@@ -14,7 +14,11 @@
 #' `NA` betyder att källmaterialet inte räcker för att fastställa värdet,
 #' inte enbart att kandidaten saknas i en gles personröstarray.
 #'
-#' `niva` väljer personvalsområde eller valdistrikt och `per_lista` avgör om
+#' `niva` väljer personvalsområde, valdistrikt, kommun (KF) eller region (RF).
+#' Kommun och region summeras från icke överlappande personvalsområden;
+#' andelarna räknas om från aggregerade antal. Personvalskvalificering följer
+#' inte med till en nivå där den inte avgörs. Listuppdelning stöds ännu inte
+#' på dessa bredare nivåer. `per_lista` avgör om
 #' listdimensionen behålls. På distriktsnivå och i listvyerna är tabellen
 #' gles som standard: endast observerade personröstrader ingår. En saknad rad
 #' betyder inte automatiskt noll röster. Med `komplettera_nollor = TRUE` läggs
@@ -65,12 +69,15 @@
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator vid läsning av resultatfiler.
-#' @param niva `"personvalsomrade"` (standard) eller `"valdistrikt"`.
+#' @param niva `"personvalsomrade"` (standard), `"valdistrikt"`, `"kommun"`
+#'   för KF eller `"region"` för RF.
 #' @param per_lista Om `TRUE`, behåll listdimensionen. Standard är `FALSE`.
 #' @param komplettera_nollor Om `TRUE`, komplettera glesa distrikts- och
 #'   listvyer med verifierade nollrader. För standardvyn på personvalsområdesnivå
 #'   utan lista ändras inte resultatet. Standard är `FALSE`.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
+#'   för alla tillgängliga harmoniserade fält.
 #'
 #' @return En tibble med en rad per giltig kandidat, parti och
 #'   personvalsområde som standard. `valar` är integer direkt efter
@@ -121,7 +128,8 @@ personroster <- function(
     komplettera_nollor = FALSE,
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)
@@ -179,7 +187,7 @@ personroster <- function(
 .personroster_ett_ar_2026 <- function(ar, val, source, data_dir, update,
                                      archive, progress, niva, per_lista,
                                      komplettera_nollor) {
-  kandidaturdata <- kandidaturer(
+  kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar,
     val = val,
     source = source,

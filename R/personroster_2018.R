@@ -454,7 +454,7 @@
 .personroster_ett_ar_2018 <- function(ar, val, source, data_dir, update,
                                       archive, progress, niva, per_lista,
                                       komplettera_nollor) {
-  kd <- kandidaturer(ar = 2018L, val = val, source = source,
+  kd <- kandidaturer(detaljniva = "full", ar = 2018L, val = val, source = source,
     data_dir = data_dir, update = update, archive = archive)
   omraden <- .xml2018_person_las(val, "personvalsomrade", kd, source,
     data_dir, update, archive, progress)

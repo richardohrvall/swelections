@@ -81,7 +81,7 @@
   if (ar == 2018L) {
     out <- .xml2018_valda_ersattare(val, source, data_dir, update,
       archive, progress)$ersattare
-    kd <- kandidaturer(ar = ar, val = val, source = source,
+    kd <- kandidaturer(detaljniva = "full", ar = ar, val = val, source = source,
       data_dir = data_dir, update = update, archive = archive)
     .ersattare_validera_kandidater(out, kd)
     out <- dplyr::mutate(out, valar = 2018L, .after = valtillfalle)
@@ -104,7 +104,7 @@
   }
   index <- .read_resultatindex(ar, source, data_dir, update, archive)
   paths <- .slutliga_mandat_paths(index, val, "ersattare")
-  kandidaturdata <- kandidaturer(
+  kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar, val = val, source = source, data_dir = data_dir,
     update = update, archive = archive
   )

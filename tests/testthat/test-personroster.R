@@ -198,10 +198,10 @@ test_that("public personroster validates arguments without file access", {
   local_mocked_bindings(
     kandidaturer = function(...) stop("Unexpected file access")
   )
-  expect_error(personroster(ar = 2024), "2022.*2026")
-  expect_error(personroster(val = "EU"), "valtyp")
-  expect_error(personroster(source = "invalid"), "arg")
-  expect_error(personroster(source = "local", update = TRUE), "local")
+  expect_error(personroster(detaljniva = "full", ar = 2024), "2022.*2026")
+  expect_error(personroster(detaljniva = "full", val = "EU"), "valtyp")
+  expect_error(personroster(detaljniva = "full", source = "invalid"), "arg")
+  expect_error(personroster(detaljniva = "full", source = "local", update = TRUE), "local")
 })
 
 test_that("public personroster returns the shared area table", {
@@ -216,7 +216,7 @@ test_that("public personroster returns the shared area table", {
       list(list(personrostomraden = expected))
     }
   )
-  expect_identical(personroster(val = "RD", progress = FALSE), expected)
-  expect_identical(personroster(val = "RD", komplettera_nollor = TRUE,
+  expect_identical(personroster(detaljniva = "full", val = "RD", progress = FALSE), expected)
+  expect_identical(personroster(detaljniva = "full", val = "RD", komplettera_nollor = TRUE,
                                progress = FALSE), expected)
 })

@@ -188,19 +188,20 @@ test_that("personroster keeps exact multi-year order and a shared year column", 
   local_mocked_bindings(
     .personroster_ett_ar_2018 = make,
     .personroster_ett_ar_2022 = make,
-    .personroster_ett_ar_2026 = make
+    .personroster_ett_ar_2026 = make,
+    .select_public_source = function(...) "local"
   )
-  expect_identical(personroster(ar = c(2026, 2022, 2026))$valar,
+  expect_identical(personroster(detaljniva = "full", ar = c(2026, 2022, 2026))$valar,
     c(2026L, 2022L))
-  expect_identical(personroster(ar = c(2026, 2018, 2022))$valar,
+  expect_identical(personroster(detaljniva = "full", ar = c(2026, 2018, 2022))$valar,
     c(2026L, 2018L, 2022L))
-  expect_identical(personroster(ar = "alla")$valar,
+  expect_identical(personroster(detaljniva = "full", ar = "alla")$valar,
     c(2018L, 2022L, 2026L))
-  expect_identical(personroster(fran = 2022, till = 2026)$valar,
+  expect_identical(personroster(detaljniva = "full", fran = 2022, till = 2026)$valar,
     c(2022L, 2026L))
-  expect_identical(personroster(ar = 2022)$valar, 2022L)
-  expect_error(personroster(ar = 2022, fran = 2022), "alternativa")
-  expect_error(personroster(ar = 2024), "stöds")
+  expect_identical(personroster(detaljniva = "full", ar = 2022)$valar, 2022L)
+  expect_error(personroster(detaljniva = "full", ar = 2022, fran = 2022), "alternativa")
+  expect_error(personroster(detaljniva = "full", ar = 2024), "stöds")
 })
 
 test_that("2022 person votes never fall back to preliminary result files", {
@@ -225,7 +226,7 @@ test_that("all four person vote views share multi-year dispatch", {
   for (n in c("personvalsomrade", "valdistrikt")) {
     for (l in c(FALSE, TRUE)) {
       for (z in c(FALSE, TRUE)) {
-        out <- personroster(ar = c(2022, 2026), niva = n,
+        out <- personroster(detaljniva = "full", ar = c(2022, 2026), niva = n,
           per_lista = l, komplettera_nollor = z)
         expect_identical(out$valar, c(2022L, 2026L))
       }

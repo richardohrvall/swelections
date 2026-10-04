@@ -13,7 +13,8 @@ kandidaturer(
   archive = FALSE,
   fran = NULL,
   till = NULL,
-  names = "sv"
+  names = "sv",
+  detaljniva = "standard"
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 \code{ar}. En utelämnad gräns är öppen.}
 
 \item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+
+\item{detaljniva}{\code{"standard"} för centrala analysvariabler eller \code{"full"}
+för alla tillgängliga harmoniserade fält.}
 }
 \value{
 En tibble där en rad är en källrad för en kandidatur eller

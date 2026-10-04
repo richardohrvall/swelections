@@ -16,7 +16,8 @@ mandat(
   progress = interactive(),
   fran = NULL,
   till = NULL,
-  names = "sv"
+  names = "sv",
+  detaljniva = "standard"
 )
 }
 \arguments{
@@ -49,7 +50,10 @@ väljas via \code{options(swelections.canonical_manifest = "...")}.}
 \item{fran, till}{Inklusiva gränser bland stödda valår, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
 
-\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+
+\item{detaljniva}{\code{"standard"} för centrala analysvariabler eller \code{"full"}
+för alla tillgängliga harmoniserade fält.
 Endast kolumnnamn ändras.}
 }
 \value{

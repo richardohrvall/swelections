@@ -1,5 +1,24 @@
 # swelections 0.3.0.9000
 
+* Keeps geographic schemas stable for empty and filtered results. Mixed-election
+  substitute views retain RD's distinct surrounding area without duplicating
+  RF/KF region/municipality fields; original parent fields are full-only
+  `source_electoral_area_*`. Empty broader preference-vote views retain the
+  same columns and types as populated views.
+
+* Harmonises standard constituency geography: RD/RF use `constituency_*`,
+  KF uses `municipal_constituency_*`, with candidacy/elected roles preserved.
+  Redundant preference-area and substitute geography aliases are omitted;
+  generic KF source constituency values remain available in full output.
+
+* Adds compact `detail = "standard"` output by default across the English API,
+  with `detail = "full"` for all available harmonised fields. Swedish wrappers
+  use `detaljniva` and share the same implementation. Standard geography uses
+  explicit district, municipality, county, region and constituency identifiers;
+  candidacy and elected constituencies are distinguished. Municipal and regional
+  preference-vote views combine non-overlapping preference-vote areas and
+  recompute shares without propagating area-specific qualification status.
+
 * Adds a 2018 `source = "canonical"` backend and prepares distribution through
   a versioned GitHub Release manifest and 20 Parquet assets. The stored schema
   uses the approved English column names across public and normalized

@@ -19,6 +19,8 @@
 #' @param update Om `TRUE`, uppdateras den lokala arbetskopian.
 #' @param archive Om `TRUE`, sparas även en daterad snapshot.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
+#'   för alla tillgängliga harmoniserade fält.
 #'
 #' @return En tibble där en rad är en källrad för en kandidatur eller
 #'   listrelation i ett valområde och eventuell valkrets. En giltig kandidat
@@ -60,7 +62,8 @@ kandidaturer <- function(
     archive = FALSE,
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)

@@ -26,7 +26,7 @@ test_that("2022 mandate results match eight official preliminary/final ZIPs", {
     krets <- switch(val, RD = "riksdagsvalkrets", RF = "regionvalkrets",
                     KF = "kommunvalkrets")
     for (niva in c(huvud, krets)) {
-      out <- mandat(ar = 2022, val = val, rakning = rakning,
+      out <- mandat(detaljniva = "full", ar = 2022, val = val, rakning = rakning,
                     niva = niva, progress = FALSE)
       expect_identical(names(out), contract, info = paste(val, rakning, niva))
       expect_identical(unique(out$valar), 2022L)
@@ -46,7 +46,7 @@ test_that("2022 mandate results match eight official preliminary/final ZIPs", {
       }
     }
   }
-  expect_equal(nrow(mandat(ar = 2022, val = "KF", niva = "kommunvalkrets",
+  expect_equal(nrow(mandat(detaljniva = "full", ar = 2022, val = "KF", niva = "kommunvalkrets",
                             progress = FALSE)), 45L)
   for (rakning in c("preliminar", "slutlig")) {
     prefix <- if (rakning == "slutlig") "s" else "p"

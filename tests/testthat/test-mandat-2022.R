@@ -154,17 +154,17 @@ test_that("mandat uses shared year selection and preserves the long contract", {
                 RF = c("region", "regionvalkrets"),
                 KF = c("kommun", "kommunvalkrets"))
   for (val in names(cases)) for (niva in cases[[val]]) {
-    a <- mandat(ar = 2022, val = val, niva = niva, progress = FALSE)
-    b <- mandat(ar = 2026, val = val, niva = niva, progress = FALSE)
-    both <- mandat(ar = c(2022, 2026), val = val, niva = niva,
+    a <- mandat(detaljniva = "full", ar = 2022, val = val, niva = niva, progress = FALSE)
+    b <- mandat(detaljniva = "full", ar = 2026, val = val, niva = niva, progress = FALSE)
+    both <- mandat(detaljniva = "full", ar = c(2022, 2026), val = val, niva = niva,
                    progress = FALSE)
     expect_identical(both, dplyr::bind_rows(a, b), info = paste(val, niva))
     expect_identical(names(both)[1:2], c("valtillfalle", "valar"))
     expect_type(both$valar, "integer")
     expect_identical(unique(both$valar), c(2022L, 2026L))
-    expect_identical(mandat(fran = 2021, till = 2026, val = val, niva = niva,
+    expect_identical(mandat(detaljniva = "full", fran = 2021, till = 2026, val = val, niva = niva,
                             progress = FALSE), both)
-    expect_identical(mandat(ar = c(2026, 2022, 2026), val = val,
+    expect_identical(mandat(detaljniva = "full", ar = c(2026, 2022, 2026), val = val,
                             niva = niva, progress = FALSE),
                      dplyr::bind_rows(b, a))
   }
@@ -173,9 +173,9 @@ test_that("mandat uses shared year selection and preserves the long contract", {
 test_that("mandat rejects bad year and level before source access", {
   calls <- 0L
   local_mocked_bindings(.read_resultatindex = function(...) { calls <<- calls + 1L })
-  expect_error(mandat(ar = c(2022, 2026), val = "RD", niva = "kommun"),
+  expect_error(mandat(detaljniva = "full", ar = c(2022, 2026), val = "RD", niva = "kommun"),
                "kommun")
-  expect_error(mandat(ar = 2024, val = "RD"), "2022.*2026")
-  expect_error(mandat(ar = 2022, fran = 2022), "ar.*fran")
+  expect_error(mandat(detaljniva = "full", ar = 2024, val = "RD"), "2022.*2026")
+  expect_error(mandat(detaljniva = "full", ar = 2022, fran = 2022), "ar.*fran")
   expect_equal(calls, 0L)
 })

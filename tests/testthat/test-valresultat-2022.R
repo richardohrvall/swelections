@@ -104,10 +104,10 @@ test_that("2022 district context derives only official constituency geography", 
 })
 
 test_that("2022 default levels and unsupported years are validated before I/O", {
-  expect_error(valresultat(ar = 2021), "2021.*2022, 2026")
-  expect_error(valresultat(ar = 2022, val = "RD", niva = "kommun"), "2022")
-  expect_error(valresultat(ar = 2022, val = "RF", niva = "riket"), "2022")
-  expect_error(valresultat(ar = 2022, val = "KF", niva = "lan"), "2022")
+  expect_error(valresultat(detaljniva = "full", ar = 2021), "2021.*2022, 2026")
+  expect_error(valresultat(detaljniva = "full", ar = 2022, val = "RD", niva = "kommun"), "2022")
+  expect_error(valresultat(detaljniva = "full", ar = 2022, val = "RF", niva = "riket"), "2022")
+  expect_error(valresultat(detaljniva = "full", ar = 2022, val = "KF", niva = "lan"), "2022")
   calls <- character()
   local_mocked_bindings(
     .read_resultatindex = function(ar, source, data_dir, update, archive) {
@@ -124,7 +124,7 @@ test_that("2022 default levels and unsupported years are validated before I/O", 
     }
   )
   for (val in c("RD", "RF", "KF")) {
-    result <- valresultat(ar = 2022, val = val, progress = FALSE)
+    result <- valresultat(detaljniva = "full", ar = 2022, val = val, progress = FALSE)
     expect_identical(unique(result$geografiniva),
                      c(RD = "riket", RF = "region", KF = "kommun")[[val]])
   }

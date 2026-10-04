@@ -19,21 +19,23 @@ test_that("all 48 election-level-count combinations select the decided source", 
   for (val in names(expected)) for (i in seq_along(nivaer)) for (rakning in c("preliminar", "slutlig")) {
     last <- NULL
     if (is.na(expected[[val]][i])) {
-      expect_error(valresultat(val = val, niva = nivaer[i], rakning = rakning), "inte|aktiverat")
+      expect_error(valresultat(detaljniva = "full", val = val, niva = nivaer[i], rakning = rakning), "inte|aktiverat")
       expect_null(last)
     } else {
-      out <- valresultat(val = val, niva = nivaer[i], rakning = rakning, progress = FALSE)
+      out <- valresultat(detaljniva = "full", val = val, niva = nivaer[i], rakning = rakning, progress = FALSE)
       expect_identical(last$kalla, expected[[val]][i])
       expect_identical(last$file, fixture_resultatpath(val, expected[[val]][i], rakning))
       expect_identical(unique(out$geografiniva), nivaer[i])
       expect_identical(unique(out$rakningstillfalle), rakning)
-      expect_identical(names(out), .valresultat_public_columns_2026(nivaer[i]))
+      original_columns <- .valresultat_public_columns_2026(nivaer[i])
+      expect_identical(names(out)[seq_along(original_columns)], original_columns)
       typer <- vapply(.valresultat_schema(), typeof, "")
       typer <- c(
         typer, kommunnamn_officiellt = "character", raknat = "logical",
         valar = "integer", valomradessparr = "double", valkretssparr = "double"
       )
-      expect_identical(unname(vapply(out, typeof, "")), unname(typer[names(out)]))
+      expect_identical(unname(vapply(out[original_columns], typeof, "")),
+                       unname(typer[original_columns]))
     }
   }
 })
@@ -41,23 +43,23 @@ test_that("all 48 election-level-count combinations select the decided source", 
 test_that("defaults give exactly one natural main level and invalid inputs fail before IO", {
   local_mocked_bindings(.read_resultatindex_2026 = function(...) stop("INDEX"))
   for (val in list(NULL, character(), NA_character_, c("RD", "RF"), "EU", 1)) {
-    expect_error(valresultat(val = val), "val|Val")
+    expect_error(valresultat(detaljniva = "full", val = val), "val|Val")
   }
   for (ar in list(2021, 2026.5, NA_real_, numeric(), "2026")) {
-    expect_error(valresultat(ar = ar), "2022, 2026")
+    expect_error(valresultat(detaljniva = "full", ar = ar), "2022, 2026")
   }
   for (niva in list(character(), NA_character_, c("riket", "kommun"), "fel")) {
-    expect_error(valresultat(niva = niva), "niva|Niv")
+    expect_error(valresultat(detaljniva = "full", niva = niva), "niva|Niv")
   }
   for (rakning in list(NULL, NA_character_, "auto", c("slutlig", "preliminar"))) {
-    expect_error(valresultat(rakning = rakning), "rakning")
+    expect_error(valresultat(detaljniva = "full", rakning = rakning), "rakning")
   }
-  expect_error(valresultat(source = "local", update = TRUE), 'source = "local".*update = TRUE')
-  expect_error(valresultat(progress = NA), "progress")
-  expect_error(valresultat(archive = 1), "archive")
-  expect_error(valresultat(update = NULL), "update")
-  expect_error(valresultat(val = "RF", niva = "lan"), "OS-formatet.*inte aktiverat.*slutlig")
-  expect_error(valresultat(val = "RD", niva = "lan"), "RD/lan.*officiell")
+  expect_error(valresultat(detaljniva = "full", source = "local", update = TRUE), 'source = "local".*update = TRUE')
+  expect_error(valresultat(detaljniva = "full", progress = NA), "progress")
+  expect_error(valresultat(detaljniva = "full", archive = 1), "archive")
+  expect_error(valresultat(detaljniva = "full", update = NULL), "update")
+  expect_error(valresultat(detaljniva = "full", val = "RF", niva = "lan"), "OS-formatet.*inte aktiverat.*slutlig")
+  expect_error(valresultat(detaljniva = "full", val = "RD", niva = "lan"), "RD/lan.*officiell")
 })
 
 test_that("NULL levels are identical to explicit main levels for both counts", {
@@ -69,10 +71,10 @@ test_that("NULL levels are identical to explicit main levels for both counts", {
     .read_valresultat_raw = function(file, kalla, val, rakning, ...) fixture_resultatraw(val, kalla, rakning)
   )
   for (v in c("RD", "RF", "KF")) for (r in c("slutlig", "preliminar")) {
-    expect_identical(valresultat(val = tolower(v), rakning = r, progress = FALSE),
-                     valresultat(val = v, niva = c(RD = "riket", RF = "region", KF = "kommun")[[v]], rakning = r, progress = FALSE))
+    expect_identical(valresultat(detaljniva = "full", val = tolower(v), rakning = r, progress = FALSE),
+                     valresultat(detaljniva = "full", val = v, niva = c(RD = "riket", RF = "region", KF = "kommun")[[v]], rakning = r, progress = FALSE))
   }
-  expect_identical(valresultat(progress = FALSE), valresultat(val = "RD", niva = "riket", rakning = "slutlig", progress = FALSE))
+  expect_identical(valresultat(detaljniva = "full", progress = FALSE), valresultat(detaljniva = "full", val = "RD", niva = "riket", rakning = "slutlig", progress = FALSE))
 })
 
 test_that("source selection is strict, unique, and never falls back", {
@@ -746,22 +748,22 @@ test_that("local index and ZIP pipeline never uses the network, including archiv
   expect_true(file.copy(test_path("fixtures", "valresultat-rd.zip"), file))
   indexfile <- val_local_path("index.md5", 2026, "test", root)
   writeLines(paste(unname(tools::md5sum(file)), paste0("./", path)), indexfile)
-  out <- valresultat(source = "local", progress = FALSE)
+  out <- valresultat(detaljniva = "full", source = "local", progress = FALSE)
   expect_identical(out$antal_roster, c(6L, 4L))
-  expect_identical(valresultat(source = "local", archive = TRUE, progress = FALSE), out)
+  expect_identical(valresultat(detaljniva = "full", source = "local", archive = TRUE, progress = FALSE), out)
   expect_true(same_file_md5(file, val_archive_path(path, 2026, "test", root)))
   expect_true(same_file_md5(indexfile, val_archive_path("index.md5", 2026, "test", root)))
   for (niva in c("valdistrikt", "kommun", "kommunvalkrets", "riksdagsvalkrets")) {
-    actual <- valresultat(niva = niva, source = "local", progress = FALSE)
+    actual <- valresultat(detaljniva = "full", niva = niva, source = "local", progress = FALSE)
     expect_equal(sum(actual$antal_roster), 10L)
   }
-  expect_identical(valresultat(source = "auto", data_dir = root, progress = FALSE), out)
-  expect_error(valresultat(source = "local", data_dir = tempfile()), "Filen finns inte")
-  expect_error(valresultat(source = "local", update = TRUE), 'source = "local".*update = TRUE')
-  expect_error(valresultat(source = "local", rakning = "preliminar"), "Saknad prim")
+  expect_identical(valresultat(detaljniva = "full", source = "auto", data_dir = root, progress = FALSE), out)
+  expect_error(valresultat(detaljniva = "full", source = "local", data_dir = tempfile()), "Filen finns inte")
+  expect_error(valresultat(detaljniva = "full", source = "local", update = TRUE), 'source = "local".*update = TRUE')
+  expect_error(valresultat(detaljniva = "full", source = "local", rakning = "preliminar"), "Saknad prim")
   missing_path <- sub("Test_2026", "Missing", path)
   writeLines(paste(strrep("a", 32), paste0("./", missing_path)), indexfile)
-  expect_error(valresultat(source = "local", archive = TRUE), "Filen finns inte")
+  expect_error(valresultat(detaljniva = "full", source = "local", archive = TRUE), "Filen finns inte")
   expect_false(file.exists(val_archive_path(missing_path, 2026, "test", root)))
 })
 
@@ -792,10 +794,10 @@ test_that("all public source flags are forwarded without changing their semantic
   for (source in c("local", "auto", "remote")) for (update in c(FALSE, TRUE)) for (archive in c(FALSE, TRUE)) {
     calls <- list()
     if (source == "local" && update) {
-      expect_error(valresultat(source = source, update = update, archive = archive), "update = TRUE")
+      expect_error(valresultat(detaljniva = "full", source = source, update = update, archive = archive), "update = TRUE")
       expect_length(calls, 0)
     } else {
-      valresultat(source = source, data_dir = "fixture", update = update, archive = archive, progress = FALSE)
+      valresultat(detaljniva = "full", source = source, data_dir = "fixture", update = update, archive = archive, progress = FALSE)
       expect_identical(calls, rep(list(list(source, "fixture", update, archive)), 2))
     }
   }

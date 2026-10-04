@@ -109,8 +109,7 @@ The Swedish functions remain supported:
 - `ersattare()`
 - `personroster()`
 
-English is the primary terminology for new public documentation and examples. Swedish remains a fully supported interface, not merely a legacy compatibility layer.
-
+The English API is the primary public API. Swedish functions are retained as convenience wrappers and should remain behaviourally aligned with the English API. New functionality should be designed in the English API first and exposed through the Swedish interface only where this can be done without creating a separate implementation or substantially increasing maintenance burden.
 For English election arguments, use the descriptive values:
 - `"parliamentary"`
 - `"regional"`

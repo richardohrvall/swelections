@@ -21,6 +21,26 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
   expect_identical(manifest$sources$md5[
     manifest$sources$source == "kandidaturer.skv"],
     "9855ac4280c2a5165389a88c647ae49f")
+  # The named research snapshot is not the candidate source of this release.
+  # An explicit file allows read-only validation without replacing that archive.
+  candidate_file <- swelections_test_env("CANONICAL_CANDIDATE_FILE")
+  if (!nzchar(candidate_file))
+    candidate_file <- file.path(root, "2018", "kandidater", "kandidaturer.skv")
+  candidate_source <- manifest$sources[
+    manifest$sources$source == "kandidaturer.skv", ]
+  if (!file.exists(candidate_file) ||
+      !identical(tolower(unname(tools::md5sum(candidate_file))), candidate_source$md5) ||
+      !identical(.canonical_sha256(candidate_file), candidate_source$sha256)) {
+    stop("Direct canonical/raw validation requires the exact candidate snapshot ",
+         "in the manifest. Set SWELECTIONS_TEST_CANONICAL_CANDIDATE_FILE; ",
+         "the older named research snapshot is not an equivalent fixture.")
+  }
+  raw_source <- .kalla_2018
+  local_mocked_bindings(.kalla_2018 = function(typ, source, data_dir,
+                                              update = FALSE, archive = FALSE) {
+    if (typ == "kandidaturer") return(candidate_file)
+    raw_source(typ, source, data_dir, update, archive)
+  })
   expect_setequal(list.files(build), c("manifest.json", manifest$assets$file))
   inspect_names <- function(x) {
     if (is.data.frame(x)) {
@@ -54,6 +74,11 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
                       resultat = TRUE) {
     got <- .canonical_public_2018(manifest, surface, val, niva,
       per_lista, komplettera_nollor, resultat, cache, urls)
+    table <- c(valresultat = "results", mandat = "seats",
+               kandidaturer = "candidacies", kandidater = "candidates",
+               valda = "elected", ersattare = "substitutes",
+               personroster = "preference_votes")[[surface]]
+    got <- .public_detail(got, table, "full")
     expect_identical(got, raw,
       info = paste(surface, paste(val, collapse = ","), niva,
                    per_lista, komplettera_nollor))
@@ -67,35 +92,35 @@ test_that("canonical RKL 2018 reproduces raw public tables", {
   )
   for (val in names(levels)) {
     for (niva in levels[[val]]) compare(
-      valresultat(ar = 2018L, val = val, niva = niva, source = "local",
+      valresultat(detaljniva = "full", ar = 2018L, val = val, niva = niva, source = "local",
                   data_dir = root, progress = FALSE),
       "valresultat", val, niva)
-    compare(mandat(ar = 2018L, val = val, source = "local",
+    compare(mandat(detaljniva = "full", ar = 2018L, val = val, source = "local",
                    data_dir = root, progress = FALSE), "mandat", val)
     for (niva in c("personvalsomrade", "valdistrikt")) {
       for (per_lista in c(FALSE, TRUE)) compare(
-        personroster(ar = 2018L, val = val, niva = niva,
+        personroster(detaljniva = "full", ar = 2018L, val = val, niva = niva,
                      per_lista = per_lista, source = "local",
                      data_dir = root, progress = FALSE),
         "personroster", val, niva, per_lista)
     }
     for (per_lista in c(FALSE, TRUE)) compare(
-      personroster(ar = 2018L, val = val, niva = "personvalsomrade",
+      personroster(detaljniva = "full", ar = 2018L, val = val, niva = "personvalsomrade",
                    per_lista = per_lista, komplettera_nollor = TRUE,
                    source = "local", data_dir = root, progress = FALSE),
       "personroster", val, "personvalsomrade", per_lista, TRUE)
   }
   for (val in c("RD", "RF", "KF")) {
-    compare(kandidaturer(ar = 2018L, val = val, source = "local",
+    compare(kandidaturer(detaljniva = "full", ar = 2018L, val = val, source = "local",
                         data_dir = root), "kandidaturer", val)
-    compare(kandidater(ar = 2018L, val = val, source = "local",
+    compare(kandidater(detaljniva = "full", ar = 2018L, val = val, source = "local",
                       data_dir = root, progress = FALSE), "kandidater", val)
-    compare(kandidater(ar = 2018L, val = val, resultat = FALSE,
+    compare(kandidater(detaljniva = "full", ar = 2018L, val = val, resultat = FALSE,
                       source = "local", data_dir = root),
             "kandidater", val, resultat = FALSE)
-    compare(valda(ar = 2018L, val = val, source = "local",
+    compare(valda(detaljniva = "full", ar = 2018L, val = val, source = "local",
                   data_dir = root, progress = FALSE), "valda", val)
-    compare(ersattare(ar = 2018L, val = val, source = "local",
+    compare(ersattare(detaljniva = "full", ar = 2018L, val = val, source = "local",
                       data_dir = root, progress = FALSE), "ersattare", val)
   }
   old <- options(swelections.canonical_manifest = file.path(build, "manifest.json"),
@@ -268,9 +293,10 @@ test_that("public 2018 APIs preserve raw-built values in both name languages", {
     manifest$assets$asset)
   expected <- function(surface, val, level = NULL) .canonical_public_2018(
     manifest, surface, val, level, cache_dir = cache, urls = urls)
-  check <- function(actual_sv, actual_en, raw_built) {
-    expect_identical(actual_sv, raw_built)
-    expect_identical(actual_en, .public_output_names(raw_built, "en"))
+  check <- function(actual_sv, actual_en, raw_built, table) {
+    raw_standard <- .public_detail(raw_built, table, "standard")
+    expect_identical(actual_sv, raw_standard)
+    expect_identical(actual_en, .public_output_names(raw_standard, "en"))
     expect_identical(unname(vapply(actual_sv, typeof, "")),
                      unname(vapply(actual_en, typeof, "")))
   }
@@ -281,10 +307,11 @@ test_that("public 2018 APIs preserve raw-built values in both name languages", {
     check(results(2018, election, level = pair[[4L]], source = "canonical",
                   names = "sv"),
           results(2018, election, level = pair[[4L]], source = "canonical",
-                  names = "en"), expected("valresultat", val, pair[[3L]]))
+                  names = "en"), expected("valresultat", val, pair[[3L]]),
+          "results")
     check(seats(2018, election, source = "canonical", names = "sv"),
           seats(2018, election, source = "canonical", names = "en"),
-          expected("mandat", val))
+          expected("mandat", val), "seats")
     for (entry in list(
       list(fun = candidacies, surface = "kandidaturer"),
       list(fun = candidates, surface = "kandidater"),
@@ -292,18 +319,21 @@ test_that("public 2018 APIs preserve raw-built values in both name languages", {
       list(fun = substitutes, surface = "ersattare"))) {
       check(entry$fun(2018, election, source = "canonical", names = "sv"),
             entry$fun(2018, election, source = "canonical", names = "en"),
-            expected(entry$surface, val))
+            expected(entry$surface, val), switch(entry$surface,
+              kandidaturer = "candidacies", kandidater = "candidates",
+              valda = "elected", ersattare = "substitutes"))
     }
     check(preference_votes(2018, election, source = "canonical", names = "sv"),
           preference_votes(2018, election, source = "canonical", names = "en"),
-          expected("personroster", val, "personvalsomrade"))
+          expected("personroster", val, "personvalsomrade"),
+          "preference_votes")
   }
   check(candidates(2018, "parliamentary", include_results = FALSE,
                    source = "canonical", names = "sv"),
         candidates(2018, "parliamentary", include_results = FALSE,
                    source = "canonical", names = "en"),
         .canonical_public_2018(manifest, "kandidater", "RD", resultat = FALSE,
-                               cache_dir = cache, urls = urls))
+                               cache_dir = cache, urls = urls), "candidates")
   for (level in c("preference_vote_area", "district")) {
     swedish_level <- if (level == "district") "valdistrikt" else "personvalsomrade"
     check(preference_votes(2018, "parliamentary", level = level,
@@ -312,7 +342,7 @@ test_that("public 2018 APIs preserve raw-built values in both name languages", {
                            by_list = TRUE, source = "canonical", names = "en"),
           .canonical_public_2018(manifest, "personroster", "RD", swedish_level,
                                  per_lista = TRUE, cache_dir = cache,
-                                 urls = urls))
+                                 urls = urls), "preference_votes")
   }
 })
 

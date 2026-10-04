@@ -56,7 +56,7 @@
 }
 
 .valda_direkt_2026 <- function(source, data_dir, update, archive) {
-  kandidaturdata <- kandidaturer(
+  kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = 2026, val = "RD", source = source, data_dir = data_dir,
     update = update, archive = archive
   )

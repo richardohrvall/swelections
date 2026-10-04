@@ -10,7 +10,7 @@ test_that("local update is rejected before any file or remote access", {
                    'source = "local".*update = TRUE')
     }
   }
-  expect_error(kandidater(source = "local", resultat = FALSE, update = TRUE),
+  expect_error(kandidater(detaljniva = "full", source = "local", resultat = FALSE, update = TRUE),
                'source = "local".*update = TRUE')
   expect_error(.read_resultatindex_2026(source = "local", update = TRUE),
                'source = "local".*update = TRUE')
@@ -51,7 +51,10 @@ test_that("candidate CSV and result index use local archival", {
   on.exit(unlink(root, recursive = TRUE), add = TRUE)
   writeLines("synthetic candidacies", val_local_path("parti/kandidaturer.csv", 2026, "val2026", root))
   expect_equal(
-    kandidaturer(source = "local", data_dir = root, archive = TRUE),
+    dplyr::select(kandidaturer(detaljniva = "full", source = "local",
+                                data_dir = root, archive = TRUE),
+                  -dplyr::starts_with("kandidatur_"),
+                  -dplyr::starts_with("kall_")),
     .kort_kommunnamn_2026(fixture_kandidaturer())
   )
   expect_true(file.exists(val_archive_path("parti/kandidaturer.csv", 2026, "val2026", root)))

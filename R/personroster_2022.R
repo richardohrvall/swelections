@@ -461,7 +461,7 @@
                                      komplettera_nollor) {
   index <- .read_resultatindex(ar, source, data_dir, update, archive)
   paths <- .slutliga_mandat_paths(index, val, "personroster")
-  kd <- kandidaturer(ar = ar, val = val, source = source,
+  kd <- kandidaturer(detaljniva = "full", ar = ar, val = val, source = source,
     data_dir = data_dir, update = update, archive = archive)
   bas <- .kandidater_bas(kd, ar)
   purrr::map2(paths$path, paths$valtyp, function(path, valtyp) {

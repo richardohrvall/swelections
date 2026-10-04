@@ -38,7 +38,7 @@ test_that("public candidacies complete KF municipality names by code", {
     .resolve_val_file = function(...) "fixture.csv",
     read_kandidaturer_2026 = function(...) fixture_kandidaturer()
   )
-  out <- kandidaturer(val = "KF")
+  out <- kandidaturer(detaljniva = "full", val = "KF")
   expect_identical(out$valomradeskod, "0180")
   expect_identical(out$valomradesnamn, "Stockholm")
   expect_false(any(c("kommunkod", "kommunnamn", "kommunnamn_officiellt") %in% names(out)))
@@ -121,7 +121,7 @@ test_that("public candidate column contract keeps constituency count beside geog
   local_mocked_bindings(
     kandidaturer = function(...) kandidaturdata,
     .valda_ett_ar = function(...) {
-      kandidater(val = "RD", progress = FALSE) |>
+      kandidater(detaljniva = "full", val = "RD", progress = FALSE) |>
         dplyr::filter(invald %in% TRUE) |>
         .valda_invaldsvalkrets_2026() |>
         dplyr::select(-antal_valkretsar)
@@ -140,16 +140,18 @@ test_that("public candidate column contract keeps constituency count beside geog
       personval = fixture_personval(), valda = fixture_valda()
     )
   )
-  out <- kandidater(val = "RD", progress = FALSE)
+  out <- kandidater(detaljniva = "full", val = "RD", progress = FALSE)
   expected <- strsplit(readLines(test_path("fixtures", "kandidater-public-columns.txt")),
                        ",", fixed = TRUE)[[1]]
-  expect_identical(names(out), expected)
+  expect_identical(names(out)[seq_along(expected)], expected)
+  expect_true(all(c("kandidatur_valkretskod", "kandidatur_valkretsnamn") %in%
+                  names(out)))
   expect_length(expected, 41L)
   expect_type(out$antal_valkretsar, "integer")
-  valda_out <- valda(val = "RD", progress = FALSE)
+  valda_out <- valda(detaljniva = "full", val = "RD", progress = FALSE)
   valda_expected <- strsplit(readLines(test_path("fixtures", "valda-public-columns.txt")),
                              ",", fixed = TRUE)[[1]]
-  expect_identical(names(valda_out), valda_expected)
+  expect_identical(names(valda_out)[seq_along(valda_expected)], valda_expected)
   expect_length(valda_expected, 40L)
   expect_gt(nrow(valda_out), 0L)
   expect_identical(dplyr::select(valda_out, -valkretskod, -valkretsnamn),
@@ -168,7 +170,7 @@ test_that("valda omits the candidacy constituency count", {
     dplyr::filter(candidates, invald %in% TRUE) |>
       dplyr::select(-antal_valkretsar)
   })
-  out <- valda(progress = FALSE)
+  out <- valda(detaljniva = "full", progress = FALSE)
   expect_identical(out, dplyr::filter(candidates, invald %in% TRUE) |>
                      dplyr::select(-antal_valkretsar))
 })

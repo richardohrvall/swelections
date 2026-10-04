@@ -19,6 +19,8 @@
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
+#'   för alla tillgängliga harmoniserade fält.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #'
@@ -56,7 +58,8 @@ ersattare <- function(
     progress = interactive(),
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)

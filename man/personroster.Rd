@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_personroster.R
 \name{personroster}
 \alias{personroster}
-\title{Personröster per personvalsområde eller valdistrikt}
+\title{Personröster per personvalsområde, valdistrikt eller större valområde}
 \usage{
 personroster(
   ar = 2026,
@@ -17,7 +17,8 @@ personroster(
   komplettera_nollor = FALSE,
   fran = NULL,
   till = NULL,
-  names = "sv"
+  names = "sv",
+  detaljniva = "standard"
 )
 }
 \arguments{
@@ -41,7 +42,8 @@ väljas via \code{options(swelections.canonical_manifest = "...")}.
 
 \item{progress}{Visa progressindikator vid läsning av resultatfiler.}
 
-\item{niva}{\code{"personvalsomrade"} (standard) eller \code{"valdistrikt"}.}
+\item{niva}{\code{"personvalsomrade"} (standard), \code{"valdistrikt"}, \code{"kommun"}
+för KF eller \code{"region"} för RF.}
 
 \item{per_lista}{Om \code{TRUE}, behåll listdimensionen. Standard är \code{FALSE}.}
 
@@ -53,6 +55,9 @@ utan lista ändras inte resultatet. Standard är \code{FALSE}.}
 \code{ar}. En utelämnad gräns är öppen.}
 
 \item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+
+\item{detaljniva}{\code{"standard"} för centrala analysvariabler eller \code{"full"}
+för alla tillgängliga harmoniserade fält.}
 }
 \value{
 En tibble med en rad per giltig kandidat, parti och
@@ -99,7 +104,11 @@ personvalsområdets relevanta röstmaterial är färdigräknat och avstämt.
 \code{NA} betyder att källmaterialet inte räcker för att fastställa värdet,
 inte enbart att kandidaten saknas i en gles personröstarray.
 
-\code{niva} väljer personvalsområde eller valdistrikt och \code{per_lista} avgör om
+\code{niva} väljer personvalsområde, valdistrikt, kommun (KF) eller region (RF).
+Kommun och region summeras från icke överlappande personvalsområden;
+andelarna räknas om från aggregerade antal. Personvalskvalificering följer
+inte med till en nivå där den inte avgörs. Listuppdelning stöds ännu inte
+på dessa bredare nivåer. \code{per_lista} avgör om
 listdimensionen behålls. På distriktsnivå och i listvyerna är tabellen
 gles som standard: endast observerade personröstrader ingår. En saknad rad
 betyder inte automatiskt noll röster. Med \code{komplettera_nollor = TRUE} läggs

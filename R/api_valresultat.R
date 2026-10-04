@@ -17,6 +17,17 @@
 #' @param niva En geografisk nivå. `NULL` ger valets huvudnivå: RD `"riket"`,
 #'   RF `"region"`, KF `"kommun"`. Se nivåerna nedan.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` (standard) för en kompakt analystabell eller
+#'   `"full"` för alla tillgängliga harmoniserade fält. Påverkar inte rader
+#'   eller värden och är oberoende av `names`.
+#'   I standardutdata avser `valkrets*` RD/RF och `kommunvalkrets*` KF.
+#'   Olika valkretsnivåer behålls i RD/RF:s distriktsdata. Kandidatur och
+#'   invaldsgeografi hålls åtskilda i kandidatvyerna. Generiska KF-källfält
+#'   finns i fullutdata med prefixet `kall_`.
+#'   Geografiska kolumnnamn följer anropets valurval även vid tomma resultat.
+#'   I ersättarvyer avser `valomrades*` RD:s omgivande geografi; RF/KF:s
+#'   föräldraområden anges som region/kommun. Ursprungliga områdesfält
+#'   bevaras i fullutdata som `kall_valomrades*`.
 #'   Endast kolumnnamn ändras; datavärden och typer bevaras.
 #' @inheritParams mandat
 #'
@@ -144,7 +155,7 @@ valresultat <- function(
     ar = 2026, val = "RD", rakning = c("slutlig", "preliminar"),
     niva = NULL, source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    fran = NULL, till = NULL, names = "sv"
+    fran = NULL, till = NULL, names = "sv", detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)

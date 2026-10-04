@@ -52,26 +52,26 @@ test_that("multi-year results equal bound single-year results without changing o
   )) {
     val <- case[[1]]
     niva <- case[[2]]
-    a <- valresultat(ar = 2022, val = val, niva = niva, progress = FALSE)
-    b <- valresultat(ar = 2026, val = val, niva = niva, progress = FALSE)
-    ab <- valresultat(ar = c(2022, 2026), val = val, niva = niva,
+    a <- valresultat(detaljniva = "full", ar = 2022, val = val, niva = niva, progress = FALSE)
+    b <- valresultat(detaljniva = "full", ar = 2026, val = val, niva = niva, progress = FALSE)
+    ab <- valresultat(detaljniva = "full", ar = c(2022, 2026), val = val, niva = niva,
                      progress = FALSE)
     expect_identical(ab, dplyr::bind_rows(a, b), info = paste(val, niva))
-    expect_identical(valresultat(ar = c(2026, 2022, 2026), val = val,
+    expect_identical(valresultat(detaljniva = "full", ar = c(2026, 2022, 2026), val = val,
                                 niva = niva, progress = FALSE),
                      dplyr::bind_rows(b, a), info = paste(val, niva))
     expect_identical(names(ab)[1:2], c("valtillfalle", "valar"))
     expect_identical(typeof(ab$valar), "integer")
     expect_identical(unique(ab$valar), c(2022L, 2026L))
-    expect_identical(valresultat(fran = 2022, val = val, niva = niva,
+    expect_identical(valresultat(detaljniva = "full", fran = 2022, val = val, niva = niva,
                                 progress = FALSE), ab)
-    expect_identical(valresultat(fran = 2022, till = 2022, val = val, niva = niva,
+    expect_identical(valresultat(detaljniva = "full", fran = 2022, till = 2022, val = val, niva = niva,
                                 progress = FALSE), a)
   }
-  expect_identical(valresultat(progress = FALSE),
-                   valresultat(ar = 2026, progress = FALSE))
-  expect_identical(valresultat(2026, "RD", "slutlig", "riket", progress = FALSE),
-                   valresultat(ar = 2026, val = "RD", rakning = "slutlig",
+  expect_identical(valresultat(detaljniva = "full", progress = FALSE),
+                   valresultat(detaljniva = "full", ar = 2026, progress = FALSE))
+  expect_identical(valresultat(detaljniva = "full", 2026, "RD", "slutlig", "riket", progress = FALSE),
+                   valresultat(detaljniva = "full", ar = 2026, val = "RD", rakning = "slutlig",
                                niva = "riket", progress = FALSE))
 })
 
@@ -81,16 +81,16 @@ test_that("multi-year requests reject unsupported combinations before source I/O
     .read_resultatindex_2026 = function(...) { calls <<- calls + 1L; stop("IO") },
     .read_resultatindex = function(...) { calls <<- calls + 1L; stop("IO") }
   )
-  expect_error(valresultat(ar = c(2022, 2026), val = "RD", niva = "kommun"),
+  expect_error(valresultat(detaljniva = "full", ar = c(2022, 2026), val = "RD", niva = "kommun"),
                "2022")
-  expect_error(valresultat(ar = "alla", val = "RF", niva = "riket"), "2022")
-  expect_error(valresultat(fran = 2021, till = 2026, val = "KF", niva = "lan"),
+  expect_error(valresultat(detaljniva = "full", ar = "alla", val = "RF", niva = "riket"), "2022")
+  expect_error(valresultat(detaljniva = "full", fran = 2021, till = 2026, val = "KF", niva = "lan"),
                "2022")
   expect_identical(calls, 0L)
-  expect_error(valresultat(ar = 2022, fran = 2018), "ar.*fran")
-  expect_error(valresultat(ar = "alla", till = 2022), "ar.*till")
-  expect_error(valresultat(ar = 2021), "2021.*2022.*2026")
-  expect_error(valresultat(fran = 2019, till = 2021), "2018.*2022.*2026")
+  expect_error(valresultat(detaljniva = "full", ar = 2022, fran = 2018), "ar.*fran")
+  expect_error(valresultat(detaljniva = "full", ar = "alla", till = 2022), "ar.*till")
+  expect_error(valresultat(detaljniva = "full", ar = 2021), "2021.*2022.*2026")
+  expect_error(valresultat(detaljniva = "full", fran = 2019, till = 2021), "2018.*2022.*2026")
 })
 
 test_that("missing local source in any selected year aborts the whole request", {
@@ -106,6 +106,6 @@ test_that("missing local source in any selected year aborts the whole request", 
       fixture_resultatraw(val, kalla, rakning)
     }
   )
-  expect_error(valresultat(ar = c(2026, 2022), val = "RD", source = "local",
+  expect_error(valresultat(detaljniva = "full", ar = c(2026, 2022), val = "RD", source = "local",
                           progress = FALSE), "Val_20220911.*Filen finns inte")
 })

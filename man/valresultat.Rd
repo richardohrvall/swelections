@@ -16,7 +16,8 @@ valresultat(
   progress = interactive(),
   fran = NULL,
   till = NULL,
-  names = "sv"
+  names = "sv",
+  detaljniva = "standard"
 )
 }
 \arguments{
@@ -49,7 +50,19 @@ väljas via \code{options(swelections.canonical_manifest = "...")}.}
 Används som alternativ till \code{ar}; \verb{fran = 2021, till = 2026} väljer i
 nuläget 2022 och 2026. Utelämnad gräns är öppen.}
 
-\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.
+\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+
+\item{detaljniva}{\code{"standard"} (standard) för en kompakt analystabell eller
+\code{"full"} för alla tillgängliga harmoniserade fält. Påverkar inte rader
+eller värden och är oberoende av \code{names}.
+I standardutdata avser \verb{valkrets*} RD/RF och \verb{kommunvalkrets*} KF.
+Olika valkretsnivåer behålls i RD/RF:s distriktsdata. Kandidatur och
+invaldsgeografi hålls åtskilda i kandidatvyerna. Generiska KF-källfält
+finns i fullutdata med prefixet \code{kall_}.
+Geografiska kolumnnamn följer anropets valurval även vid tomma resultat.
+I ersättarvyer avser \verb{valomrades*} RD:s omgivande geografi; RF/KF:s
+föräldraområden anges som region/kommun. Ursprungliga områdesfält
+bevaras i fullutdata som \verb{kall_valomrades*}.
 Endast kolumnnamn ändras; datavärden och typer bevaras.}
 }
 \value{

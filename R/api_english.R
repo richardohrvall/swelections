@@ -28,14 +28,36 @@
   unname(choices[value])
 }
 
-.english_call <- function(fun, args, year, year_missing, names) {
+.english_call <- function(fun, args, year, year_missing, names, detail, table) {
   language <- .english_output_language(names)
+  detail <- .check_detail(detail)
   args["val"] <- list(.english_argument_value(args$val, "election", nullable = TRUE))
   if (!year_missing) {
     if (identical(year, "all")) year <- "alla"
     args$ar <- year
   }
-  .public_output_names(do.call(fun, args), language)
+  broader_preference <- identical(table, "preference_votes") &&
+    !is.null(args$niva) &&
+    args$niva %in% c("kommun", "region")
+  if (broader_preference) {
+    requested_level <- args$niva
+    expected_election <- if (requested_level == "kommun") "KF" else "RF"
+    if (!identical(args$val, expected_election)) {
+      stop("This broader preference-vote level requires election ",
+           expected_election, ".", call. = FALSE)
+    }
+    if (isTRUE(args$per_lista)) {
+      stop("List-level preference votes are not available at this broader level.",
+           call. = FALSE)
+    }
+    args$niva <- "personvalsomrade"
+  }
+  data <- do.call(fun, args)
+  if (broader_preference) data <- .aggregate_preference_area(data, requested_level)
+  elections <- if (is.null(args$val)) c("RD", "RF", "KF") else args$val
+  if (table == "seats" && !is.null(args$niva))
+    elections <- unique(.mandat_par_2026(args$val, args$niva)$valtyp)
+  .public_output_names(.public_detail(data, table, detail, elections), language)
 }
 
 #' Election results
@@ -66,6 +88,20 @@
 #' @param progress Show a progress indicator.
 #' @param from,to Inclusive bounds among supported election years, as an
 #'   alternative to `year`.
+#' @param detail `"standard"` (default) selects analysis-facing columns;
+#'   `"full"` retains all available harmonised fields. This is independent
+#'   of the output-name language and does not change observations or values.
+#'   Standard constituency fields refer to RD/RF constituencies; KF uses
+#'   `municipal_constituency_*`, including candidacy/elected role prefixes.
+#'   Distinct municipal constituency context is retained for RD/RF districts.
+#'   Preference-vote areas use their own primary identifiers instead of
+#'   duplicate constituency aliases. Full output preserves generic KF source
+#'   constituency fields as `source_*constituency_*`.
+#'   Geographic column selection follows the requested election even for empty
+#'   results. In substitute views, `electoral_area_*` describes RD's distinct
+#'   surrounding area; RF/KF parents use region/municipality identifiers.
+#'   Full output preserves the original parent fields as
+#'   `source_electoral_area_*`.
 #' @param names Output column language: `"en"` or `"sv"`. `NULL` uses
 #'   `getOption("swelections.names", "en")`. This changes column names only.
 #' @return A tibble with the same rows, values and types as [valresultat()].
@@ -80,15 +116,15 @@ results <- function(
     year = 2026, election = "parliamentary", count = "final", level = NULL,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    from = NULL, to = NULL, names = NULL
+    from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(valresultat, list(
+  .english_call(.raw_public_api$valresultat, list(
     val = election, rakning = .english_argument_value(count, "count"),
     niva = .english_argument_value(level, "level", nullable = TRUE),
     source = source, data_dir = data_dir, update = update, archive = archive,
     progress = progress, fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "results")
 }
 
 #' Seats and mandates
@@ -108,15 +144,15 @@ seats <- function(
     year = 2026, election = NULL, count = "final", level = NULL,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    from = NULL, to = NULL, names = NULL
+    from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(mandat, list(
+  .english_call(.raw_public_api$mandat, list(
     val = election, rakning = .english_argument_value(count, "count"),
     niva = .english_argument_value(level, "level", nullable = TRUE),
     source = source, data_dir = data_dir, update = update, archive = archive,
     progress = progress, fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "seats")
 }
 
 #' Candidacies
@@ -136,13 +172,13 @@ seats <- function(
 candidacies <- function(
     year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
-    from = NULL, to = NULL, names = NULL
+    from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(kandidaturer, list(
+  .english_call(.raw_public_api$kandidaturer, list(
     val = election, source = source, data_dir = data_dir,
     update = update, archive = archive, fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "candidacies")
 }
 
 #' Candidates
@@ -160,14 +196,14 @@ candidates <- function(
     year = 2026, election = NULL, include_results = TRUE,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    from = NULL, to = NULL, names = NULL
+    from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(kandidater, list(
+  .english_call(.raw_public_api$kandidater, list(
     val = election, resultat = include_results, source = source,
     data_dir = data_dir, update = update, archive = archive,
     progress = progress, fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "candidates")
 }
 
 #' Elected members
@@ -183,14 +219,15 @@ candidates <- function(
 elected <- function(
     year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
-    progress = interactive(), from = NULL, to = NULL, names = NULL
+    progress = interactive(), from = NULL, to = NULL, names = NULL,
+    detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(valda, list(
+  .english_call(.raw_public_api$valda, list(
     val = election, source = source, data_dir = data_dir,
     update = update, archive = archive, progress = progress,
     fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "elected")
 }
 
 #' Substitute relationships
@@ -205,26 +242,30 @@ elected <- function(
 substitutes <- function(
     year = 2026, election = NULL, source = c("auto", "local", "remote", "canonical"),
     data_dir = NULL, update = FALSE, archive = FALSE,
-    progress = interactive(), from = NULL, to = NULL, names = NULL
+    progress = interactive(), from = NULL, to = NULL, names = NULL,
+    detail = "standard"
 ) {
   year_missing <- missing(year)
-  .english_call(ersattare, list(
+  .english_call(.raw_public_api$ersattare, list(
     val = election, source = source, data_dir = data_dir,
     update = update, archive = archive, progress = progress,
     fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "substitutes")
 }
 
 #' Preference votes
 #'
-#' Read candidate preference votes by preference-vote area or district through
-#' [personroster()]. `by_list` retains the observed list dimension;
+#' Read candidate preference votes by preference-vote area, district or a
+#' supported broader election area. `by_list` retains the observed list dimension;
 #' `include_zeros` adds only verified zero combinations. The default view is
 #' one candidate–party–preference-vote-area row.
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
-#' @param level `"preference_vote_area"` (default) or `"district"`.
+#' @param level `"preference_vote_area"` (default), `"district"`,
+#'   `"municipality"` for municipal elections, or `"region"` for regional
+#'   elections. Broader areas aggregate non-overlapping area results and do
+#'   not currently support `by_list = TRUE`.
 #' @param by_list Retain the result-list dimension when `TRUE`.
 #' @param include_zeros Add verified zero combinations to sparse views when
 #'   `TRUE`; this never invents a zero from incomplete source data.
@@ -236,20 +277,20 @@ preference_votes <- function(
     data_dir = NULL, update = FALSE, archive = FALSE,
     progress = interactive(), level = "preference_vote_area",
     by_list = FALSE, include_zeros = FALSE,
-    from = NULL, to = NULL, names = NULL
+    from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
   if (!is.character(level) || length(level) != 1L || is.na(level) ||
-      !level %in% c("preference_vote_area", "district")) {
-    stop("Invalid `level`; use preference_vote_area or district.", call. = FALSE)
+      !level %in% c("preference_vote_area", "district", "municipality", "region")) {
+    stop("Invalid `level`; use preference_vote_area, district, municipality or region.", call. = FALSE)
   }
   .check_flag(by_list, "by_list")
   .check_flag(include_zeros, "include_zeros")
-  .english_call(personroster, list(
+  .english_call(.raw_public_api$personroster, list(
     val = election, source = source, data_dir = data_dir,
     update = update, archive = archive, progress = progress,
     niva = .english_argument_value(level, "level"),
     per_lista = by_list, komplettera_nollor = include_zeros,
     fran = from, till = to
-  ), year, year_missing, names)
+  ), year, year_missing, names, detail, "preference_votes")
 }

@@ -63,6 +63,8 @@
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
+#'   för alla tillgängliga harmoniserade fält.
 #'   Endast kolumnnamn ändras.
 #' @return En tibble där en rad avser val, räkning, geografisk nivå och
 #'   område samt parti. Områdestotaler upprepas på partirader och nivåerna
@@ -104,7 +106,8 @@ mandat <- function(
     progress = interactive(),
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)

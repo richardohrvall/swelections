@@ -26,19 +26,19 @@ test_that("candidate year selection preserves order and does not change old posi
       tibble::tibble(valar = as.integer(ar), valtyp = val[[1]])
     }
   )
-  expect_identical(kandidater(ar = c(2026, 2022, 2026), val = "RD")$valar,
+  expect_identical(kandidater(detaljniva = "full", ar = c(2026, 2022, 2026), val = "RD")$valar,
                    c(2026L, 2022L))
-  expect_identical(kandidater(ar = c(2026, 2018, 2022), val = "RD")$valar,
+  expect_identical(kandidater(detaljniva = "full", ar = c(2026, 2018, 2022), val = "RD")$valar,
                    c(2026L, 2018L, 2022L))
-  expect_identical(kandidater(ar = "alla", val = "RF")$valar,
+  expect_identical(kandidater(detaljniva = "full", ar = "alla", val = "RF")$valar,
                    c(2018L, 2022L, 2026L))
-  expect_identical(kandidater(fran = 2022, val = "KF")$valar,
+  expect_identical(kandidater(detaljniva = "full", fran = 2022, val = "KF")$valar,
                    c(2022L, 2026L))
-  expect_identical(kandidater(till = 2022, val = "KF")$valar,
+  expect_identical(kandidater(detaljniva = "full", till = 2022, val = "KF")$valar,
                    c(2018L, 2022L))
-  expect_error(kandidater(ar = 2022, fran = 2022, val = "RD"),
+  expect_error(kandidater(detaljniva = "full", ar = 2022, fran = 2022, val = "RD"),
                "alternativa")
-  expect_error(kandidater(ar = 2016, val = "RD"), "2016")
+  expect_error(kandidater(detaljniva = "full", ar = 2016, val = "RD"), "2016")
 })
 
 test_that("public candidate years stack without changing the established columns", {
@@ -48,9 +48,9 @@ test_that("public candidate years stack without changing the established columns
   local_mocked_bindings(kandidaturer = function(ar, ...) {
     dplyr::mutate(cand, valtillfalle = paste0("Val_", ar))
   })
-  a <- kandidater(ar = 2022, val = "RD", resultat = FALSE)
-  b <- kandidater(ar = 2026, val = "RD", resultat = FALSE)
-  both <- kandidater(ar = c(2022, 2026), val = "RD", resultat = FALSE)
+  a <- kandidater(detaljniva = "full", ar = 2022, val = "RD", resultat = FALSE)
+  b <- kandidater(detaljniva = "full", ar = 2026, val = "RD", resultat = FALSE)
+  both <- kandidater(detaljniva = "full", ar = c(2022, 2026), val = "RD", resultat = FALSE)
   expect_identical(both, dplyr::bind_rows(a, b))
   expect_identical(names(both)[1:2], c("valtillfalle", "valar"))
   expect_type(both$valar, "integer")
@@ -58,9 +58,12 @@ test_that("public candidate years stack without changing the established columns
   expect_identical(both$antal_valkretsar,
                    c(a$antal_valkretsar, b$antal_valkretsar))
   expect_setequal(setdiff(names(both), names(make_kandidater_2026(cand))),
-                  c("valar", "oppen_lista", "pa_namnvalsedel"))
+                  c("valar", "oppen_lista", "pa_namnvalsedel",
+                    "kandidatur_valomradeskod", "kandidatur_valomradesnamn",
+                    "kandidatur_valkretskod", "kandidatur_valkretsnamn"))
   expect_identical(
-    dplyr::select(b, -valar, -oppen_lista, -pa_namnvalsedel),
+    dplyr::select(b, -valar, -oppen_lista, -pa_namnvalsedel,
+                  -dplyr::starts_with("kandidatur_")),
     dplyr::filter(
       make_kandidater_2026(dplyr::mutate(cand, valtillfalle = "Val_2026")),
       valtyp == "RD"

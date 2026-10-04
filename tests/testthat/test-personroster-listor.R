@@ -256,12 +256,13 @@ test_that("contradictory list and summary values fail before validity filtering"
 
 test_that("public detail arguments are checked without accessing data", {
   local_mocked_bindings(kandidaturer = function(...) stop("File access"))
-  expect_error(personroster(niva = "kommun"), "niva")
-  expect_error(personroster(niva = NA_character_), "niva")
-  expect_error(personroster(per_lista = NA), "per_lista")
-  expect_error(personroster(per_lista = 1), "per_lista")
-  expect_error(personroster(komplettera_nollor = NA), "komplettera_nollor")
-  expect_error(personroster(komplettera_nollor = 1), "komplettera_nollor")
+  expect_error(personroster(detaljniva = "full", niva = "kommun"),
+               "requires election")
+  expect_error(personroster(detaljniva = "full", niva = NA_character_), "niva")
+  expect_error(personroster(detaljniva = "full", per_lista = NA), "per_lista")
+  expect_error(personroster(detaljniva = "full", per_lista = 1), "per_lista")
+  expect_error(personroster(detaljniva = "full", komplettera_nollor = NA), "komplettera_nollor")
+  expect_error(personroster(detaljniva = "full", komplettera_nollor = 1), "komplettera_nollor")
 })
 
 test_that("public detail modes route to their respective results", {
@@ -280,7 +281,7 @@ test_that("public detail modes route to their respective results", {
   )
   for (mode in list(list("valdistrikt", FALSE), list("valdistrikt", TRUE),
                     list("personvalsomrade", TRUE))) {
-    out <- personroster(val = "RD", niva = mode[[1]], per_lista = mode[[2]],
+    out <- personroster(detaljniva = "full", val = "RD", niva = mode[[1]], per_lista = mode[[2]],
                        progress = FALSE)
     expect_identical(unique(out$geografiniva),
                      if (mode[[1]] == "valdistrikt") "valdistrikt" else "riksdagsvalkrets")
@@ -290,12 +291,12 @@ test_that("public detail modes route to their respective results", {
     expect_type(out$andel_personroster, "double")
     expect_type(out$kvalificerad_personval, "logical")
   }
-  full <- personroster(val = "RD", niva = "valdistrikt",
+  full <- personroster(detaljniva = "full", val = "RD", niva = "valdistrikt",
                        komplettera_nollor = TRUE, progress = FALSE)
   expect_equal(nrow(full), 4L)
-  district_list_full <- personroster(val = "RD", niva = "valdistrikt",
+  district_list_full <- personroster(detaljniva = "full", val = "RD", niva = "valdistrikt",
     per_lista = TRUE, komplettera_nollor = TRUE, progress = FALSE)
-  area_list_full <- personroster(val = "RD", per_lista = TRUE,
+  area_list_full <- personroster(detaljniva = "full", val = "RD", per_lista = TRUE,
     komplettera_nollor = TRUE, progress = FALSE)
   expect_equal(nrow(district_list_full), 5L)
   expect_equal(nrow(area_list_full), 3L)

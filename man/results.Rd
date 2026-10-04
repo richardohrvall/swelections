@@ -16,7 +16,8 @@ results(
   progress = interactive(),
   from = NULL,
   to = NULL,
-  names = NULL
+  names = NULL,
+  detail = "standard"
 )
 }
 \arguments{
@@ -54,6 +55,21 @@ alternative to \code{year}.}
 
 \item{names}{Output column language: \code{"en"} or \code{"sv"}. \code{NULL} uses
 \code{getOption("swelections.names", "en")}. This changes column names only.}
+
+\item{detail}{\code{"standard"} (default) selects analysis-facing columns;
+\code{"full"} retains all available harmonised fields. This is independent
+of the output-name language and does not change observations or values.
+Standard constituency fields refer to RD/RF constituencies; KF uses
+\verb{municipal_constituency_*}, including candidacy/elected role prefixes.
+Distinct municipal constituency context is retained for RD/RF districts.
+Preference-vote areas use their own primary identifiers instead of
+duplicate constituency aliases. Full output preserves generic KF source
+constituency fields as \verb{source_*constituency_*}.
+Geographic column selection follows the requested election even for empty
+results. In substitute views, \verb{electoral_area_*} describes RD's distinct
+surrounding area; RF/KF parents use region/municipality identifiers.
+Full output preserves the original parent fields as
+\verb{source_electoral_area_*}.}
 }
 \value{
 A tibble with the same rows, values and types as \code{\link[=valresultat]{valresultat()}}.

@@ -6,14 +6,14 @@ test_that("complete final RD 2026 has no artificial person-vote NA", {
   options(swelections.resultatsamling_2026 = "val2026")
   on.exit(options(swelections.resultatsamling_2026 = old_option), add = TRUE)
 
-  area <- personroster(val = "RD", source = "local", data_dir = data_dir,
+  area <- personroster(detaljniva = "full", val = "RD", source = "local", data_dir = data_dir,
                        progress = FALSE)
-  sparse <- personroster(val = "RD", niva = "personvalsomrade",
+  sparse <- personroster(detaljniva = "full", val = "RD", niva = "personvalsomrade",
     per_lista = TRUE, source = "local", data_dir = data_dir, progress = FALSE)
-  full <- personroster(val = "RD", niva = "personvalsomrade",
+  full <- personroster(detaljniva = "full", val = "RD", niva = "personvalsomrade",
     per_lista = TRUE, komplettera_nollor = TRUE,
     source = "local", data_dir = data_dir, progress = FALSE)
-  candidates <- kandidater(val = "RD", source = "local", data_dir = data_dir,
+  candidates <- kandidater(detaljniva = "full", val = "RD", source = "local", data_dir = data_dir,
                            progress = FALSE)
 
   expect_equal(nrow(area), 31820L)

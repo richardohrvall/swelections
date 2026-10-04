@@ -97,6 +97,24 @@ elections where the official source provides them, but parliamentary county
 results are not supported. Regional county results are not yet activated.
 Unsupported combinations give an error.
 
+The public tables default to `detail = "standard"`, a compact set of
+analysis variables with geographic code/name pairs for the observation level.
+Use `detail = "full"` for all harmonised fields available from the selected
+source, including source-specific reporting metadata. This changes columns,
+not observations or values. The Swedish functions use the same distinction
+through `detaljniva = "standard"` or `"full"`; `names` independently selects
+the column language. Historical canonical data can expose only fields stored
+in that release.
+
+The public tables default to `detail = "standard"`, a compact set of
+analysis variables with geographic code/name pairs for the observation level.
+Use `detail = "full"` for all harmonised fields available from the selected
+source, including source-specific reporting metadata. This changes columns,
+not observations or values. The Swedish functions use the same distinction
+through `detaljniva = "standard"` or `"full"`; `names` independently selects
+the column language. Historical canonical data can expose only fields stored
+in that release.
+
 At district level, `counted` distinguishes reported districts from districts
 whose vote distribution is not yet available. Unreported districts remain in
 the public table with `NA` in current result fields; an explicit reported zero
@@ -135,6 +153,16 @@ they contain observed candidate results, including explicit source zeros.
 complete source information. A missing row is not automatically zero, and
 `NA` means the available source cannot establish the value. Preference-vote
 shares are proportions on the 0–1 scale.
+For municipal elections, `level = "municipality"` combines non-overlapping
+preference-vote areas within each municipality; regional elections similarly
+support `level = "region"`. Shares are recalculated from the combined counts.
+Qualification by preference votes is not carried to these broader views when
+it is determined in a smaller preference-vote area.
+For municipal elections, `level = "municipality"` combines non-overlapping
+preference-vote areas within each municipality; regional elections similarly
+support `level = "region"`. Shares are recalculated from the combined counts.
+Qualification by preference votes is not carried to these broader views when
+it is determined in a smaller preference-vote area.
 
 ```r
 # Preference votes for candidates on observed result lists by district

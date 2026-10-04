@@ -52,6 +52,8 @@
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator vid läsning av resultatfiler.
 #' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
+#'   för alla tillgängliga harmoniserade fält.
 #'
 #' @return En tibble med en rad per `kandidatnummer`, `valtyp` och `partikod`,
 #'   byggd från giltiga kandidaturer. Namn normaliseras deterministiskt och
@@ -99,7 +101,8 @@ kandidater <- function(
     progress = interactive(),
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)
@@ -130,7 +133,7 @@ kandidater <- function(
   if (source %in% c("canonical", "canonical_auto"))
     return(.canonical_2018_source("kandidater", val, resultat = resultat,
       auto_selected = identical(source, "canonical_auto")))
-  kandidaturdata <- kandidaturer(
+  kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar,
     val = val,
     source = source,
@@ -245,7 +248,8 @@ valda <- function(
     progress = interactive(),
     fran = NULL,
     till = NULL,
-    names = "sv"
+    names = "sv",
+    detaljniva = "standard"
 ) {
   .check_output_language(names)
   ar_angivet <- !missing(ar)
