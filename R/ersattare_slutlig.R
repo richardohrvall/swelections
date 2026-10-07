@@ -76,7 +76,7 @@
   source <- .select_public_source(source, ar, "ersattare", data_dir,
                                   update, archive)
   if (source %in% c("canonical", "canonical_auto"))
-    return(.canonical_2018_source("ersattare", val,
+    return(.canonical_source(ar, "ersattare", val,
       auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
     out <- .xml2018_valda_ersattare(val, source, data_dir, update,

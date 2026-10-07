@@ -61,7 +61,7 @@
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -164,10 +164,15 @@ personroster <- function(
           "personroster", data_dir, update, archive)
         selected_source %in% c("canonical", "canonical_auto")
       }) {
-        purrr::list_rbind(lapply(val, function(v)
-          .canonical_2018_source("personroster", v, niva, per_lista,
+        canonical_data <- purrr::list_rbind(lapply(val, function(v)
+          .canonical_source(ett_ar, "personroster", v, niva, per_lista,
             komplettera_nollor,
             auto_selected = identical(selected_source, "canonical_auto"))))
+        if (ett_ar == 2022L) canonical_data <- dplyr::arrange(canonical_data,
+          .data$valtyp, .data$valomradeskod, .data$personvalsomradeskod,
+          .data$partikod, .data$kandidatnummer,
+          dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
+        canonical_data
       } else if (ett_ar == 2018L) {
         .personroster_ett_ar_2018(ett_ar, val, selected_source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)

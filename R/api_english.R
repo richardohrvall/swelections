@@ -78,9 +78,12 @@
 #'   For 2018, `"auto"` prefers a complete configured local raw set, then an
 #'   explicitly auto-eligible published canonical release, then the official
 #'   remote raw source. Other years retain the official raw-data route.
-#'   Explicit `"canonical"` currently covers 2018 and resolves the published
-#'   English-schema Parquet release; a local build may be selected through
+#'   Explicit `"canonical"` resolves the published 2018 English-schema Parquet
+#'   release. Unpublished 2022 builds require an explicitly configured manifest;
+#'   they are not selected by `"auto"`. A local build may be selected through
 #'   `options(swelections.canonical_manifest = "path/to/manifest.json")`.
+#'   A named character vector of manifest paths keyed by year supports requests
+#'   spanning published 2018 and configured 2022 data.
 #'   Canonical Parquet reading requires optional package `nanoparquet`.
 #' @param data_dir Local root directory for raw files.
 #' @param update Update the local working copy when `TRUE`.

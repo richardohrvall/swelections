@@ -9,7 +9,7 @@
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.

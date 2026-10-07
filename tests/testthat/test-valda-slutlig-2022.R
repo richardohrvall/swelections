@@ -85,3 +85,83 @@ test_that("missing or unfinished final 2022 elected node is an error", {
     fixture$raw, fixture$kandidaturer, fixture$kandidater),
     "Slutlig invaldsrelation 2022")
 })
+
+test_that("2022 global elected enrichment preserves requested file order", {
+  rd <- .fixture_valda_slutlig_2022("RD")
+  rf <- .fixture_valda_slutlig_2022("RF")
+  kd <- dplyr::bind_rows(rd$kandidaturer, rf$kandidaturer)
+  bas <- .kandidater_bas(kd, 2022L)
+  parsed <- lapply(list(rf$raw, rd$raw), .valda_parsad_raw_2022,
+                   kandidaturdata = kd, kandidater_bas = bas)
+  out <- .valda_fran_parsade_2022(parsed, kd, bas, c("RF", "RD"))
+  expect_identical(out$valtyp, c("RF", "RD"))
+  expect_identical(out$antal_personroster_totalt, c(1L, 1L))
+})
+
+test_that("2022 elected enrichment uses all final candidacy areas", {
+  cases <- tibble::tibble(
+    id = c("35910", "12565", "39734"),
+    party = c("1439", "0110", "1439"),
+    elected_area = c("0127", "0481", "1282"),
+    other_area = c("1480", "0480", "1280"),
+    local_votes = c(454L, 54L, 324L),
+    total_votes = c(3575L, 205L, 477L)
+  )
+  for (i in seq_len(nrow(cases))) {
+    for (valtyp in c("KF", "RF")) {
+      fixture <- .fixture_valda_slutlig_2022(valtyp, indelad = FALSE)
+      make_raw <- function(kod, votes, elected) {
+        raw <- fixture$raw
+        raw$valomrade$kod <- kod
+        raw$valomrade$namn <- paste("Area", kod)
+        raw$valomrade$valda$partiLedamoterLista <- if (elected) list(list(
+          partikod = cases$party[i], ledamoter = list(list(
+            kandidatnummer = cases$id[i], namn = "Anna Andersson",
+            invalsordning = 1L)))) else list()
+        raw$valomrade$mandatfordelning$partiLista <- list(list(
+          partikod = cases$party[i], antalMandat = as.integer(elected)))
+        raw$valomrade$kvalificeradeForPersonvalLista <- list(list(
+          kandidatnummer = cases$id[i], partikod = cases$party[i],
+          antalPersonroster = votes))
+        p <- raw$valomrade$rostfordelning$rosterPaverkaMandat$partiRoster[[1]]
+        p$partikod <- cases$party[i]
+        p$antalRoster <- votes
+        p$listRoster[[1]]$antalRoster <- votes
+        p$listRoster[[1]]$antalRosterMedPersonrost <- votes
+        p$listRoster[[1]]$personroster[[1]] <- list(
+          kandidatNummer = cases$id[i], antalPersonroster = votes)
+        raw$valomrade$rostfordelning$rosterPaverkaMandat$partiRoster <- list(p)
+        raw
+      }
+      codes <- if (valtyp == "KF")
+        c(cases$elected_area[i], cases$other_area[i]) else c("01", "03")
+      raws <- list(make_raw(codes[1], cases$local_votes[i], TRUE),
+                   make_raw(codes[2], cases$total_votes[i] - cases$local_votes[i], FALSE))
+      before <- serialize(raws, NULL)
+      kd <- dplyr::bind_rows(lapply(codes, function(kod)
+        dplyr::mutate(fixture$kandidaturer,
+          kandidatnummer = cases$id[i], partikod = cases$party[i],
+          valomradeskod = kod, valomradesnamn = paste("Area", kod))))
+      bas <- .kandidater_bas(kd, 2022L)
+      paths <- paste0("s/", tolower(valtyp), "/Val_20220911_", codes, "_", valtyp, ".zip")
+      local_mocked_bindings(
+        .read_resultatindex = function(...) tibble::tibble(path = paths),
+        .resultat_file = function(ar, path, ...) path,
+        read_raw_json_zip_2026 = function(file, ...) raws[[match(file, paths)]],
+        kandidaturer = function(...) kd
+      )
+      elected <- .valda_ett_ar(2022L, valtyp, "local", tempdir(), FALSE, FALSE, FALSE)
+      candidates <- .add_kandidatresultat_2022(
+        bas, kd, valtyp, "local", tempdir(), FALSE, FALSE, FALSE)
+      expect_identical(elected$antal_personroster_totalt, cases$total_votes[i])
+      expect_identical(elected$antal_personroster_totalt,
+                       candidates$antal_personroster_totalt)
+      expect_identical(elected$antal_personvalsomraden, 2L)
+      expect_identical(elected$antal_personvalsomraden,
+                       candidates$antal_personvalsomraden)
+      expect_identical(elected$invald_valomradeskod, codes[1])
+      expect_identical(nrow(elected), 1L)
+      expect_identical(serialize(raws, NULL), before)
+    }
+  }
+})

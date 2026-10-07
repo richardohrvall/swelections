@@ -33,9 +33,12 @@ results when \code{TRUE}; corresponds to \code{resultat} in \code{\link[=kandida
 For 2018, \code{"auto"} prefers a complete configured local raw set, then an
 explicitly auto-eligible published canonical release, then the official
 remote raw source. Other years retain the official raw-data route.
-Explicit \code{"canonical"} currently covers 2018 and resolves the published
-English-schema Parquet release; a local build may be selected through
+Explicit \code{"canonical"} resolves the published 2018 English-schema Parquet
+release. Unpublished 2022 builds require an explicitly configured manifest;
+they are not selected by \code{"auto"}. A local build may be selected through
 \code{options(swelections.canonical_manifest = "path/to/manifest.json")}.
+A named character vector of manifest paths keyed by year supports requests
+spanning published 2018 and configured 2022 data.
 Canonical Parquet reading requires optional package \code{nanoparquet}.}
 
 \item{data_dir}{Local root directory for raw files.}

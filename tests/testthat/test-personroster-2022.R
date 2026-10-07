@@ -75,6 +75,66 @@ personroster_2022_fixture <- function() {
   x
 }
 
+test_that("canonical 2022 person bases reproduce all raw views and missingness", {
+  skip_if_not_installed("nanoparquet")
+  x <- personroster_2022_fixture()
+  local_mocked_bindings(.resultat_file = function(...) "fixture.zip",
+    read_raw_json_zip_2026 = function(file, type) {
+      if (type == "mandatfordelning") x$mandat else x$rost
+    }, .kandidater_bas = function(...) x$kandidater)
+  for (incomplete in c(FALSE, TRUE)) {
+    if (incomplete) x$mandat$valomrade$valkretsLista[[1]]$rostfordelning$
+      rosterPaverkaMandat$partiRoster[[1]]$listRoster[[2]]$personroster <- NULL
+    for (level in c("personvalsomrade", "valdistrikt")) {
+      m <- .normalisera_resultat_2022(x$mandat)
+      g <- .personroster_2022_geografi(m,
+        if (level == "valdistrikt") x$rost else NULL)
+      p <- .personroster_2022_population(x$kandidaturer, g$indelad)
+      k <- .personroster_2022_kallrader(g$noder, g$geo,
+        strikt_listtotal = level == "personvalsomrade")
+      p <- .personroster_2022_observerade(p, k$roster)
+      parts <- c(k, list(geo = g$geo,
+        omraden = dplyr::select(g$omraden, -".personval_nod"),
+        officiella = .personval_officiella_2026(g$omraden),
+        metadata = tibble::tibble(valtillfalle = m$valtillfalle,
+          valtyp = "RD", valdatum = m$valdatum, test = m$test)),
+        stats::setNames(p[c("kandidat", "lista", "alla")],
+                        paste0("population_", c("kandidat", "lista", "alla"))))
+      parts <- lapply(parts, function(data) {
+        data$.source_area <- rep("00", nrow(data)); .canonical_names_en(data)
+      })
+      asset <- paste0("rkl2022-preference-votes-base-",
+        if (level == "valdistrikt") "district" else "area", "-rd")
+      layouts <- data.frame(asset = asset, table = names(parts),
+        columns = vapply(parts, function(z) paste(names(z), collapse = ","), ""))
+      combined <- dplyr::bind_rows(lapply(names(parts), function(component) {
+        out <- parts[[component]]
+        out$.component <- rep(component, nrow(out)); out
+      }))
+      file <- tempfile(fileext = ".parquet")
+      nanoparquet::write_parquet(combined, file)
+      roundtrip <- tibble::as_tibble(nanoparquet::read_parquet(file))
+      unlink(file)
+      fetch <- function(name) {
+        if (name == "rkl2022-candidacies") return(.canonical_names_en(x$kandidaturer))
+        if (name == "rkl2022-candidates") return(.canonical_names_en(x$kandidater))
+        roundtrip
+      }
+      for (by_list in c(FALSE, TRUE)) for (zeros in c(FALSE, TRUE)) {
+        expected <- .personroster_2022_fil(2022L, "fixture", "RD",
+          x$kandidaturer, x$kandidater, "local", NULL, FALSE, FALSE,
+          level, by_list, zeros) |>
+          dplyr::arrange(.data$valtyp, .data$valomradeskod,
+            .data$personvalsomradeskod, .data$partikod, .data$kandidatnummer,
+            dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
+        got <- .canonical_person_2022(list(tables = layouts, schema_version = 2L),
+          fetch, "RD", level, by_list, zeros)
+        expect_identical(got, expected)
+      }
+    }
+  }
+})
+
 test_that("2022 area votes use validated official area lists", {
   x <- personroster_2022_fixture()
   g <- .personroster_2022_geografi(x$mandat)

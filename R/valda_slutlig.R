@@ -50,7 +50,7 @@
   source <- .select_public_source(source, ar, "valda", data_dir,
                                   update, archive)
   if (source %in% c("canonical", "canonical_auto"))
-    return(.canonical_2018_source("valda", val,
+    return(.canonical_source(ar, "valda", val,
       auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
     kandidaturdata <- kandidaturer(detaljniva = "full", ar = ar, val = val, source = source,
@@ -69,7 +69,7 @@
     update = update, archive = archive
   )
   kandidater_bas <- .kandidater_bas(kandidaturdata, ar)
-  out <- purrr::map2(paths$path, paths$valtyp, function(path, valtyp) {
+  parsed <- purrr::map2(paths$path, paths$valtyp, function(path, valtyp) {
     file <- .resultat_file(ar, path, source, data_dir, update, archive)
     raw <- read_raw_json_zip_2026(file, type = "mandatfordelning")
     if (!identical(as_chr_na(raw$valtyp), valtyp) ||
@@ -81,11 +81,14 @@
     bas <- dplyr::filter(kandidater_bas, .data$valtyp == .env$valtyp)
     kd <- dplyr::filter(kandidaturdata, .data$valtyp == .env$valtyp)
     if (ar == 2022L) {
-      .valda_fran_raw_2022(raw, kd, bas)
+      .valda_parsad_raw_2022(raw, kd, bas)
     } else {
       .valda_fran_raw_2026(raw, kd, bas)
     }
-  }, .progress = progress) |> purrr::list_rbind()
+  }, .progress = progress)
+  out <- if (ar == 2022L) {
+    .valda_fran_parsade_2022(parsed, kandidaturdata, kandidater_bas, val)
+  } else purrr::list_rbind(parsed)
   if (anyDuplicated(out[c("kandidatnummer", "valtyp", "partikod")])) {
     stop("Samma person valdes i flera slutliga resultatfiler.", call. = FALSE)
   }
@@ -93,7 +96,7 @@
     dplyr::select(-dplyr::any_of("antal_valkretsar"))
 }
 
-.valda_fran_raw_2022 <- function(raw, kandidaturdata, kandidater_bas) {
+.valda_parsad_raw_2022 <- function(raw, kandidaturdata, kandidater_bas) {
   normaliserad <- .normalisera_resultat_2022(raw)
   area <- normaliserad$valomrade
   noder <- if (length(area$valkretsLista)) area$valkretsLista else list(area)
@@ -110,12 +113,25 @@
   valda_data <- parse_valda_ersattare_2026(normaliserad)$valda |>
     dplyr::filter(kandidatnummer != "0")
   .valda_validera_nycklar(valda_data, kandidater_bas)
-  bas <- dplyr::semi_join(kandidater_bas, valda_data,
-    by = dplyr::join_by(kandidatnummer, valtyp, partikod))
-  kd <- dplyr::semi_join(kandidaturdata, valda_data,
-    by = dplyr::join_by(kandidatnummer, valtyp, partikod))
-  parsed <- .kandidatresultat_raw_2022(raw, kd)
+  # Validate the entire source before selecting the elected population.
+  .kandidatresultat_raw_2022(raw, kandidaturdata)
+}
+
+.valda_fran_parsade_2022 <- function(parsed, kandidaturdata, kandidater_bas, val) {
+  valda_data <- purrr::map(parsed, "valda") |> purrr::list_rbind()
+  .valda_validera_nycklar(valda_data, kandidater_bas)
+  # Preserve the established file/election order independently of enrichment.
+  bas <- purrr::map(parsed, function(p) dplyr::semi_join(kandidater_bas, p$valda,
+    by = dplyr::join_by(kandidatnummer, valtyp, partikod))) |> purrr::list_rbind()
+  # Keep the same candidacy scope as candidates(), including other areas
+  # in which an elected candidate stood. Election geography comes from valda.
   .add_kandidatresultat_fran_parsade_2026(
-    bas, kd, as_chr_na(normaliserad$valtyp), list(parsed)
+    bas, kandidaturdata, val, parsed
   ) |> dplyr::filter(invald %in% TRUE)
+}
+
+.valda_fran_raw_2022 <- function(raw, kandidaturdata, kandidater_bas) {
+  parsed <- .valda_parsad_raw_2022(raw, kandidaturdata, kandidater_bas)
+  .valda_fran_parsade_2022(list(parsed), kandidaturdata, kandidater_bas,
+                          as_chr_na(raw$valtyp))
 }

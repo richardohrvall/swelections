@@ -1,10 +1,88 @@
-# Canonical data distribution: RKL 2018
+# Canonical data distribution: RKL 2018 and 2022
+
+## RKL 2022: unpublished local build
+
+The next collection is a local `data-v0.2.0` build, using English Parquet
+schema version 2. It has **not** been published or enabled for automatic
+selection. The published 2018 assets are unchanged. An explicit 2022 request
+uses `options(swelections.canonical_manifest = ".../manifest.json")`;
+named manifest paths keyed by year support mixed 2018/2022 requests.
+
+Build with:
+
+```sh
+Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR PYTHON
+```
+
+`SOURCE_ROOT` is the preserved `rkl/2022` collection. The script pins the
+reviewed official index and the verified historical candidate CSV (MD5
+`639daa9630a1f2554f1c6839473448ee`). It hashes all preserved result JSON,
+RSA signature files and candidate snapshots, and checks the originals again
+after building. Signatures are recorded as signatures, not interpreted as
+textual SHA256 checksums. Four corrected final KF ZIPs (0136, 1439, 1860,
+2506) are downloaded separately and verified against the pinned official
+index. Raw files are never overwritten.
+
+RF 25 uses the preserved October 2022 result snapshot. The documented
+14 November correction `50975 -> 488` is applied only to typed candidate-ID
+fields for SD/Bo Larsson: two mandate-file fields and 95 district-file fields.
+The manifest records original hashes, changed JSON paths, derived hashes,
+decision `201-11278-2022` and its official protocol URL. Original elected
+and substitute relations are retained; later mandate-period replacements
+are not imported. Counts, names, order and other source values are unchanged
+by this reconstruction.
+
+An external temporary raw comparison archive contains explicitly derived
+ZIP containers. Its index checksums describe those containers, not the
+original official ZIPs. Neither this archive nor original raw files form
+part of the canonical asset distribution.
+
+The 24 Parquet assets are:
+
+- `rkl2022-results-{preliminar,slutlig}-{rd,rf,kf}.parquet` (six files);
+- `rkl2022-seats-{preliminar,slutlig}.parquet` (two files);
+- `rkl2022-candidacies.parquet`;
+- `rkl2022-candidates.parquet`;
+- `rkl2022-elected.parquet`;
+- `rkl2022-substitutes.parquet`;
+- `rkl2022-preference-votes-{area,district}-{rd,rf,kf}.parquet`
+  (six analysis assets: all four area views and the two sparse district views);
+- `rkl2022-preference-votes-base-{area,district}-{rd,rf,kf}.parquet`
+  (six files).
+
+Result, seat and preference-vote analysis assets record per-table layouts. Normalized preference-vote
+bases record per-component layouts and source-area partition keys. The same
+verified 2022 presentation/aggregation implementation serves raw and
+canonical requests, including list views and optional verified-zero
+completion. Completed panels are reconstructed on demand rather than
+stored as millions of duplicate rows. Technical base fields use the same
+English vocabulary for shared concepts; the source percentage used for
+validation is explicitly named `source_preference_vote_percent` and remains
+on its raw 0–100 scale. Public shares remain proportions.
+
+All seven public functions retain their existing 2022 geographic matrix.
+Results cover district plus parliamentary constituency/national (RD),
+regional constituency/region (RF), municipal constituency/municipality (KF),
+for preliminary and final counting. Seats cover the corresponding
+non-district levels. Candidate-related and preference-vote data describe
+final election results. Broader RF region/KF municipality preference-vote
+aggregation and both detail/name settings are handled by the shared public
+layer. No new unsupported geographical levels are inferred.
+
+Validate with `development/validate_canonical_2022.R OUTPUT_DIR`. The sweep
+uses public raw and canonical APIs, all supported levels/count stages,
+both languages/detail settings, all list/zero preference-vote variants,
+broader aggregation, keys, missingness, source/asset hashes and the
+Norrbotten election-time identities. A local dirty build is only a reviewed
+prototype: a future release requires a new clean-commit build, validation
+and explicit publication approval. No 2022 release or registry entry is
+created by these scripts.
 
 The 2018 canonical collection is an independent Parquet data product. It uses
 English public column names from `R/output_names.R`, with schema version 2
 and data version `data-v0.1.0`. These versions are separate from the R package
-version. The current collection is a local pre-release build; no release or
-data tag has been published.
+version. The 2018 collection is published as `data-v0.1.0`; the 2022
+`data-v0.2.0` collection above is an unpublished local build.
 
 ## Asset inventory
 

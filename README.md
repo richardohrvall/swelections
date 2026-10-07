@@ -247,6 +247,10 @@ results(year = 2018, election = "parliamentary", level = "national",
         source = "canonical")
 ```
 
+An unpublished 2022 canonical build can also be selected explicitly through
+its local manifest. It covers the package's existing 2022 levels and is not
+selected by `auto`; no 2022 canonical release is published yet.
+
 Canonical assets are read next to the manifest by default and cached with
 checksum verification. `nanoparquet` is needed only for Parquet use. The
 explicit canonical request does not fall back to raw files when an asset is

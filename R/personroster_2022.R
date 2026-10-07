@@ -358,6 +358,15 @@
     strikt_listtotal = niva == "personvalsomrade")
   .personroster_2022_kontrollera_poster(kallor$roster, pop)
   pop <- .personroster_2022_observerade(pop, kallor$roster)
+  .personroster_2022_public(raw, geo, pop, kallor, kandidater_bas,
+    niva, per_lista, komplettera_nollor)
+}
+
+# Shared presentation of verified normalized sources, including canonical bases.
+# No raw-file access or completeness inference is performed here.
+.personroster_2022_public <- function(raw, geo, pop, kallor, kandidater_bas,
+                                      niva, per_lista, komplettera_nollor,
+                                      officiella = NULL) {
   if (niva == "personvalsomrade") {
     out <- .personroster_2022_omrade(kallor, pop, geo$geo,
       per_lista, komplettera_nollor)
@@ -366,7 +375,8 @@
       per_lista, komplettera_nollor)
   }
   if (!nrow(out)) return(out)
-  officiella <- .personval_officiella_2026(geo$omraden)
+  if (is.null(officiella))
+    officiella <- .personval_officiella_2026(geo$omraden)
   if (nrow(dplyr::anti_join(officiella, pop$alla_globalt,
       by = dplyr::join_by(partikod, kandidatnummer)))) {
     stop("Officiell personvalskandidat saknar giltig kandidatur.",

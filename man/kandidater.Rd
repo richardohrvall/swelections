@@ -30,7 +30,7 @@ Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 personval och invaldsuppgifter från slutliga resultatfiler.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
-\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet.
+\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"auto"} väljer kompletta lokala officiella råfiler först, därefter en

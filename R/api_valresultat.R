@@ -207,10 +207,10 @@ valresultat <- function(
   }
   source <- .select_public_source(source, ar, "valresultat", data_dir,
                                   update, archive)
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_source(ar, "valresultat", val, niva,
+        rakning = rakning, auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
-    if (source %in% c("canonical", "canonical_auto"))
-      return(.canonical_2018_source("valresultat", val, niva,
-        auto_selected = identical(source, "canonical_auto")))
     return(.valresultat_2018(val, niva, source, data_dir, update, archive, progress))
   }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)

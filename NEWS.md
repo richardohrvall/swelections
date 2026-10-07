@@ -1,5 +1,12 @@
 # swelections 0.3.0.9000
 
+* Adds an explicitly configured, unpublished 2022 canonical Parquet backend
+  for all seven public functions, retaining preliminary/final results,
+  detail/name choices and preference-vote views. The local build records
+  source hashes and election-result corrections, including the scoped
+  Norrbotten candidate-ID reconstruction while preserving election-time
+  elected/substitute relations. Published 2018 assets and `auto` are unchanged.
+
 * Keeps geographic schemas stable for empty and filtered results. Mixed-election
   substitute views retain RD's distinct surrounding area without duplicating
   RF/KF region/municipality fields; original parent fields are full-only

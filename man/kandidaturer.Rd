@@ -26,7 +26,7 @@ används 2026.}
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
-\code{"canonical"} avser den separat versionerade 2018-samlingen i Parquet,
+\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.

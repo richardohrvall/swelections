@@ -180,7 +180,14 @@
 # below are technical fields; every shared concept uses the public name map.
 .canonical_base_names_en <- c(node_id = "node_id",
                               parti_complete = "party_complete",
-                              list_complete = "list_complete")
+                              list_complete = "list_complete",
+                              party_id = "party_id", list_id = "list_id",
+                              listnummer_raw = "source_list_number",
+                              kandidatnamn_raw = "source_candidate_name",
+                              ovriga_complete = "other_parties_complete",
+                              personval_available = "preference_qualification_available",
+                              antal_personroster_officiellt = "official_preference_votes",
+                              andel_personroster_officiellt_procent = "source_preference_vote_percent")
 
 .canonical_names_en <- function(data) {
   original <- base::names(data)

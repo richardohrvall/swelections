@@ -55,7 +55,7 @@
 #'   `"riksdagsvalkrets"`, RF `"region"` och `"regionvalkrets"`, och KF
 #'   `"kommun"` och `"kommunvalkrets"`. `NULL` ger alla relevanta nivåer.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #' @param data_dir Lokal rotmapp för rådata.
@@ -146,11 +146,11 @@ mandat <- function(
   }
   source <- .select_public_source(source, ar, "mandat", data_dir,
                                   update, archive)
-  if (ar == 2018L) {
-    if (source %in% c("canonical", "canonical_auto"))
-      return(.canonical_2018_source("mandat", val,
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_source(ar, "mandat", val,
         unique(par$geografiniva),
-        auto_selected = identical(source, "canonical_auto")))
+        rakning = rakning, auto_selected = identical(source, "canonical_auto")))
+  if (ar == 2018L) {
     return(.mandat_2018(val, par, source, data_dir, update, archive, progress))
   }
   index <- .valresultat_index_for_ar(ar, source, data_dir, update, archive)

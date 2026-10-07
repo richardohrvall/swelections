@@ -46,8 +46,8 @@
 }
 
 .check_canonical_years <- function(source, years) {
-  if (identical(source, "canonical") && any(years != 2018L)) {
-    stop("`source = 'canonical'` currently supports only 2018.", call. = FALSE)
+  if (identical(source, "canonical") && any(!years %in% c(2018L, 2022L))) {
+    stop("`source = 'canonical'` supports only 2018 and configured 2022 builds.", call. = FALSE)
   }
   invisible(years)
 }

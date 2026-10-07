@@ -10,7 +10,7 @@
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet,
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -92,10 +92,10 @@ kandidaturer <- function(
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
   source <- .select_public_source(source, ar, "kandidaturer", data_dir,
                                   update, archive)
-  if (ar == 2018L) {
-    if (source %in% c("canonical", "canonical_auto"))
-      return(.canonical_2018_source("kandidaturer", val,
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_source(ar, "kandidaturer", val,
         auto_selected = identical(source, "canonical_auto")))
+  if (ar == 2018L) {
     file <- .kalla_2018("kandidaturer", source, data_dir, update, archive)
     out <- .read_kandidaturer_2018(file)
     if (!is.null(val)) out <- dplyr::filter(out, valtyp %in% val)

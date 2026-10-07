@@ -110,14 +110,14 @@ test_that("table layouts restore level-specific columns and types", {
                "Kanonisk tabell saknas")
 })
 
-test_that("canonical is explicit, 2018-only and separate from raw local files", {
+test_that("canonical is explicit and separate from raw local files", {
   expect_identical(.check_public_args(2018L, "results", "auto", NULL,
                                       FALSE, FALSE, valar_resolved = TRUE), "auto")
   for (fun in list(results, seats, candidacies, candidates, elected,
                    substitutes, preference_votes)) {
     expect_error(fun(year = 2026, source = "canonical"), "only 2018")
   }
-  expect_error(results(year = c(2018, 2022), source = "canonical"), "only 2018")
+  expect_silent(.check_canonical_years("canonical", c(2018L, 2022L)))
   expect_error(results(year = 2018, source = "canonical", data_dir = "raw"),
                "data_dir")
   expect_error(results(year = 2018, source = "canonical", update = TRUE),

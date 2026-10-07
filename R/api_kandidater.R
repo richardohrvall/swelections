@@ -39,7 +39,7 @@
 #' @param resultat Om `TRUE`, kompletteras kandidaterna med personröster,
 #'   personval och invaldsuppgifter från slutliga resultatfiler.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen i Parquet.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"auto"` väljer kompletta lokala officiella råfiler först, därefter en
@@ -131,7 +131,7 @@ kandidater <- function(
   source <- .select_public_source(source, ar, "kandidater", data_dir,
                                   update, archive, include_results = resultat)
   if (source %in% c("canonical", "canonical_auto"))
-    return(.canonical_2018_source("kandidater", val, resultat = resultat,
+    return(.canonical_source(ar, "kandidater", val, resultat = resultat,
       auto_selected = identical(source, "canonical_auto")))
   kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar,
