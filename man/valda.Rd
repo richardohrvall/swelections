@@ -19,7 +19,7 @@ valda(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.

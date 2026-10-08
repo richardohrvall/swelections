@@ -47,6 +47,9 @@
 
 .valda_ett_ar <- function(ar, val, source, data_dir, update, archive,
                           progress) {
+  if (ar == 2014L && source == "canonical") return(.canonical_source(ar, "valda", val))
+  if (ar == 2014L) return(.valda_2014(
+    .sources_2014(source, data_dir, update, archive), val, progress))
   source <- .select_public_source(source, ar, "valda", data_dir,
                                   update, archive)
   if (source %in% c("canonical", "canonical_auto"))

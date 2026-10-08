@@ -20,7 +20,7 @@ kandidater(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -30,7 +30,12 @@ Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 personval och invaldsuppgifter från slutliga resultatfiler.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
-\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet.
+För 2014 ingår valsedelskandidater och identifierade kandidater i
+slutresultatets personröst-, valda- och ersättarstrukturer. Resultatbaserad
+population skapar inte nya offentliga kandidaturposter. Namn är typade
+\code{NA}; odokumenterade kandidaturattribut för resultat-only kandidater är
+\code{NA}. Inga senare mandatperiodsfiler används.
+\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"auto"} väljer kompletta lokala officiella råfiler först, därefter en

@@ -140,6 +140,12 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
+  if (ar == 2014L) {
+    if (rakning != "slutlig") stop("2014 seats require final election XML.", call. = FALSE)
+    if (source == "canonical") return(.canonical_source(ar, "mandat", val,
+      unique(par$geografiniva), rakning = rakning))
+    return(.mandat_2014(.sources_2014(source, data_dir, update, archive), par, progress))
+  }
   if (ar == 2018L && rakning != "slutlig") {
     stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
          call. = FALSE)

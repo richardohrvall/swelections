@@ -1,5 +1,14 @@
 # swelections 0.3.0.9000
 
+* Adds 2014 R XML adapters and an explicitly configured, unpublished canonical
+  prototype for the seven data families. Full preliminary results combine
+  ordinary election-night districts with preserved official preliminary
+  collection-district pages. Final election relationships exclude later
+  membership changes; unsupported attributes and candidate names remain
+  typed missing values. Candidate population includes identified final-result
+  candidates in addition to documented ballot candidacies. Repeated official
+  candidate preference-vote records are summed within their source node.
+
 * Adds an explicitly configured, unpublished 2022 canonical Parquet backend
   for all seven public functions, retaining preliminary/final results,
   detail/name choices and preference-vote views. The local build records

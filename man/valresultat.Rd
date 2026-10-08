@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_valresultat.R
 \name{valresultat}
 \alias{valresultat}
-\title{Officiella valresultat för 2018, 2022 och 2026}
+\title{Officiella valresultat för 2014, 2018, 2022 och 2026}
 \usage{
 valresultat(
   ar = 2026,
@@ -76,6 +76,11 @@ Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valå
 från Valmyndighetens
 officiella primärkälla. Ingen geografisk aggregering eller automatisk
 reservkälla används om den valda källan saknas.
+Undantaget är 2014 års fulla preliminära resultat: vanliga valdistrikt från
+valnatts-XML kombineras med preliminära uppsamlingsdistrikt från den officiella
+presentationen och aggregeras till begärd nivå. Slutliga uppsamlingsröster
+används aldrig i preliminära resultat. Slutligt 2014 använder samma
+geografiska nivåer som 2018 och en separat XML-adapter.
 }
 \details{
 RD stöder valdistrikt, kommun, kommunvalkrets, riksdagsvalkrets och riket.

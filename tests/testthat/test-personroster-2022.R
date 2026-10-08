@@ -246,6 +246,8 @@ test_that("personroster keeps exact multi-year order and a shared year column", 
     valtillfalle = paste0("Val_", ar), valar = as.integer(ar),
     valtyp = "RD", kandidatnummer = "1", antal_personroster = 2L)
   local_mocked_bindings(
+    .sources_2014 = function(...) list(),
+    .personroster_2014 = function(...) make(2014L),
     .personroster_ett_ar_2018 = make,
     .personroster_ett_ar_2022 = make,
     .personroster_ett_ar_2026 = make,
@@ -256,7 +258,7 @@ test_that("personroster keeps exact multi-year order and a shared year column", 
   expect_identical(personroster(detaljniva = "full", ar = c(2026, 2018, 2022))$valar,
     c(2026L, 2018L, 2022L))
   expect_identical(personroster(detaljniva = "full", ar = "alla")$valar,
-    c(2018L, 2022L, 2026L))
+    c(2014L, 2018L, 2022L, 2026L))
   expect_identical(personroster(detaljniva = "full", fran = 2022, till = 2026)$valar,
     c(2022L, 2026L))
   expect_identical(personroster(detaljniva = "full", ar = 2022)$valar, 2022L)

@@ -30,7 +30,7 @@
 #' lokal kopia av slutresultat-ZIP på rådatavägen, eller den separat
 #' versionerade kanoniska Parquet-samlingen med `source = "canonical"`.
 #'
-#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -39,7 +39,12 @@
 #' @param resultat Om `TRUE`, kompletteras kandidaterna med personröster,
 #'   personval och invaldsuppgifter från slutliga resultatfiler.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet.
+#'   För 2014 ingår valsedelskandidater och identifierade kandidater i
+#'   slutresultatets personröst-, valda- och ersättarstrukturer. Resultatbaserad
+#'   population skapar inte nya offentliga kandidaturposter. Namn är typade
+#'   `NA`; odokumenterade kandidaturattribut för resultat-only kandidater är
+#'   `NA`. Inga senare mandatperiodsfiler används.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"auto"` väljer kompletta lokala officiella råfiler först, därefter en
@@ -128,6 +133,10 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
+  if (ar == 2014L && source == "canonical") return(.canonical_source(ar, "kandidater", val,
+    resultat = resultat))
+  if (ar == 2014L) return(.kandidater_2014(
+    .sources_2014(source, data_dir, update, archive), val, resultat, progress))
   source <- .select_public_source(source, ar, "kandidater", data_dir,
                                   update, archive, include_results = resultat)
   if (source %in% c("canonical", "canonical_auto"))
@@ -212,7 +221,7 @@ kandidater <- function(
 #' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
-#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.

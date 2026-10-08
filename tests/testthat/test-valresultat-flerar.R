@@ -9,15 +9,15 @@ fixture_flerar_index <- function(ar) {
 }
 
 test_that("shared year resolver distinguishes exact years, all and inclusive ranges", {
-  expect_identical(.stodd_valar("valresultat", "RD"), c(2018L, 2022L, 2026L))
-  expect_identical(.stodd_valar("valresultat", "RF"), c(2018L, 2022L, 2026L))
-  expect_identical(.stodd_valar("valresultat", "KF"), c(2018L, 2022L, 2026L))
-  expect_identical(.stodd_valar("mandat", "RD"), c(2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "RD"), c(2014L, 2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "RF"), c(2014L, 2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("valresultat", "KF"), c(2014L, 2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("mandat", "RD"), c(2014L, 2018L, 2022L, 2026L))
   expect_identical(.resolve_valar(2026L), 2026L)
   expect_identical(.resolve_valar(c(2026, 2022, 2026)), c(2026L, 2022L))
-  expect_identical(.resolve_valar("alla"), c(2018L, 2022L, 2026L))
+  expect_identical(.resolve_valar("alla"), c(2014L, 2018L, 2022L, 2026L))
   expect_identical(.resolve_valar(fran = 2022, ar_angivet = FALSE), c(2022L, 2026L))
-  expect_identical(.resolve_valar(till = 2022, ar_angivet = FALSE), c(2018L, 2022L))
+  expect_identical(.resolve_valar(till = 2022, ar_angivet = FALSE), c(2014L, 2018L, 2022L))
   expect_identical(.resolve_valar(fran = 2021, till = 2026,
                                   ar_angivet = FALSE), c(2022L, 2026L))
   for (ar in list(2019:2022, 2024, 2022.5, numeric(), NA_real_, "2022",
@@ -28,7 +28,7 @@ test_that("shared year resolver distinguishes exact years, all and inclusive ran
   expect_error(.resolve_valar("alla", till = 2022), "ar.*till")
   expect_error(.resolve_valar(fran = 2026, till = 2022, ar_angivet = FALSE),
                "fran.*till")
-  expect_identical(.resolve_valar(till = 2021, ar_angivet = FALSE), 2018L)
+  expect_identical(.resolve_valar(till = 2021, ar_angivet = FALSE), c(2014L, 2018L))
   for (grans in list(2022:2026, 2022.5, NA_real_, "2022", TRUE)) {
     expect_error(.resolve_valar(fran = grans, ar_angivet = FALSE), "fran")
   }

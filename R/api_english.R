@@ -68,6 +68,8 @@
 #'
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
+#'   Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+#'   election, geographic level and count stage.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
 #' @param count `"final"` or `"preliminary"`.
@@ -79,12 +81,22 @@
 #'   explicitly auto-eligible published canonical release, then the official
 #'   remote raw source. Other years retain the official raw-data route.
 #'   Explicit `"canonical"` resolves the published 2018 English-schema Parquet
-#'   release. Unpublished 2022 builds require an explicitly configured manifest;
+#'   release. Unpublished 2014/2022 builds require an explicitly configured manifest;
 #'   they are not selected by `"auto"`. A local build may be selected through
 #'   `options(swelections.canonical_manifest = "path/to/manifest.json")`.
 #'   A named character vector of manifest paths keyed by year supports requests
 #'   spanning published 2018 and configured 2022 data.
 #'   Canonical Parquet reading requires optional package `nanoparquet`.
+#'   The 2014 raw route requires a preserved local archive: final XML under
+#'   `2014/valresultat/slutresultat_20141001`, election-night XML under
+#'   `2014/valresultat/valnatt`, ballot files under `2014/kandidater`, and the
+#'   independently captured preliminary collection-district presentation.
+#'   Remote/update/archive operations are not implemented for this historical
+#'   source collection. Preliminary results combine ordinary election-night
+#'   districts with preliminary collection districts, never final collection
+#'   votes. Seats, elected members, substitutes and preference votes use final
+#'   election XML; later membership files are excluded. Candidate names are
+#'   typed missing values. Unsupported historical attributes remain missing.
 #' @param data_dir Local root directory for raw files.
 #' @param update Update the local working copy when `TRUE`.
 #' @param archive Save a dated raw-data snapshot when `TRUE`.

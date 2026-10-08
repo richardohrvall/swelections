@@ -115,7 +115,7 @@ test_that("canonical is explicit and separate from raw local files", {
                                       FALSE, FALSE, valar_resolved = TRUE), "auto")
   for (fun in list(results, seats, candidacies, candidates, elected,
                    substitutes, preference_votes)) {
-    expect_error(fun(year = 2026, source = "canonical"), "only 2018")
+    expect_error(fun(year = 2026, source = "canonical"), "supports 2018.*2014/2022")
   }
   expect_silent(.check_canonical_years("canonical", c(2018L, 2022L)))
   expect_error(results(year = 2018, source = "canonical", data_dir = "raw"),

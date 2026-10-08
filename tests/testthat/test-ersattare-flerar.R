@@ -16,7 +16,7 @@ test_that("ersattare year selections stack exact-year results in requested order
   expect_identical(ersattare(detaljniva = "full", ar = c(2026, 2018, 2022), val = "RD"),
                    dplyr::bind_rows(b, c, a))
   expect_identical(ersattare(detaljniva = "full", ar = "alla", val = "RD"),
-                   dplyr::bind_rows(c, a, b))
+                   dplyr::bind_rows(ersattare(detaljniva = "full", ar = 2014, val = "RD"), c, a, b))
   expect_identical(ersattare(detaljniva = "full", fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(names(a)[1:2], c("valtillfalle", "valar"))

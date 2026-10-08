@@ -1,9 +1,14 @@
-#' Officiella valresultat för 2018, 2022 och 2026
+#' Officiella valresultat för 2014, 2018, 2022 och 2026
 #'
 #' Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 #' från Valmyndighetens
 #' officiella primärkälla. Ingen geografisk aggregering eller automatisk
 #' reservkälla används om den valda källan saknas.
+#' Undantaget är 2014 års fulla preliminära resultat: vanliga valdistrikt från
+#' valnatts-XML kombineras med preliminära uppsamlingsdistrikt från den officiella
+#' presentationen och aggregeras till begärd nivå. Slutliga uppsamlingsröster
+#' används aldrig i preliminära resultat. Slutligt 2014 använder samma
+#' geografiska nivåer som 2018 och en separat XML-adapter.
 #'
 #' @param ar Ett eller flera exakta valår, till exempel `c(2018, 2022, 2026)`, eller
 #'   `"alla"` för samtliga stödda år för vald valtyp. Dubbletter tas bort med
@@ -201,6 +206,14 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  if (ar == 2014L) {
+    if (source == "canonical") return(.canonical_source(ar, "valresultat", val,
+      niva, rakning = rakning))
+    sources <- .sources_2014(source, data_dir, update, archive)
+    if (rakning == "preliminar")
+      return(.valresultat_preliminary_2014(sources, val, niva, progress))
+    return(.valresultat_final_2014(sources, val, niva, progress))
+  }
   if (ar == 2018L && rakning != "slutlig") {
     stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
          call. = FALSE)
@@ -244,7 +257,7 @@ valresultat <- function(
 }
 
 .valresultat_kalla <- function(val, niva, ar = 2026) {
-  if (ar == 2018L) {
+  if (ar %in% c(2014L, 2018L)) {
     .valresultat_niva_2018(val, niva)
     return("XML")
   }

@@ -2,7 +2,7 @@
 #'
 #' Hämtar kandidaturdata från Valmyndigheten.
 #'
-#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -10,7 +10,10 @@
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
+#'   För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
+#'   `alkandur_R/L/K.skv`. Källan saknar bland annat explicit giltighet och
+#'   samtycke; dessa fält är typade `NA`. Kandidatnamn exponeras inte.
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -90,6 +93,10 @@ kandidaturer <- function(
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
+  if (ar == 2014L && source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
+  if (ar == 2014L) return(.read_candidacies_2014(
+    .sources_2014(source, data_dir, update, archive),
+    if (is.null(val)) c("RD", "RF", "KF") else val))
   source <- .select_public_source(source, ar, "kandidaturer", data_dir,
                                   update, archive)
   if (source %in% c("canonical", "canonical_auto"))

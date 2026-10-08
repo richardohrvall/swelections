@@ -18,7 +18,7 @@ kandidaturer(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
@@ -26,7 +26,10 @@ används 2026.}
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
-\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
+För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
+\code{alkandur_R/L/K.skv}. Källan saknar bland annat explicit giltighet och
+samtycke; dessa fält är typade \code{NA}. Kandidatnamn exponeras inte.
+\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.

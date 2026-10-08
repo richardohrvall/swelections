@@ -15,7 +15,7 @@ test_that("valda year selections retain exact-year order and long format", {
                    dplyr::bind_rows(b, a))
   expect_identical(valda(detaljniva = "full", ar = c(2026, 2018, 2022), val = "RD"),
                    dplyr::bind_rows(b, c, a))
-  expect_identical(valda(detaljniva = "full", ar = "alla", val = "RD"), dplyr::bind_rows(c, a, b))
+  expect_identical(valda(detaljniva = "full", ar = "alla", val = "RD"), dplyr::bind_rows(valda(detaljniva = "full", ar = 2014, val = "RD"), c, a, b))
   expect_identical(valda(detaljniva = "full", fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
   expect_identical(names(a)[1:2], c("valtillfalle", "valar"))

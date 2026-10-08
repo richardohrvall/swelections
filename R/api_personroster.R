@@ -54,14 +54,14 @@
 #' de krävs därför inte summera exakt till varandra. Funktionen läser enbart
 #' slutliga resultatfiler och gör ingen preliminär personröstberäkning.
 #'
-#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
+#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -168,11 +168,14 @@ personroster <- function(
           .canonical_source(ett_ar, "personroster", v, niva, per_lista,
             komplettera_nollor,
             auto_selected = identical(selected_source, "canonical_auto"))))
-        if (ett_ar == 2022L) canonical_data <- dplyr::arrange(canonical_data,
+        if (ett_ar %in% c(2014L, 2022L)) canonical_data <- dplyr::arrange(canonical_data,
           .data$valtyp, .data$valomradeskod, .data$personvalsomradeskod,
           .data$partikod, .data$kandidatnummer,
           dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
         canonical_data
+      } else if (ett_ar == 2014L) {
+        .personroster_2014(.sources_2014(selected_source, data_dir, update, archive),
+          val, niva, per_lista, komplettera_nollor, progress)
       } else if (ett_ar == 2018L) {
         .personroster_ett_ar_2018(ett_ar, val, selected_source, data_dir, update,
           archive, progress, niva, per_lista, komplettera_nollor)

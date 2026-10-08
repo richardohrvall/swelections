@@ -31,11 +31,11 @@ test_that("candidate year selection preserves order and does not change old posi
   expect_identical(kandidater(detaljniva = "full", ar = c(2026, 2018, 2022), val = "RD")$valar,
                    c(2026L, 2018L, 2022L))
   expect_identical(kandidater(detaljniva = "full", ar = "alla", val = "RF")$valar,
-                   c(2018L, 2022L, 2026L))
+                   c(2014L, 2018L, 2022L, 2026L))
   expect_identical(kandidater(detaljniva = "full", fran = 2022, val = "KF")$valar,
                    c(2022L, 2026L))
   expect_identical(kandidater(detaljniva = "full", till = 2022, val = "KF")$valar,
-                   c(2018L, 2022L))
+                   c(2014L, 2018L, 2022L))
   expect_error(kandidater(detaljniva = "full", ar = 2022, fran = 2022, val = "RD"),
                "alternativa")
   expect_error(kandidater(detaljniva = "full", ar = 2016, val = "RD"), "2016")

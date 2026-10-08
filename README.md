@@ -7,7 +7,7 @@ as tables for analysis. The public API is English-first, with a fully supported
 Swedish interface.
 
 > [!IMPORTANT]
-> The package is under active development. It supports selected 2018, 2022 and
+> The package is under active development. It supports selected 2014, 2018, 2022 and
 > 2026 election data, but availability depends on the election, counting stage,
 > geographic level and published source files. Public interfaces may change.
 
@@ -189,6 +189,15 @@ contains names. Result-dependent 2018 calls currently require a local copy of
 the official XML archive. The official 2018 candidacy source can be read
 remotely.
 
+2014 support uses preserved local ballot and final XML sources. Its full
+preliminary result combines ordinary election-night districts with an official
+preliminary collection-district presentation snapshot; final collection votes
+are not substituted. Candidate data include identifiers documented in the final
+results even when absent from the ballot files. Public candidate names and
+unsupported historical attributes are missing. Later membership snapshots are
+excluded. A 2014 canonical prototype is available only through an explicitly
+configured local manifest and is not selected automatically.
+
 For supported combinations, exact year vectors, `year = "all"`, and inclusive
 `from`/`to` ranges return years stacked in long format with integer
 `election_year`. Every selected year must support the requested data and level;
@@ -247,9 +256,9 @@ results(year = 2018, election = "parliamentary", level = "national",
         source = "canonical")
 ```
 
-An unpublished 2022 canonical build can also be selected explicitly through
-its local manifest. It covers the package's existing 2022 levels and is not
-selected by `auto`; no 2022 canonical release is published yet.
+Unpublished 2014 and 2022 canonical builds can also be selected explicitly
+through their local manifests. They cover the supported historical levels and
+are not selected by `auto`; neither has a published canonical release yet.
 
 Canonical assets are read next to the manifest by default and cached with
 checksum verification. `nanoparquet` is needed only for Parquet use. The

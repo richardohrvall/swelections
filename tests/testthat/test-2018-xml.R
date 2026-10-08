@@ -52,7 +52,7 @@ test_that("2018 vacancies require a validated elected relation", {
 })
 
 test_that("2018 support matrix and local source are strict", {
-  expect_identical(.stodd_valar("kandidaturer", "RD"), c(2018L, 2022L, 2026L))
+  expect_identical(.stodd_valar("kandidaturer", "RD"), c(2014L, 2018L, 2022L, 2026L))
   for (val in c("RD", "RF", "KF")) {
     for (niva in c("valdistrikt", "kommun", "kommunvalkrets", "lan",
                    "region", "regionvalkrets", "riksdagsvalkrets", "riket")) {
