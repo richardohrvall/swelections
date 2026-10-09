@@ -10,6 +10,13 @@
 #' används aldrig i preliminära resultat. Slutligt 2014 använder samma
 #' geografiska nivåer som 2018 och en separat XML-adapter.
 #'
+#' För 2010 kombinerar preliminär räkning ordinarie valnattsdistrikt med
+#' bevarade preliminära uppsamlingsdistrikt. Tomma fält förblir NA; slutliga
+#' uppsamlingsröster används inte. För slutlig räkning används XML och samma
+#' historiska normalisering som 2014. Publika kandidatnamn är saknade.
+#' Preliminära resultat kräver en komplett separat officiell
+#' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+#'
 #' @param ar Ett eller flera exakta valår, till exempel `c(2018, 2022, 2026)`, eller
 #'   `"alla"` för samtliga stödda år för vald valtyp. Dubbletter tas bort med
 #'   den först angivna årsordningen bevarad. Standard är 2026 när inga
@@ -206,10 +213,10 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
-  if (ar == 2014L) {
+  if (ar %in% c(2010L, 2014L)) {
     if (source == "canonical") return(.canonical_source(ar, "valresultat", val,
       niva, rakning = rakning))
-    sources <- .sources_2014(source, data_dir, update, archive)
+    sources <- .sources_historical(ar, source, data_dir, update, archive)
     if (rakning == "preliminar")
       return(.valresultat_preliminary_2014(sources, val, niva, progress))
     return(.valresultat_final_2014(sources, val, niva, progress))
@@ -257,7 +264,7 @@ valresultat <- function(
 }
 
 .valresultat_kalla <- function(val, niva, ar = 2026) {
-  if (ar %in% c(2014L, 2018L)) {
+  if (ar %in% c(2010L, 2014L, 2018L)) {
     .valresultat_niva_2018(val, niva)
     return("XML")
   }

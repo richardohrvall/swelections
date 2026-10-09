@@ -198,6 +198,13 @@ unsupported historical attributes are missing. Later membership snapshots are
 excluded. A 2014 canonical prototype is available only through an explicitly
 configured local manifest and is not selected automatically.
 
+2010 final results use preserved election-result XML and ballot candidacies,
+with identified result-only candidates retained. Names and unsupported attributes
+remain missing. Preliminary results combine ordinary election-night districts
+with a separately preserved preliminary collection-district reporting snapshot.
+Unreported districts and blank category fields remain missing; final collection
+votes are never substituted. The local canonical prototype is opt-in and unpublished.
+
 For supported combinations, exact year vectors, `year = "all"`, and inclusive
 `from`/`to` ranges return years stacked in long format with integer
 `election_year`. Every selected year must support the requested data and level;

@@ -54,7 +54,12 @@
 #' de krävs därför inte summera exakt till varandra. Funktionen läser enbart
 #' slutliga resultatfiler och gör ingen preliminär personröstberäkning.
 #'
-#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
+#' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+#' historiska normalisering som 2014. Publika kandidatnamn är saknade.
+#' Preliminära resultat kräver en komplett separat officiell
+#' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+#'
+#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -168,13 +173,13 @@ personroster <- function(
           .canonical_source(ett_ar, "personroster", v, niva, per_lista,
             komplettera_nollor,
             auto_selected = identical(selected_source, "canonical_auto"))))
-        if (ett_ar %in% c(2014L, 2022L)) canonical_data <- dplyr::arrange(canonical_data,
+        if (ett_ar %in% c(2010L, 2014L, 2022L)) canonical_data <- dplyr::arrange(canonical_data,
           .data$valtyp, .data$valomradeskod, .data$personvalsomradeskod,
           .data$partikod, .data$kandidatnummer,
           dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
         canonical_data
-      } else if (ett_ar == 2014L) {
-        .personroster_2014(.sources_2014(selected_source, data_dir, update, archive),
+      } else if (ett_ar %in% c(2010L, 2014L)) {
+        .personroster_2014(.sources_historical(ett_ar, selected_source, data_dir, update, archive),
           val, niva, per_lista, komplettera_nollor, progress)
       } else if (ett_ar == 2018L) {
         .personroster_ett_ar_2018(ett_ar, val, selected_source, data_dir, update,

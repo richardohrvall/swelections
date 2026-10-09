@@ -1,5 +1,14 @@
 # swelections 0.3.0.9000
 
+* Adds preserved-source 2010 XML/ballot adapters through the shared historical
+  normalisation layer and an opt-in unpublished canonical prototype. Final
+  election relationships exclude mandate-period changes. The approved Björn
+  Andersson identity rule is applied before joins; source files remain intact.
+  Preliminary results combine election-night ordinary districts with the
+  preserved preliminary collection reporting snapshot. All districts remain
+  represented; unreported districts and blank category fields retain NA.
+  Final collection votes are never substituted.
+
 * Adds 2014 R XML adapters and an explicitly configured, unpublished canonical
   prototype for the seven data families. Full preliminary results combine
   ordinary election-night districts with preserved official preliminary

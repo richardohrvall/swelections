@@ -43,6 +43,11 @@
 #'
 #' Hämtar mandatfördelningen.
 #'
+#' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+#' historiska normalisering som 2014. Publika kandidatnamn är saknade.
+#' Preliminära resultat kräver en komplett separat officiell
+#' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+#'
 #' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
@@ -140,11 +145,11 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
-  if (ar == 2014L) {
-    if (rakning != "slutlig") stop("2014 seats require final election XML.", call. = FALSE)
+  if (ar %in% c(2010L, 2014L)) {
+    if (rakning != "slutlig") stop(ar, " seats require final election XML.", call. = FALSE)
     if (source == "canonical") return(.canonical_source(ar, "mandat", val,
       unique(par$geografiniva), rakning = rakning))
-    return(.mandat_2014(.sources_2014(source, data_dir, update, archive), par, progress))
+    return(.mandat_2014(.sources_historical(ar, source, data_dir, update, archive), par, progress))
   }
   if (ar == 2018L && rakning != "slutlig") {
     stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",

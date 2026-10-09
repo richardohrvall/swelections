@@ -20,7 +20,7 @@ kandidater(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -121,6 +121,11 @@ XML-resultatet. Publika namn är alltid \code{NA}, även om en lokal historisk
 kandidatsnapshot innehåller namn. Resultatberoende 2018-anrop kräver en
 lokal kopia av slutresultat-ZIP på rådatavägen, eller den separat
 versionerade kanoniska Parquet-samlingen med \code{source = "canonical"}.
+
+För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+historiska normalisering som 2014. Publika kandidatnamn är saknade.
+Preliminära resultat kräver en komplett separat officiell
+uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 }
 \examples{
 \dontrun{

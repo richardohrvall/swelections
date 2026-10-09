@@ -18,7 +18,7 @@ kandidaturer(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
@@ -75,6 +75,12 @@ senare uppstår i valresultatet, inklusive \code{90000}, påverkar inte fältet.
 }
 \description{
 Hämtar kandidaturdata från Valmyndigheten.
+}
+\details{
+För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+historiska normalisering som 2014. Publika kandidatnamn är saknade.
+Preliminära resultat kräver en komplett separat officiell
+uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 }
 \examples{
 \dontrun{

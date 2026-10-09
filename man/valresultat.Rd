@@ -83,6 +83,13 @@ används aldrig i preliminära resultat. Slutligt 2014 använder samma
 geografiska nivåer som 2018 och en separat XML-adapter.
 }
 \details{
+För 2010 kombinerar preliminär räkning ordinarie valnattsdistrikt med
+bevarade preliminära uppsamlingsdistrikt. Tomma fält förblir NA; slutliga
+uppsamlingsröster används inte. För slutlig räkning används XML och samma
+historiska normalisering som 2014. Publika kandidatnamn är saknade.
+Preliminära resultat kräver en komplett separat officiell
+uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+
 RD stöder valdistrikt, kommun, kommunvalkrets, riksdagsvalkrets och riket.
 RF stöder valdistrikt, kommun, kommunvalkrets, region, regionvalkrets och
 riket. KF stöder valdistrikt, kommun, kommunvalkrets, lan och riket.

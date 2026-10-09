@@ -79,7 +79,7 @@ test_that("2018 personal votes distinguish observed, verified zero and unknown",
 test_that("2018 result-dependent APIs are registered for all election types", {
   for (fun in c("kandidater", "valda", "ersattare", "personroster")) {
     for (val in c("RD", "RF", "KF")) {
-      expect_identical(.stodd_valar(fun, val), c(2014L, 2018L, 2022L, 2026L))
+      expect_identical(.stodd_valar(fun, val), c(2010L, 2014L, 2018L, 2022L, 2026L))
     }
   }
 })

@@ -1,10 +1,10 @@
-.xml2014_result_rows <- function(node, geo, root, val, register) {
+.xml2014_result_rows <- function(node, geo, root, val, register, ar = 2014L) {
   other <- .xml2018_forsta(node, "\u00d6VRIGA_GILTIGA")
   if (!inherits(other, "xml_missing") && !length(xml2::xml_children(other))) {
     child <- xml2::xml_add_child(other, "HANDSKRIVNA")
     xml2::xml_attrs(child) <- xml2::xml_attrs(other)
   }
-  out <- .metadata_2014(.xml2018_partirader(node, geo, root, val, register))
+  out <- .metadata_2014(.xml2018_partirader(node, geo, root, val, register), ar)
   out$partibeteckning[out$ovriga_partier %in% TRUE] <- "\u00d6vriga partier"
   out
 }
@@ -18,7 +18,8 @@
   as.double(sub(",", ".", x, fixed = TRUE))
 }
 
-.xml2014_collection <- function(file, node, doc, val, register) {
+.xml2014_collection <- function(file, node, doc, val, register, ar = 2014L) {
+  if (ar == 2010L) return(.xml2010_collection(file, node, doc, val, register))
   html <- xml2::read_html(file, options = "NONET")
   rows <- xml2::xml_find_all(html,
     "//table[contains(@class,'sorteringsbar_tabell')]//tr")
@@ -27,7 +28,8 @@
   cells <- cells[vapply(cells, function(x) grepl("^[0-9]+$", x[[3]]), logical(1))]
   if (!length(cells)) stop("Missing preliminary collection results: ", file, call. = FALSE)
   # A new XML node is a read adapter for HTML, not a saved replacement source.
-  synthetic <- xml2::read_xml("<VAL VALDAG='20140914' VALDAG_FGVAL='20100919'><ONSDAGSDISTRIKT/></VAL>")
+  synthetic <- xml2::read_xml(paste0("<VAL VALDAG='", if (ar == 2010L) "20100919" else "20140914",
+    "' VALDAG_FGVAL='", if (ar == 2010L) "20060917" else "20100919", "'><ONSDAGSDISTRIKT/></VAL>"))
   target <- xml2::xml_find_first(synthetic, "./ONSDAGSDISTRIKT")
   for (x in cells) {
     label <- x[[1]]
@@ -59,7 +61,7 @@
     xml2::xml_set_attr(turnout, "SUMMA_R\u00d6STER_FGVAL", as.character(previous +
       sum(as.integer(xml2::xml_attr(invalid, "R\u00d6STER_FGVAL")))))
   .xml2014_result_rows(target, .xml2018_geo(node, val, "valdistrikt", doc),
-    synthetic, val, register)
+    synthetic, val, register, ar)
 }
 
 .valresultat_preliminary_2014 <- function(sources, val, niva, progress,
@@ -67,14 +69,16 @@
   .valresultat_niva_2018(val, niva)
   snapshot <- list.dirs(file.path(sources$root, "valresultat"), recursive = FALSE,
     full.names = TRUE)
-  snapshot <- snapshot[grepl("preliminary-presentation-", basename(snapshot))]
+  snapshot <- snapshot[grepl(if (.historical_year(sources) == 2010L)
+    "^preliminary-collection-preservation-" else "preliminary-presentation-", basename(snapshot))]
   if (length(snapshot) != 1L) stop("An unambiguous 2014 preliminary presentation snapshot is required.", call. = FALSE)
   manifest <- jsonlite::fromJSON(file.path(snapshot, "source-manifest.json"))$sources
   letter <- c(RD = "R", RF = "L", KF = "K")[[val]]
   selected <- manifest[manifest$role == "collection_district" &
     grepl(paste0("/prelresultat/", letter, "/"), manifest$url, fixed = TRUE), ]
-  expected <- if (val == "RF") 387L else 390L
-  if (nrow(selected) != expected) stop("Incomplete 2014 collection source inventory.", call. = FALSE)
+  expected <- if (.historical_year(sources) == 2010L) if (val == "RF") 392L else 395L else
+    if (val == "RF") 387L else 390L
+  if (nrow(selected) != expected) stop("Incomplete ", .historical_year(sources), " collection source inventory: expected ", expected, ", found ", nrow(selected), ".", call. = FALSE)
   collection_key <- sub(".*/onsdagsdistrikt/([0-9]{2})/([0-9]{2})/([0-9]{2})/.*", "\\1\\2\\3", selected$url)
   if (anyDuplicated(collection_key)) stop("Duplicate preliminary collection source.", call. = FALSE)
   register <- .xml2014_register_all(sources, val)
@@ -90,12 +94,15 @@
   files <- .xml2014_members(sources, val, "valdistrikt", night = TRUE)
   out <- purrr::map(files, function(f) {
     night <- .xml2014_file(f, val, night = TRUE)
-    final <- .xml2014_file(file.path(sources$final, sub("^valnatt_", "slutresultat_", basename(f))), val)
+    if (.historical_year(sources) == 2010L) register <- .xml2010_preliminary_register(register, night, val)
+    final_file <- if (.historical_year(sources) == 2010L) structure(sub("^valnatt_", "slutresultat_", as.character(f)), zip = sources$final) else
+      file.path(sources$final, sub("^valnatt_", "slutresultat_", basename(f)))
+    final <- .xml2014_file(final_file, val)
     root <- xml2::xml_find_first(night, "./KOMMUN")
     rd <- if (val == "RD") .xml2018_rd_krets_fran_listor(final, kd) else NULL
     ordinary <- xml2::xml_find_all(night, "./KOMMUN/KRETS_KOMMUN/VALDISTRIKT")
     rows <- lapply(ordinary, function(node)
-      .xml2014_result_rows(node, .xml2018_geo(node, val, "valdistrikt", night), root, val, register))
+      .xml2014_result_rows(node, .xml2018_geo(node, val, "valdistrikt", night), root, val, register, .historical_year(sources)))
     collection <- xml2::xml_find_all(final, "./KOMMUN/KRETS_KOMMUN/ONSDAGSDISTRIKT")
     rows <- c(rows, lapply(collection, function(node) {
       code <- .xml2018_attr(node, "KOD")
@@ -104,7 +111,7 @@
       file <- file.path(snapshot, gsub("\\", "/", selected$file[[hit]], fixed = TRUE))
       if (!identical(unname(tools::md5sum(file)), selected$md5[[hit]]))
         stop("Changed preliminary source: ", file, call. = FALSE)
-      .xml2014_collection(file, node, final, val, register)
+      .xml2014_collection(file, node, final, val, register, .historical_year(sources))
     }))
     rows <- purrr::list_rbind(rows)
     if (!is.null(rd)) {
@@ -124,11 +131,11 @@
     rows
   }, .progress = progress) |> purrr::list_rbind()
   out$rakningstillfalle <- rep("preliminar", nrow(out))
-  out$raknat <- rep(TRUE, nrow(out))
+  out$raknat <- if (.historical_year(sources) == 2010L) !is.na(out$giltiga_roster) else rep(TRUE, nrow(out))
   .valresultat_check_key(out, "valdistrikt")
   if (internal) return(out)
   if (niva != "valdistrikt") {
-    out <- .xml2014_aggregate_results(out, val, niva)
+    out <- .xml2014_aggregate_results(out, val, niva, .historical_year(sources))
     out <- .xml2014_preliminary_metadata(out, sources, val, niva)
   }
   out <- .komplettera_kommunnamn_2026(out, out$kommunnamn)
@@ -136,7 +143,7 @@
   out[.valresultat_public_columns_2026(niva)]
 }
 
-.xml2014_aggregate_results <- function(x, val, niva) {
+.xml2014_aggregate_results <- function(x, val, niva, ar = 2014L) {
   geography <- switch(niva, riket = character(), lan = c("lankod", "lannamn"),
     region = c("lankod", "lannamn"), kommun = c("kommunkod", "kommunnamn", "lankod", "lannamn"),
     kommunvalkrets = c("kommunkod", "kommunnamn", "lankod", "lannamn", "kommunvalkretskod", "kommunvalkretsnamn"),
@@ -148,7 +155,13 @@
     "totalt_antal_roster_fg", "blanka_roster", "blanka_roster_fg", "ovriga_ogiltiga",
     "ovriga_ogiltiga_fg", "ogiltiga_roster", "ogiltiga_roster_fg", "antal_rostberattigade",
     "antal_rostberattigade_fg", "antal_rostberattigade_raknade")
-  complete_sum <- function(v) if (anyNA(v)) NA_integer_ else as.integer(sum(as.double(v)))
+  complete_sum <- function(v) {
+    if (ar == 2010L) {
+      # Published preliminary aggregates describe reported votes, not eventual
+      # totals. Missing district/category values remain missing in the input.
+      if (all(is.na(v))) NA_integer_ else as.integer(sum(as.double(v), na.rm = TRUE))
+    } else if (anyNA(v)) NA_integer_ else as.integer(sum(as.double(v)))
+  }
   party <- x |> dplyr::summarise(dplyr::across(dplyr::all_of(c("antal_roster", "antal_roster_fg")), complete_sum),
     .by = dplyr::all_of(key))
   context <- x |> dplyr::distinct(dplyr::across(dplyr::all_of(c(geography, "valdistriktskod", totals)))) |>
@@ -171,13 +184,19 @@
   out$antal_rostberattigade <- electorate$antal_rostberattigade[electorate_index]
   known <- electorate$alla_raknade[electorate_index] %in% TRUE
   out$antal_rostberattigade_raknade[known] <- out$antal_rostberattigade[known]
-  out <- .metadata_2014(out)
+  out <- .metadata_2014(out, ar)
   out$rakningstillfalle <- rep("preliminar", nrow(out))
   out$valtyp <- rep(val, nrow(out))
   out$geografiniva <- rep(niva, nrow(out))
   if (val == "RD") { out$valomradeskod <- rep("00", nrow(out)); out$valomradesnamn <- rep("Sverige", nrow(out)) }
   if (val == "RF" && niva != "riket") { out$valomradeskod <- out$lankod; out$valomradesnamn <- out$lannamn }
   if (val == "KF" && niva %in% c("kommun", "kommunvalkrets")) { out$valomradeskod <- out$kommunkod; out$valomradesnamn <- out$kommunnamn }
+  if (ar == 2010L) {
+    for (suffix in c("", "_fg")) {
+      out[[paste0("ogiltiga_roster", suffix)]] <- out[[paste0("blanka_roster", suffix)]] + out[[paste0("ovriga_ogiltiga", suffix)]]
+      out[[paste0("totalt_antal_roster", suffix)]] <- out[[paste0("giltiga_roster", suffix)]] + out[[paste0("ogiltiga_roster", suffix)]]
+    }
+  }
   out$diff_antal_roster <- out$antal_roster - out$antal_roster_fg
   out
 }
@@ -187,12 +206,14 @@
 # Read only metadata here: party counts still come from the verified district
 # construction, and current totals must agree with the independent presentation.
 .xml2014_preliminary_metadata <- function(x, sources, val, niva) {
+  if (.historical_year(sources) == 2010L) return(.xml2010_preliminary_metadata(x, sources, val, niva))
   snapshot <- list.dirs(file.path(sources$root, "valresultat"), recursive = FALSE)
-  snapshot <- snapshot[grepl("preliminary-presentation-", basename(snapshot))]
+  snapshot <- snapshot[grepl(if (.historical_year(sources) == 2010L)
+    "^preliminary-collection-preservation-" else "preliminary-presentation-", basename(snapshot))]
   if (length(snapshot) != 1L) stop("Ambiguous 2014 preliminary snapshot.", call. = FALSE)
   entries <- jsonlite::fromJSON(file.path(snapshot, "source-manifest.json"))$sources
   letter <- c(RD = "R", RF = "L", KF = "K")[[val]]
-  prefix <- paste0("/val/val2014/prelresultat/", letter, "/")
+  prefix <- paste0("/val/val", .historical_year(sources), "/prelresultat/", letter, "/")
   entries <- entries[grepl(prefix, entries$url, fixed = TRUE), ]
   path <- switch(niva,
     riket = rep("rike/index.html", nrow(x)),

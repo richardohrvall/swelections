@@ -8,8 +8,8 @@
       .xml2018_valda_ersattare_fil(doc, v, register)
     }, .progress = progress)
   }) |> unlist(recursive = FALSE)
-  list(valda = .metadata_2014(purrr::map(parsed, "valda") |> purrr::list_rbind()),
-    ersattare = .metadata_2014(purrr::map(parsed, "ersattare") |> purrr::list_rbind()))
+  list(valda = .metadata_2014(purrr::map(parsed, "valda") |> purrr::list_rbind(), .historical_year(sources)),
+    ersattare = .metadata_2014(purrr::map(parsed, "ersattare") |> purrr::list_rbind(), .historical_year(sources)))
 }
 
 .xml2014_person_read <- function(sources, val, niva, kd, progress = FALSE) {
@@ -34,7 +34,7 @@
 
 # This is internal population evidence, not fabricated public candidacies.
 # Public candidacies retain the unsupported validity attribute as NA.
-.xml2014_population <- function(kd, areas, relations) {
+.xml2014_population <- function(kd, areas, relations, ar = 2014L) {
   key <- c("valtyp", "partikod", "kandidatnummer")
   observed <- dplyr::select(areas$roster,
     dplyr::all_of(c(key, "valomradeskod", "personvalsomradeskod"))) |>
@@ -62,10 +62,10 @@
     paste(parties$valtyp, parties$partikod))
   extra$partiforkortning <- dplyr::coalesce(extra$partiforkortning, parties$partiforkortning[party_index])
   extra$partibeteckning <- dplyr::coalesce(extra$partibeteckning, parties$partibeteckning[party_index])
-  extra$valtillfalle <- rep("Val_2014", nrow(extra))
-  extra$valar <- rep(2014L, nrow(extra))
-  extra$valkretskod <- ifelse(is.na(evidence$valkretskod), "00",
-    substring(evidence$valkretskod, nchar(evidence$valkretskod) - 1L))
+  extra$valtillfalle <- rep(paste0("Val_", ar), nrow(extra))
+  extra$valar <- rep(as.integer(ar), nrow(extra))
+  extra$valkretskod <- substring(evidence$valkretskod, nchar(evidence$valkretskod) - 1L)
+  extra$valkretskod[is.na(extra$valkretskod)] <- "00"
   extra$namn <- rep(NA_character_, nrow(extra))
   out <- dplyr::bind_rows(kd, extra)
   out$giltig <- rep(TRUE, nrow(out))
@@ -78,7 +78,7 @@
   kd <- .read_candidacies_2014(sources, val)
   relations <- .xml2014_relations(sources, val, progress)
   areas <- .xml2014_person_read(sources, val, "personvalsomrade", kd, progress)
-  population <- .xml2014_population(kd, areas, relations)
+  population <- .xml2014_population(kd, areas, relations, .historical_year(sources))
   list(kd = kd, population = population, areas = areas, relations = relations)
 }
 
@@ -88,7 +88,7 @@
   raw <- if (niva == "personvalsomrade") bundle$areas else
     .xml2014_person_read(sources, val, niva, bundle$population, progress)
   out <- .metadata_2014(.xml2018_person_public(raw, bundle$areas,
-    bundle$population, niva, per_lista, komplettera_nollor)) |>
+    bundle$population, niva, per_lista, komplettera_nollor), .historical_year(sources)) |>
     dplyr::arrange(.data$valtyp, .data$valomradeskod,
       .data$personvalsomradeskod, .data$partikod, .data$kandidatnummer,
       dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
@@ -99,7 +99,7 @@
 
 .kandidater_2014 <- function(sources, val, resultat, progress, bundle = NULL) {
   if (is.null(bundle)) bundle <- .xml2014_bundle(sources, val, progress)
-  bas <- .kandidater_bas(bundle$population, 2014L)
+  bas <- .kandidater_bas(bundle$population, .historical_year(sources))
   extra <- dplyr::semi_join(bas, attr(bundle$population, "result_only_keys"),
     by = c("valtyp", "partikod", "kandidatnummer"))
   hit <- paste(bas$valtyp, bas$partikod, bas$kandidatnummer) %in%
@@ -123,8 +123,8 @@
     unique(bundle$population$valtyp), parsed)
 }
 
-.valda_2014 <- function(sources, val, progress) {
-  bundle <- .xml2014_bundle(sources, val, progress)
+.valda_2014 <- function(sources, val, progress, bundle = NULL) {
+  if (is.null(bundle)) bundle <- .xml2014_bundle(sources, val, progress)
   out <- .kandidater_2014(sources, val, TRUE, progress, bundle) |>
     dplyr::filter(.data$invald %in% TRUE) |>
     .valda_invaldsvalkrets_2026() |>

@@ -11,13 +11,14 @@
   final <- file.path(root, "valresultat", "slutresultat_20141001")
   if (!dir.exists(final)) stop("Missing preserved 2014 final XML directory: ",
                               final, call. = FALSE)
-  list(root = root, final = final,
+  list(root = root, year = 2014L, final = final,
        night = file.path(root, "valresultat", "valnatt"),
        registers = new.env(parent = emptyenv()))
 }
 
 .xml2014_members <- function(sources, val, niva, mandat = FALSE,
                              night = FALSE) {
+  if (identical(sources$year, 2010L)) return(.xml2010_members(sources, val, niva, mandat, night))
   letter <- c(RD = "R", RF = "L", KF = "K")[[val]]
   municipal <- niva %in% c("valdistrikt", "kommun", "kommunvalkrets") &&
     (!mandat || val == "KF")
@@ -33,6 +34,7 @@
 }
 
 .xml2014_file <- function(file, val, night = FALSE) {
+  if (!is.null(attr(file, "zip"))) return(.xml2010_file(file, val, night))
   doc <- xml2::read_xml(file, options = c("NONET", "NOBLANKS"))
   root <- xml2::xml_root(doc)
   if (!identical(.xml2018_attr(root, "VALDAG"), "20140914") ||
@@ -73,6 +75,7 @@
 }
 
 .xml2014_register_all <- function(sources, val) {
+  if (identical(sources$year, 2010L)) return(.xml2010_register_all(sources, val))
   cached <- get0(val, envir = sources$registers, inherits = FALSE)
   if (!is.null(cached)) return(cached)
   files <- unlist(lapply(c("RD", "RF", "KF"), function(v)
@@ -121,10 +124,10 @@
   get(val, envir = sources$registers, inherits = FALSE)
 }
 
-.metadata_2014 <- function(out) {
-  out$valtillfalle <- rep("Val_2014", nrow(out))
-  out$valar <- rep(2014L, nrow(out))
-  if ("valdatum" %in% names(out)) out$valdatum <- rep("2014-09-14", nrow(out))
+.metadata_2014 <- function(out, ar = 2014L) {
+  out$valtillfalle <- rep(paste0("Val_", ar), nrow(out))
+  out$valar <- rep(as.integer(ar), nrow(out))
+  if ("valdatum" %in% names(out)) out$valdatum <- rep(if (ar == 2010L) "2010-09-19" else "2014-09-14", nrow(out))
   out
 }
 
@@ -161,6 +164,7 @@
 }
 
 .read_candidacies_2014 <- function(sources, val) {
+  if (identical(sources$year, 2010L)) return(.read_candidacies_2010(sources, val))
   out <- lapply(val, function(v) {
     doc <- .xml2014_file(.xml2014_members(sources, v, "riket")[[1]], v)
     register <- .xml2014_register(doc, v)$data
@@ -255,7 +259,7 @@
       .xml2018_partirader(node, .xml2018_geo(node, val, niva, doc), root, val, reg)) |>
       purrr::list_rbind()
   }, .progress = progress) |> purrr::list_rbind()
-  out <- .metadata_2014(out)
+  out <- .metadata_2014(out, .historical_year(sources))
   out <- .xml2014_known_vote_totals(out)
   if (niva == "valdistrikt") out$raknat <- rep(TRUE, nrow(out))
   out <- .komplettera_kommunnamn_2026(out, out$kommunnamn)

@@ -30,7 +30,12 @@
 #' lokal kopia av slutresultat-ZIP på rådatavägen, eller den separat
 #' versionerade kanoniska Parquet-samlingen med `source = "canonical"`.
 #'
-#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
+#' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+#' historiska normalisering som 2014. Publika kandidatnamn är saknade.
+#' Preliminära resultat kräver en komplett separat officiell
+#' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+#'
+#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -133,10 +138,10 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
-  if (ar == 2014L && source == "canonical") return(.canonical_source(ar, "kandidater", val,
+  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidater", val,
     resultat = resultat))
-  if (ar == 2014L) return(.kandidater_2014(
-    .sources_2014(source, data_dir, update, archive), val, resultat, progress))
+  if (ar %in% c(2010L, 2014L)) return(.kandidater_2014(
+    .sources_historical(ar, source, data_dir, update, archive), val, resultat, progress))
   source <- .select_public_source(source, ar, "kandidater", data_dir,
                                   update, archive, include_results = resultat)
   if (source %in% c("canonical", "canonical_auto"))
@@ -221,7 +226,7 @@ kandidater <- function(
 #' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
-#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.

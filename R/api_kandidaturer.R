@@ -2,7 +2,12 @@
 #'
 #' Hämtar kandidaturdata från Valmyndigheten.
 #'
-#' @param ar Ett eller flera exakta valår (2014, 2018, 2022, 2026), eller `"alla"`.
+#' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+#' historiska normalisering som 2014. Publika kandidatnamn är saknade.
+#' Preliminära resultat kräver en komplett separat officiell
+#' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+#'
+#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -93,9 +98,9 @@ kandidaturer <- function(
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
-  if (ar == 2014L && source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
-  if (ar == 2014L) return(.read_candidacies_2014(
-    .sources_2014(source, data_dir, update, archive),
+  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
+  if (ar %in% c(2010L, 2014L)) return(.read_candidacies_2014(
+    .sources_historical(ar, source, data_dir, update, archive),
     if (is.null(val)) c("RD", "RF", "KF") else val))
   source <- .select_public_source(source, ar, "kandidaturer", data_dir,
                                   update, archive)

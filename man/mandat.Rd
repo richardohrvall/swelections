@@ -80,6 +80,12 @@ För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \description{
 Hämtar mandatfördelningen.
 }
+\details{
+För 2010 används bevarade slutliga XML-/valsedelskällor och samma
+historiska normalisering som 2014. Publika kandidatnamn är saknade.
+Preliminära resultat kräver en komplett separat officiell
+uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+}
 \examples{
 \dontrun{
 mandat(val = "RD", source = "local", data_dir = "mitt_arkiv")

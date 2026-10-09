@@ -8,8 +8,8 @@
   if (!is.null(names(configured)) && as.character(ar) %in% names(configured)) {
     configured <- unname(configured[[as.character(ar)]])
   }
-  if (ar == 2014L) return(.canonical_2014_source(configured, surface, val,
-    niva, per_lista, komplettera_nollor, resultat, rakning))
+  if (ar %in% c(2010L, 2014L)) return(.canonical_2014_source(configured, surface, val,
+    niva, per_lista, komplettera_nollor, resultat, rakning, ar))
   if (ar == 2018L) {
     old <- options(swelections.canonical_manifest = configured)
     on.exit(options(old), add = TRUE)

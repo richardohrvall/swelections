@@ -13,6 +13,6 @@
         purrr::list_rbind()
     }, .progress = progress) |> purrr::list_rbind()
   }) |> purrr::list_rbind()
-  rows <- .metadata_2014(rows)
-  .mandat_public_2026(.kort_kommunnamn_2026(rows), 2014L)
+  rows <- .metadata_2014(rows, .historical_year(sources))
+  .mandat_public_2026(.kort_kommunnamn_2026(rows), .historical_year(sources))
 }
