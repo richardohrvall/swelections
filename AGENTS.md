@@ -45,7 +45,10 @@ Do not conflate the fixed election result with changes during the subsequent man
 
 ### General code conventions
 
-- Package code is in R.
+- The project is R-only: package code, data preparation, source retrieval,
+  validation, diagnostics and canonical builds must use R.
+- Do not introduce Python code or require a Python executable anywhere in the
+  reproducible workflow. Independent validators use separate R parsing logic.
 - Use `snake_case`.
 - Prefer compact, descriptive names.
 - Internal/source-facing R objects may retain the established Swedish naming conventions.

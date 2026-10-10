@@ -11,7 +11,7 @@ named manifest paths keyed by year support mixed 2018/2022 requests.
 Build with:
 
 ```sh
-Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR PYTHON
+Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR
 ```
 
 `SOURCE_ROOT` is the preserved `rkl/2022` collection. The script pins the
@@ -22,6 +22,12 @@ after building. Signatures are recorded as signatures, not interpreted as
 textual SHA256 checksums. Four corrected final KF ZIPs (0136, 1439, 1860,
 2506) are downloaded separately and verified against the pinned official
 index. Raw files are never overwritten.
+
+Preparation is implemented in `data-raw/prepare-canonical-2022.R`; no Python
+executable is required. Build-time R dependencies include `pkgload`,
+`nanoparquet`, `digest` and `zip`, in addition to package dependencies.
+Derived ZIP members use a fixed UTC timestamp, including the candidate CSV.
+See `R_ONLY_WORKFLOW.md` for the preparation contract and byte-level audit.
 
 RF 25 uses the preserved October 2022 result snapshot. The documented
 14 November correction `50975 -> 488` is applied only to typed candidate-ID

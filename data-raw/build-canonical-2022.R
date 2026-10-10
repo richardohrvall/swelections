@@ -1,10 +1,10 @@
 # Local, unpublished RKL 2022 canonical build. Never modifies original sources.
-# Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR PYTHON
+# Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR
 # SOURCE_ROOT: the preserved rkl/2022 collection, including valresultat/filer.
 # Derived raw input containers live in an external temporary staging directory;
 # the output contains only English Parquet assets and manifest.json.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 3L) stop("Specify SOURCE_ROOT OUTPUT_DIR PYTHON.")
+if (length(args) != 2L) stop("Specify SOURCE_ROOT OUTPUT_DIR.")
 pkgload::load_all(".", quiet = TRUE)
 if (!requireNamespace("nanoparquet", quietly = TRUE)) stop("Install nanoparquet.")
 source_root <- normalizePath(args[[1]], winslash = "/", mustWork = TRUE)
@@ -38,15 +38,9 @@ for (area in c("0136", "1439", "1860", "2506")) {
   if (!identical(tolower(unname(tools::md5sum(file))), tolower(expected)))
     stop("Official ZIP MD5 does not match index: ", path)
 }
-if (!nzchar(resume)) {
-  status <- system2(args[[3]], c(shQuote("data-raw/prepare-canonical-2022.py"),
-    shQuote(source_root), shQuote(stage), shQuote(corrections)))
-  if (status != 0L) stop("Snapshot selection failed.")
-} else {
-  status <- system2(args[[3]], c(shQuote("data-raw/prepare-canonical-2022.py"),
-    "--validate", shQuote(source_root), shQuote(stage), shQuote(corrections)))
-  if (status != 0L) stop("Resumed input archive differs from pinned source generation.")
-}
+source("data-raw/prepare-canonical-2022.R")
+if (!nzchar(resume)) canonical2022_prepare(source_root, stage, corrections) else
+  canonical2022_validate(source_root, stage, corrections)
 provenance <- jsonlite::read_json(file.path(stage, "provenance.json"), simplifyVector = TRUE)
 candidate_selected <- provenance$sources$classification == "official_historical_candidate_snapshot" &
   provenance$sources$selected
@@ -227,9 +221,9 @@ manifest <- list(data_version = "data-v0.2.0", schema_version = 2L,
   source_index = list(url = index_url, md5 = unname(tools::md5sum(index_path)), sha256 = sha(index_path)),
   raw_input_archive = stage, source_root = source_root,
   build_code_sha256 = data.frame(file = c(list.files("R", full.names = TRUE),
-    "data-raw/build-canonical-2022.R", "data-raw/prepare-canonical-2022.py"),
+    "data-raw/build-canonical-2022.R", "data-raw/prepare-canonical-2022.R"),
     sha256 = vapply(c(list.files("R", full.names = TRUE),
-      "data-raw/build-canonical-2022.R", "data-raw/prepare-canonical-2022.py"), sha, "")),
+      "data-raw/build-canonical-2022.R", "data-raw/prepare-canonical-2022.R"), sha, "")),
   assets = purrr::list_rbind(assets), tables = purrr::list_rbind(tables))
 jsonlite::write_json(manifest, file.path(out, "manifest.json"),
   pretty = TRUE, auto_unbox = TRUE, na = "null")

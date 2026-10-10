@@ -8,7 +8,14 @@ pkgload::load_all(".", quiet = TRUE)
 dir <- normalizePath(args[[1]], winslash = "/", mustWork = TRUE)
 manifest_path <- file.path(dir, "manifest.json")
 m <- swelections:::.canonical_manifest(manifest_path)
-raw_dir <- m$raw_input_archive
+raw_dir <- Sys.getenv("SWELECTIONS_VALIDATION_RAW_ARCHIVE", m$raw_input_archive)
+if (!identical(raw_dir, m$raw_input_archive)) {
+  # Build-tool migrations may compare a new staged archive with the immutable
+  # reference assets before rebuilding them. Verify the pinned source rules.
+  source("data-raw/prepare-canonical-2022.R")
+  canonical2022_validate(m$source_root, raw_dir,
+    file.path(m$raw_input_archive, "official-corrections"))
+}
 if (!dir.exists(raw_dir)) stop("Pinned raw comparison archive is unavailable.")
 report <- if (length(args) >= 2L) args[[2]] else
   file.path(dirname(dir), "canonical-2022-validation.json")

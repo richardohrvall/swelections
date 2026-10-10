@@ -1,4 +1,4 @@
-# Independent Excel export for validate_sources_2010.py (development only).
+# Independent Excel export for validate_sources_2010.R (development only).
 # These files are validation snapshots, never canonical build inputs.
 files <- list.files(".local-data/rkl/2010", recursive = TRUE, full.names = TRUE)
 output <- lapply(c("R", "L", "K"), function(letter) {

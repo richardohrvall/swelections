@@ -1,5 +1,9 @@
 # 2010 preliminary source preservation and validation — 2026-10-09
 
+The current acquisition and independent validation tools are R-only; see
+[R_ONLY_WORKFLOW.md](R_ONLY_WORKFLOW.md). Script names in the historical
+inventory below refer to the original, now replaced or retired tools.
+
 ## Conclusion
 
 The complete official preliminary collection-page population is available and is now preserved: RD 395, RF 392, KF 395. Election-night ordinary districts plus the **reported preliminary** collection figures reproduce the published preliminary aggregates exactly. There are no missing collection URLs and no numerical reconciliation, redistribution or substitution of final votes.

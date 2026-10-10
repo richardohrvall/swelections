@@ -40,7 +40,7 @@ Two other same-name party pairs require geographic identity rather than global n
 - Repeated official PERSONVAL records are consolidated additively by official candidate key. Area and district sources are not added together.
 - Bjorn RF raw 451964 resolves to canonical 442089 before joins. The previously documented RD ballot linkage 497359 is restricted to party 0003 / constituency 03 / list 03600 / position 22. Provenance retains the original IDs. No other identity harmonisation is enabled; seven weaker pairs remain unresolved. The raw-source candidate outputs show canonical 442089 in RD/RF/KF, with person-vote totals 10 / 8 / 25; no duplicate 451964 or 497359 remains.
 - Nine KF unfilled seats are preserved as unfilled; no candidate is fabricated.
-- English/Swedish standard/full schemas retain the established public contracts. No Python package runtime dependency: Python scripts are development/source-validation aids only.
+- English/Swedish standard/full schemas retain the established public contracts. The package and current development/build workflow are R-only; see [R_ONLY_WORKFLOW.md](R_ONLY_WORKFLOW.md) for the replacement of the original development scripts.
 
 ## Independent results
 
@@ -94,9 +94,9 @@ Tests:
 
 Documentation: README, NEWS, six generated man pages, source inventory, implementation decisions and this validation report.
 
-Development/build aids: `data-raw/build-canonical-2010.R`; `development/validate_canonical_2010.R`, `validate_sources_2010.py`, `export_mandate_validation_2010.R`, `build_party_identifiers_2010.py`, `retrieve_preliminary_2010.py`, `smoke_2010.R`.
+Current development/build aids: `data-raw/build-canonical-2010.R`; `development/validate_canonical_2010.R`, `validate_sources_2010.R`, `export_source_validation_2010.R`, `export_mandate_validation_2010.R`, `build_party_identifiers_2010.R`, `preserve_preliminary_2010_conservative.R`, `validate_preliminary_2010_preserved.R`, `smoke_2010.R`. The historical file inventory below records the original implementation; current R-only replacements are documented in `R_ONLY_WORKFLOW.md`.
 
-The separately committed identity adapter/provenance files are not part of the new reader diff. Original `.local-data` sources and canonical prototype outputs are ignored, not Git changes. Python is confined to optional development tooling.
+The separately committed identity adapter/provenance files are not part of the new reader diff. Original `.local-data` sources and canonical prototype outputs are ignored, not Git changes. The current development tooling uses R throughout.
 
 ## Prototype inventory and additional aggregation checks
 

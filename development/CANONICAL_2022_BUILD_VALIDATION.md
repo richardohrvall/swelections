@@ -9,6 +9,11 @@ registry entry, tag, commit or push is created here.
 
 ## Corrected elected-scope rebuild: 2026-10-07
 
+The current preparation and diagnostic tools have since been replaced with
+R implementations; see [R_ONLY_WORKFLOW.md](R_ONLY_WORKFLOW.md). References
+to Python below describe historical validations, not current build requirements.
+The corrected elected-scope prototype remains the migration regression reference.
+
 The complete prototype has been rebuilt from the current working tree in
 `.local-data/canonical-build/2022-local-v0.2.0-elected-scope`.
 This section supersedes the earlier prototype's checksum/size, KF enrichment
@@ -355,8 +360,9 @@ Official main-level party vote counts agree exactly with district sums
 for all three elections and both preliminary/final counting stages.
 
 Reproduce with `development/audit_canonical_2022_aggregates.R` and
-`development/diagnose_2022_rd_person_votes.py`. The latter saves every
-matching raw candidate post, list counters and geographic context in
+`development/diagnose_2022_rd_person_votes.R`. The latter accepts an output
+path and saves every matching raw candidate post, list counter and geographic
+context. The preserved original reference is
 `.local-data/canonical-build/2022-rd-person-vote-source-traces.json`.
 The arithmetic report is `.local-data/canonical-build/2022-aggregate-audit.json`.
 
