@@ -25,23 +25,23 @@ date communicated by Valmyndigheten.
 A complete current RF source set (42 preliminary/final ZIPs, including both OS
 files) was retrieved sequentially and verified against the official index.
 The immutable acquisition snapshot is external to Git:
-`C:/valdata/corrected-snapshots/20261010-rf`.
+`<archive_root>/corrected-snapshots/20261010-rf`.
 Its `provenance.json` records URLs, UTC retrieval times, sizes, MD5 and SHA256.
 `index-comparison.csv` records the full index comparison.
 
 ## Current-source workflow (activated 11 October 2026)
 
 The corrected snapshot is now activated in the current external raw archive,
-`C:/valdata/2026/val2026/`. All 42 RF preliminary/final ZIPs, the official index
+`<archive_root>/2026/val2026/`. All 42 RF preliminary/final ZIPs, the official index
 and the unchanged candidate CSV were verified before installation and compared
 byte-for-byte with the immutable acquisition snapshot afterward.
 
-Future RF processing uses `source = "local", data_dir = "C:/valdata"`, or
+Future RF processing uses `source = "local", data_dir = "<archive_root>"`, or
 `source = "auto"` with that archive configured. For example:
 
 ```r
 results(2026, election = "regional", count = "final", level = "region",
-        source = "local", data_dir = "C:/valdata")
+        source = "local", data_dir = "<archive_root>")
 ```
 
 The archive root remains configurable; no package default or global R option
@@ -182,7 +182,7 @@ and nested substitute relations are unchanged. Only `valgrundId` and
 ## Activation validation — 11 October 2026
 
 Validation was repeated through the public API using the active archive
-`C:/valdata`, not the old source files. All six final RF result levels are
+`<archive_root>`, not the old source files. All six final RF result levels are
 identical to the previously verified corrected snapshot: district (85,426 rows),
 municipality (5,554), municipal constituency (969), regional constituency
 (1,436), region (704) and national (141). Party/category sums agree exactly

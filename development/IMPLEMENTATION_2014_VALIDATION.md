@@ -1,5 +1,10 @@
 # 2014 implementation and unpublished canonical validation
 
+> Historical validation record: build/commit status and tool names in dated
+> checkpoints describe that checkpoint, not the current worktree. Current R-only
+> commands are indexed in [README.md](README.md); preserved discrepancies and
+> source-selection decisions remain applicable.
+
 ## Scope and status
 
 The implementation adds 2014 to all seven English functions and their Swedish

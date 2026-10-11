@@ -1,5 +1,10 @@
 # RKL 2022 canonical build and validation
 
+> Historical validation record: build/commit status and tool names in dated
+> checkpoints describe that checkpoint, not the current worktree. Current R-only
+> commands are indexed in [README.md](README.md); preserved discrepancies and
+> source-selection decisions remain applicable.
+
 This report concerns the **unpublished local** `data-v0.2.0` prototype,
 English Parquet schema version 2. The package version remains `0.3.0.9000`.
 The build starts from commit `40af0b761c2583071bd38bc79a27783a8dcab380`
@@ -539,4 +544,3 @@ raw comparisons and deterministic regressions passed after those fixes.
 Validation checkpoint parsing, memory lifetime and temporary-cache handling
 were improved in the development harness only. No published asset, raw
 snapshot, candidate-name rule, 2026 RF validation or download helper changed.
-

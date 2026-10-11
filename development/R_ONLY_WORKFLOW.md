@@ -1,4 +1,4 @@
-# R-only workflow migration
+# R-only preparation and reproducibility
 
 ## Audited 2022 preparation contract
 
@@ -57,14 +57,6 @@ values with `digits=NA`; integral-valued doubles may be written as `1` rather
 than `1.0`. JSON numeric storage is compared with zero tolerance, and canonical
 column types/values must still match the previous Parquet assets exactly.
 
-## Git-state constraint
-
-This refactoring is explicitly not authorised for commit. Consequently a
-build of the replacement code cannot truthfully have `build_tree_dirty=false`
-at the current HEAD. Validation builds record the real dirty state and exact
-build-code hashes. A clean committed rebuild remains required after review;
-no synthetic commit or misleading clean-build metadata is created.
-
 ## Independent development tools
 
 The reproducible workflow uses R throughout. Required development libraries
@@ -84,9 +76,7 @@ are already present in the project toolchain: `xml2`, `jsonlite`, `digest`,
 | `assess_preliminary_2010_candidate_information.py` | Retired | Completed one-off investigation, not a build input; preliminary HTML supplies party results, not additional candidate-identified votes |
 
 `development/source_tools.R` contains independent I/O and counters only; it
-does not call production XML/JSON normalisers. Existing machine-readable
-reports are optional regression references, not inputs required to perform
-the corresponding source checks. The R output/Excel export scripts remain
+does not call production XML/JSON normalisers. Generated machine-readable reports are optional regression references. The pinned 2010_SOURCE_INVENTORY.json is a required input to validate_sources_2010.R. The R output/Excel export scripts remain
 the producers of comparison data.
 
 Run development scripts from the repository root with the project R library:
@@ -176,38 +166,10 @@ unpublished prototype is `.local-data/canonical-build/2022-r-only-validation`.
 Its manifest records HEAD `09048a6c3a28ff10d4d74cc0b7a9b95fffff9a3d`, real
 `build_tree_dirty=true`, the R staging lineage and exact build-code checksums.
 
-## Reviewed change inventory
 
-No files in production `R/`, installed-package tests, `DESCRIPTION` or
-`NAMESPACE` change. No raw source or published canonical asset is changed.
+## Contributor setup
 
-Updated paths:
-
-- `AGENTS.md`
-- `data-raw/build-canonical-2022.R`
-- `development/CANONICAL_DATA.md`
-- `development/CANONICAL_2022_BUILD_VALIDATION.md`
-- `development/IMPLEMENTATION_2010_VALIDATION.md`
-- `development/PRELIMINARY_2010_SOURCE_RETRIEVAL.md`
-- `development/export_mandate_validation_2010.R`
-- `development/validate_canonical_2022.R`
-
-New paths:
-
-- `data-raw/prepare-canonical-2022.R`
-- `development/R_ONLY_WORKFLOW.md`
-- `development/source_tools.R`
-- `development/build_party_identifiers_2010.R`
-- `development/preserve_preliminary_2010_conservative.R`
-- `development/validate_preliminary_2010_preserved.R`
-- `development/validate_sources_2010.R`
-- `development/export_source_validation_2010.R`
-- `development/diagnose_2022_rd_person_votes.R`
-- `development/test_r_only_preparation.R`
-- `development/test_source_retrieval.R`
-- `development/validate_r_only_2022.R`
-- `development/compare_r_only_assets.R`
-
-The eight former `.py` paths listed in the tool table are removed. Six have
-validated R replacements and two are deliberately retired. Historical report
-references retain their provenance meaning; none is an executable dependency.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for R libraries and package checks.
+The validation results above are historical migration evidence, not a current
+worktree status or permission instruction. Preparation rules and reference
+checksums remain part of the reproducibility contract.

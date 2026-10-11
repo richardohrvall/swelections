@@ -1,5 +1,10 @@
 # 2010 preliminary reporting integration
 
+> Historical validation record: build/commit status and tool names in dated
+> checkpoints describe that checkpoint, not the current worktree. Current R-only
+> commands are indexed in [README.md](README.md); preserved discrepancies and
+> source-selection decisions remain applicable.
+
 ## Scope and source selection
 
 This is an unpublished working-tree prototype. No commit, push, tag, release or published canonical asset was changed.

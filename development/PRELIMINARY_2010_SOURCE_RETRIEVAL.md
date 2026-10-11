@@ -1,5 +1,10 @@
 # 2010 preliminary source preservation and validation — 2026-10-09
 
+> Historical validation record: build/commit status and tool names in dated
+> checkpoints describe that checkpoint, not the current worktree. Current R-only
+> commands are indexed in [README.md](README.md); preserved discrepancies and
+> source-selection decisions remain applicable.
+
 The current acquisition and independent validation tools are R-only; see
 [R_ONLY_WORKFLOW.md](R_ONLY_WORKFLOW.md). Script names in the historical
 inventory below refer to the original, now replaced or retired tools.

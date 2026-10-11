@@ -1,6 +1,7 @@
 # 2010 implementation and validation (unpublished working prototype)
 
-Identity adapter committed separately: `65bdb1f8e7cc64bd066dbbfaa5eaa07af8c6d62e`. No push, tag or release. The subsequent 2010 readers and normalisers remain uncommitted.
+The source and validation results below record historical build checkpoints.
+The 2010 implementation is committed; checkpoint dirty-tree statements are historical, not current status.
 
 ## Sources and roles
 
@@ -94,7 +95,7 @@ Tests:
 
 Documentation: README, NEWS, six generated man pages, source inventory, implementation decisions and this validation report.
 
-Current development/build aids: `data-raw/build-canonical-2010.R`; `development/validate_canonical_2010.R`, `validate_sources_2010.R`, `export_source_validation_2010.R`, `export_mandate_validation_2010.R`, `build_party_identifiers_2010.R`, `preserve_preliminary_2010_conservative.R`, `validate_preliminary_2010_preserved.R`, `smoke_2010.R`. The historical file inventory below records the original implementation; current R-only replacements are documented in `R_ONLY_WORKFLOW.md`.
+Current development/build aids: `data-raw/build-canonical-2010.R`; `development/validate_canonical_2010.R`, `validate_sources_2010.R`, `export_source_validation_2010.R`, `export_mandate_validation_2010.R`, `build_party_identifiers_2010.R`, `preserve_preliminary_2010_conservative.R`, `validate_preliminary_2010_preserved.R`. The historical file inventory below records the original implementation; current R-only replacements are documented in `R_ONLY_WORKFLOW.md`.
 
 The separately committed identity adapter/provenance files are not part of the new reader diff. Original `.local-data` sources and canonical prototype outputs are ignored, not Git changes. The current development tooling uses R throughout.
 
@@ -182,12 +183,12 @@ The following list is the union of Git content differences and new non-ignored f
 - `R/xml_2010.R`
 - `data-raw/build-canonical-2010.R`
 - `development/2010_SOURCE_INVENTORY.json`
-- `development/IMPLEMENTATION_2010_PLAN.md`
+- the consolidated implementation decisions in this report
 - `development/IMPLEMENTATION_2010_VALIDATION.md`
 - `development/build_party_identifiers_2010.py`
 - `development/export_mandate_validation_2010.R`
 - `development/retrieve_preliminary_2010.py`
-- `development/smoke_2010.R`
+- the maintained source export and validation tools
 - `development/validate_canonical_2010.R`
 - `development/validate_sources_2010.py`
 - `tests/testthat/fixtures/2010/metadata-fixture.zip`

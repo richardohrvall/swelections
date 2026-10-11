@@ -288,3 +288,9 @@ Bug reports and suggestions are welcome in the
 ## License
 
 MIT
+
+## Development and provenance
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor setup, the
+[development index](development/README.md) for reproducible validation and source
+methodology, and [source references](references/README.md) for official specifications.

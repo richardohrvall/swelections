@@ -62,3 +62,24 @@ Thumbs.db
 
 # Generated integration-test log
 development/*_INTEGRATION.txt
+
+# Preserved internal workbenches and historical development records
+/development/IMPLEMENTATION_2010_PLAN.md
+/development/PERSONROSTER_AVAILABILITY.md
+/development/PERSONROSTER_IMPLEMENTATION.md
+/development/RELEASE_0.1.0_INTEGRATION.md
+/development/RELEASE_0.1.0_PATCH_PLAN.md
+/development/RELEASE_0.1.0_REVIEW.md
+/development/SOURCE_ID_CROSSWALK_2010_PROPOSED.csv
+/development/STATUS.md
+/development/VALRESULTAT_0.2.0_SNAPSHOT_INTEGRATION.md
+/development/VALRESULTAT_INTEGRATION.md
+/development/VALRESULTAT_PLAN.md
+/development/escape-strings.R
+/development/integration-personroster.R
+/development/integration-release-0.1.0.R
+/development/integration-valresultat.R
+/development/refresh_preliminary_metadata_2014.R
+/development/smoke_2010.R
+/references/Teknisk beskrivning av resultatfiler _ Valmyndigheten.pdf
+/inlasning_valmyndigheten_2026.qmd

@@ -12,3 +12,5 @@
 ^data-raw$
 ^\.r-lib$
 ^\.local-data$
+
+^CONTRIBUTING\.md$
