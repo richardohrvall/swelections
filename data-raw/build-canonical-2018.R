@@ -2,6 +2,7 @@
 # are not distribution assets. The input candidate file must be Valmyndigheten's
 # currently published, redacted kandidaturer.skv; the local named research
 # snapshot is deliberately not a build input.
+# Canonical staging uses the complete raw readers, before public detail/geography projection.
 # Usage: Rscript data-raw/build-canonical-2018.R RAW_ROOT OFFICIAL_CANDIDATE_FILE
 # RAW_ROOT has 2018/valresultat/{slutresultat.zip,deltagande_partier.skv}.
 args <- commandArgs(trailingOnly = TRUE)
@@ -10,6 +11,7 @@ root <- normalizePath(args[[1]], mustWork = TRUE)
 candidate <- normalizePath(args[[2]], mustWork = TRUE)
 pkgload::load_all(".", quiet = TRUE)
 
+raw <- function(surface, ...) do.call(swelections:::.raw_public_api[[surface]], list(...))
 sha <- swelections:::.canonical_sha256
 result_file <- file.path(root, "2018", "valresultat", "slutresultat.zip")
 party_file <- file.path(root, "2018", "valresultat", "deltagande_partier.skv")
@@ -96,7 +98,7 @@ if (resume && file.exists(file.path(outdir, "rkl2018-valresultat.rds"))) {
   for (v in values) for (lev in levels[[v]]) {
     key <- paste(v, lev, sep = "__")
     say("valresultat", key)
-    results[[key]] <- valresultat(ar = 2018L, val = v, niva = lev,
+    results[[key]] <- raw("valresultat", ar = 2018L, val = v, niva = lev,
                                  source = "local", data_dir = stage,
                                  progress = FALSE)
   }
@@ -109,7 +111,7 @@ say("Building mandate tables")
 if (resume && file.exists(file.path(outdir, "rkl2018-mandat.rds"))) {
   entries[[length(entries) + 1L]] <- existing_entry("rkl2018-mandat", "mandat")
 } else {
-  mandates <- lapply(values, function(v) mandat(ar = 2018L, val = v,
+  mandates <- lapply(values, function(v) raw("mandat", ar = 2018L, val = v,
     source = "local", data_dir = stage, progress = FALSE))
   names(mandates) <- values
   entries[[length(entries) + 1L]] <- save_asset(mandates, "rkl2018-mandat", "mandat")
@@ -122,13 +124,13 @@ if (resume && file.exists(file.path(outdir, "rkl2018-kandidater.rds"))) {
     c("kandidaturer", "kandidater", "valda", "ersattare"))
 } else {
 candidate_tables <- list(
-  kandidaturer = kandidaturer(ar = 2018L, source = "local", data_dir = stage,
+  kandidaturer = raw("kandidaturer", ar = 2018L, source = "local", data_dir = stage,
                              archive = FALSE),
-  kandidater = kandidater(ar = 2018L, source = "local", data_dir = stage,
+  kandidater = raw("kandidater", ar = 2018L, source = "local", data_dir = stage,
                          progress = FALSE),
-  valda = valda(ar = 2018L, source = "local", data_dir = stage,
+  valda = raw("valda", ar = 2018L, source = "local", data_dir = stage,
                progress = FALSE),
-  ersattare = ersattare(ar = 2018L, source = "local", data_dir = stage,
+  ersattare = raw("ersattare", ar = 2018L, source = "local", data_dir = stage,
                        progress = FALSE)
 )
 entries[[length(entries) + 1L]] <- save_asset(candidate_tables,
@@ -148,7 +150,7 @@ for (v in values) {
     entries[[length(entries) + 1L]] <- existing_entry(district_name, "personroster")
     next
   }
-  kd <- kandidaturer(ar = 2018L, val = v, source = "local", data_dir = stage,
+  kd <- raw("kandidaturer", ar = 2018L, val = v, source = "local", data_dir = stage,
                     archive = FALSE)
   area <- swelections:::.xml2018_person_las(v, "personvalsomrade", kd,
     "local", stage, FALSE, FALSE, FALSE)
