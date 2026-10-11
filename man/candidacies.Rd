@@ -20,7 +20,7 @@ candidacies(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 election, geographic level and count stage.}
 
 \item{election}{One or more English election values or official codes;
@@ -79,6 +79,9 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=kandidaturer]{kandidaturer()}}.
 }
 \description{
+For 2006, \code{candidate_number} identifies a geographical ballot-position
+observation, not a person. Unstructured \code{ballot_info} is retained without
+inventing a structured name or a printed-ballot status.
 Read source-level candidate and ballot-list records through \code{\link[=kandidaturer]{kandidaturer()}}.
 \code{ballot_info} is optional candidate identification text printed on the
 ballot, such as occupation or age. \code{list_ballots_ordered} records the

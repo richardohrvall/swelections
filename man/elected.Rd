@@ -21,7 +21,7 @@ elected(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 election, geographic level and count stage.}
 
 \item{election}{One or more English election values or official codes;
@@ -82,6 +82,9 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=valda]{valda()}}.
 }
 \description{
+For 2006, candidate numbers identify original appointed source slots,
+not persons linked across lists. \verb{Kunde ej utses} positions remain unfilled
+seats and are excluded from elected observations.
 Read the official final elected-member relation through \code{\link[=valda]{valda()}}. No
 preliminary elected-member result is inferred.
 }

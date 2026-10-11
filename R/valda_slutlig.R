@@ -47,6 +47,10 @@
 
 .valda_ett_ar <- function(ar, val, source, data_dir, update, archive,
                           progress) {
+  if (ar == 2006L) {
+    if (source == "canonical") return(.canonical_source(ar, "valda", val))
+    return(.valda_2006(.sources_2006(source, data_dir, update, archive), val, progress))
+  }
   if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "valda", val))
   if (ar %in% c(2010L, 2014L)) return(.valda_2014(
     .sources_historical(ar, source, data_dir, update, archive), val, progress))

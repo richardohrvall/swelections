@@ -145,6 +145,10 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
+  if (ar == 2006L) {
+    if (source == "canonical") return(.canonical_source(ar, "mandat", val, unique(par$geografiniva), rakning = rakning))
+    return(.mandat_2006(.sources_2006(source, data_dir, update, archive), par, rakning, progress))
+  }
   if (ar %in% c(2010L, 2014L)) {
     if (rakning != "slutlig") stop(ar, " seats require final election XML.", call. = FALSE)
     if (source == "canonical") return(.canonical_source(ar, "mandat", val,

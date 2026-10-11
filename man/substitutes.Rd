@@ -21,7 +21,7 @@ substitutes(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 election, geographic level and count stage.}
 
 \item{election}{One or more English election values or official codes;
@@ -82,6 +82,9 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=ersattare]{ersattare()}}.
 }
 \description{
+For 2006, member and substitute numbers identify original source slots.
+Group relationships are expanded without name-based identity linkage or
+later mandate-period entrants.
 Read final elected-member–substitute relationships through \code{\link[=ersattare]{ersattare()}}.
 }
 \seealso{

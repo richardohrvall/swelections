@@ -20,7 +20,7 @@ kandidater(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -91,9 +91,18 @@ det faktiska invaldsområdet oberoende av kandidaturernas antal; även där
 används kort kommunnamn för KF. \code{folkbokforingskommun} ändras inte.
 }
 \description{
-Skapar en analysvänlig kandidatfil.
+För 2006 används bevarade slutliga lokala källor. \code{kandidatnummer} är
+en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
+Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
+personröster och tillgängliga strukturerade namn bevaras; okända
+personkopplingar och attribut förblir \code{NA}. Personröster över flera
+personvalsområden kan inte aggregeras på personnivå för 2006 och
+\code{komplettera_nollor} skapar inga oobserverade kandidatkombinationer.
+Slutliga rådatavärden används inte för att fylla preliminära luckor.
 }
 \details{
+Skapar en analysvänlig kandidatfil.
+
 En rad motsvarar kandidatnummer × valtyp × parti. Kandidater som
 ställer upp på flera politiska nivåer eller för flera partier kan därför
 förekomma på flera rader.

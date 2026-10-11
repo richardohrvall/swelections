@@ -7,7 +7,7 @@ as tables for analysis. The public API is English-first, with a fully supported
 Swedish interface.
 
 > [!IMPORTANT]
-> The package is under active development. It supports selected 2014, 2018, 2022 and
+> The package is under active development. It supports selected 2006, 2010, 2014, 2018, 2022 and
 > 2026 election data, but availability depends on the election, counting stage,
 > geographic level and published source files. Public interfaces may change.
 
@@ -180,6 +180,19 @@ parliamentary results in 2026, the completed district view has about 3.84
 million rows without list detail and 4.18 million with it.
 
 ## Years and source coverage
+
+2006 final RD/RF/KF data use preserved local XML, ballot and supplementary
+candidate sources, with an opt-in unpublished canonical prototype. No complete
+preliminary collection source is available. For 2006, `candidate_number` is a
+package-generated **source-observation/candidacy key**, not a person identifier.
+Equal names are not merged across lists, source structures or elections.
+Observed preference votes and available names are retained; unsupported
+attributes and person-wide totals remain missing. Preference votes are exposed
+at their original area/district levels; cross-area person aggregation is not
+supported. `include_zeros` creates no unsupported synthetic 2006 observations.
+Allocated seats remain distinct from filled positions: the 14 KF positions
+labelled `Kunde ej utses` are unfilled seats, never elected candidates. See
+[2006 implementation and limitations](development/IMPLEMENTATION_2006.md).
 
 The seven data families support 2022 and 2026 where their official source
 files contain the requested information. Final 2018 data are also supported

@@ -24,7 +24,7 @@ preference_votes(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 election, geographic level and count stage.}
 
 \item{election}{One or more English election values or official codes;
@@ -95,6 +95,10 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=personroster]{personroster()}}.
 }
 \description{
+For 2006, rows identify observed source records, not linked persons.
+\code{include_zeros} adds no unsupported combinations; explicit zeros remain.
+Area and list views are alternative representations, not additive totals.
+Cross-area municipality/region person aggregation is unavailable.
 Read candidate preference votes by preference-vote area, district or a
 supported broader election area. \code{by_list} retains the observed list dimension;
 \code{include_zeros} adds only verified zero combinations. The default view is

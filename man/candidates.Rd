@@ -22,7 +22,7 @@ candidates(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 election, geographic level and count stage.}
 
 \item{election}{One or more English election values or official codes;
@@ -86,6 +86,10 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=kandidater]{kandidater()}}.
 }
 \description{
+For 2006, a candidate number is a package-generated source-observation
+key. Ballot, area preference-vote and appointment observations are retained
+separately; equal names are not linked. Rows are not unique-person counts
+and unsupported cross-source totals/attributes remain missing.
 Read one row per candidate, election type and party through \code{\link[=kandidater]{kandidater()}}.
 }
 \seealso{

@@ -1,5 +1,9 @@
 #' Ersättare
 #'
+#' För 2006 identifierar kandidatnumren paketgenererade källposter, inte
+#' personer. Ursprungliga XML-grupper beskriver ledamot–ersättarrelationer;
+#' senare mandatperiodsförändringar används inte. Lika namn kopplas inte.
+#'
 #' Hämtar officiella relationer mellan valda ledamöter och deras ersättare
 #' från slutliga mandatfiler. Preliminära filer används aldrig för att
 #' uppskatta ersättare.

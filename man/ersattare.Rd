@@ -68,6 +68,11 @@ alltid \code{NA}. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
 \code{source = "canonical"} använder i stället den versionerade Parquet-samlingen.
 }
 \description{
+För 2006 identifierar kandidatnumren paketgenererade källposter, inte
+personer. Ursprungliga XML-grupper beskriver ledamot–ersättarrelationer;
+senare mandatperiodsförändringar används inte. Lika namn kopplas inte.
+}
+\details{
 Hämtar officiella relationer mellan valda ledamöter och deras ersättare
 från slutliga mandatfiler. Preliminära filer används aldrig för att
 uppskatta ersättare.

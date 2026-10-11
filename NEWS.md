@@ -1,5 +1,13 @@
 # swelections 0.3.0.9000
 
+* Adds final 2006 RD/RF/KF adapters for the seven data families and a local,
+  unpublished canonical prototype. Candidate keys identify source observations,
+  not persons; unsupported linkage and attributes remain missing. Separate
+  smaller-party results and observed preference votes are retained. Allocated
+  mandates are distinguished from the 14 unfilled KF positions. No incomplete
+  election-night result is relabelled as full preliminary data. Known RD/KF
+  preference discrepancies and RF SCB duplicates remain documented unchanged.
+
 * Adds preserved-source 2010 XML/ballot adapters through the shared historical
   normalisation layer and an opt-in unpublished canonical prototype. Final
   election relationships exclude mandate-period changes. The approved Björn

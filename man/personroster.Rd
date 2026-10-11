@@ -22,7 +22,7 @@ personroster(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -89,9 +89,18 @@ Partiellt eller oklart underlag ger \code{NA} när raden i övrigt finns;
 oobserverade resultat har ingen rad i en gles vy.
 }
 \description{
-Skapar en analysvänlig tabell med personröster för giltiga kandidaturer.
+För 2006 används bevarade slutliga lokala källor. \code{kandidatnummer} är
+en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
+Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
+personröster och tillgängliga strukturerade namn bevaras; okända
+personkopplingar och attribut förblir \code{NA}. Personröster över flera
+personvalsområden kan inte aggregeras på personnivå för 2006 och
+\code{komplettera_nollor} skapar inga oobserverade kandidatkombinationer.
+Slutliga rådatavärden används inte för att fylla preliminära luckor.
 }
 \details{
+Skapar en analysvänlig tabell med personröster för giltiga kandidaturer.
+
 En rad motsvarar valtillfälle × valtyp × personvalsområde × parti ×
 kandidat. Personvalsområdet är den faktiska geografiska enhet där
 personvalet avgörs: riksdagsvalkrets, region eller regionvalkrets, eller

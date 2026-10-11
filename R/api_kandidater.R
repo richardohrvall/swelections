@@ -1,5 +1,14 @@
 #' Kandidater
 #'
+#' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
+#' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
+#' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
+#' personröster och tillgängliga strukturerade namn bevaras; okända
+#' personkopplingar och attribut förblir `NA`. Personröster över flera
+#' personvalsområden kan inte aggregeras på personnivå för 2006 och
+#' `komplettera_nollor` skapar inga oobserverade kandidatkombinationer.
+#' Slutliga rådatavärden används inte för att fylla preliminära luckor.
+#'
 #' Skapar en analysvänlig kandidatfil.
 #'
 #' En rad motsvarar kandidatnummer × valtyp × parti. Kandidater som
@@ -35,7 +44,7 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -138,6 +147,10 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
+  if (ar == 2006L) {
+    if (source == "canonical") return(.canonical_source(ar, "kandidater", val, resultat = resultat))
+    return(.kandidater_2006(.sources_2006(source, data_dir, update, archive), val, resultat, progress))
+  }
   if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidater", val,
     resultat = resultat))
   if (ar %in% c(2010L, 2014L)) return(.kandidater_2014(
@@ -221,12 +234,16 @@ kandidater <- function(
 
 #' Valda kandidater
 #'
+#' För 2006 avser kandidatnumret en paketgenererad utsedd källpost, inte
+#' ett person-ID. Källans `Kunde ej utses` är ett tomt mandat och ingår
+#' inte som vald person. Personröstetal kopplas inte genom namn.
+#'
 #' Läser personer i Valmyndighetens officiella slutliga invaldsrelation och
 #' kompletterar med kandidatmetadata. Preliminära resultatfiler saknar denna
 #' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
-#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.

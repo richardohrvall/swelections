@@ -53,6 +53,8 @@
     args$niva <- "personvalsomrade"
   }
   data <- do.call(fun, args)
+  if (broader_preference && any(data$valar == 2006L))
+    stop("2006 preference votes identify source observations; aggregation across preference-vote areas requires unsupported person linkage.", call. = FALSE)
   if (broader_preference) data <- .aggregate_preference_area(data, requested_level)
   elections <- if (is.null(args$val)) c("RD", "RF", "KF") else args$val
   if (table == "seats" && !is.null(args$niva))
@@ -62,13 +64,18 @@
 
 #' Election results
 #'
+#' 2006 requires preserved local final sources or an explicitly configured
+#' unpublished canonical build; full preliminary results are unavailable.
+#' Candidate numbers in 2006 identify source observations rather than people.
+#' See the repository's 2006 implementation documentation for source limitations.
+#'
 #' Read official party results at one geographic level and one count stage.
 #' The English interface calls [valresultat()] and translates column names
 #' only; source values and data values are unchanged.
 #'
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
-#'   Supported years include 2014, 2018, 2022 and 2026, subject to the requested
+#'   Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 #'   election, geographic level and count stage.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
@@ -172,6 +179,10 @@ seats <- function(
 
 #' Candidacies
 #'
+#'
+#' For 2006, `candidate_number` identifies a geographical ballot-position
+#' observation, not a person. Unstructured `ballot_info` is retained without
+#' inventing a structured name or a printed-ballot status.
 #' Read source-level candidate and ballot-list records through [kandidaturer()].
 #' `ballot_info` is optional candidate identification text printed on the
 #' ballot, such as occupation or age. `list_ballots_ordered` records the
@@ -198,6 +209,11 @@ candidacies <- function(
 
 #' Candidates
 #'
+#'
+#' For 2006, a candidate number is a package-generated source-observation
+#' key. Ballot, area preference-vote and appointment observations are retained
+#' separately; equal names are not linked. Rows are not unique-person counts
+#' and unsupported cross-source totals/attributes remain missing.
 #' Read one row per candidate, election type and party through [kandidater()].
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
@@ -223,6 +239,10 @@ candidates <- function(
 
 #' Elected members
 #'
+#'
+#' For 2006, candidate numbers identify original appointed source slots,
+#' not persons linked across lists. `Kunde ej utses` positions remain unfilled
+#' seats and are excluded from elected observations.
 #' Read the official final elected-member relation through [valda()]. No
 #' preliminary elected-member result is inferred.
 #' @inheritParams results
@@ -247,6 +267,10 @@ elected <- function(
 
 #' Substitute relationships
 #'
+#'
+#' For 2006, member and substitute numbers identify original source slots.
+#' Group relationships are expanded without name-based identity linkage or
+#' later mandate-period entrants.
 #' Read final elected-member–substitute relationships through [ersattare()].
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
@@ -270,6 +294,11 @@ substitutes <- function(
 
 #' Preference votes
 #'
+#'
+#' For 2006, rows identify observed source records, not linked persons.
+#' `include_zeros` adds no unsupported combinations; explicit zeros remain.
+#' Area and list views are alternative representations, not additive totals.
+#' Cross-area municipality/region person aggregation is unavailable.
 #' Read candidate preference votes by preference-vote area, district or a
 #' supported broader election area. `by_list` retains the observed list dimension;
 #' `include_zeros` adds only verified zero combinations. The default view is

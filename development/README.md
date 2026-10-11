@@ -9,6 +9,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for dependencies and package checks.
 
 | Tool | Role / inputs |
 |---|---|
+| `data-raw/build-canonical-2006.R` | Preserved archive root and new unpublished output directory |
 | `data-raw/build-canonical-2010.R` | Raw archive root and new output directory |
 | `data-raw/build-canonical-2014.R` | Raw archive root and new output directory |
 | `data-raw/build-canonical-2018.R` | Raw archive and pinned official candidate file; full-schema staging |
@@ -25,6 +26,13 @@ The [R-only preparation contract](R_ONLY_WORKFLOW.md) records reproducible ZIP/J
 selection and serialization, including differences from the retired implementation.
 
 ## Acquisition and source tools
+
+- `data-raw/preserve-final-2006.R`: sequential preservation of the official
+  RD/RF municipality XML, with per-file URL, retrieval time, size and hashes.
+- [2006 implementation](IMPLEMENTATION_2006.md), [validation](VALIDATION_2006.md) and [source inventory](SOURCE_INVENTORY_2006.md):
+  conservative source-observation identity and documented source limitations.
+- `validate_canonical_2006.R` and `data-raw/validate-scb-2006.R`: public/raw
+  equivalence and independent municipality/party/mandate validation in R.
 
 - `preserve_preliminary_2010_conservative.R`: sequential, resumable acquisition;
   immutable cached responses, provenance and rate-limit backoff. The `--verify-cache`

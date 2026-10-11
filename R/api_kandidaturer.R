@@ -1,5 +1,14 @@
 #' Kandidaturer
 #'
+#' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
+#' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
+#' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
+#' personröster och tillgängliga strukturerade namn bevaras; okända
+#' personkopplingar och attribut förblir `NA`. Personröster över flera
+#' personvalsområden kan inte aggregeras på personnivå för 2006 och
+#' `komplettera_nollor` skapar inga oobserverade kandidatkombinationer.
+#' Slutliga rådatavärden används inte för att fylla preliminära luckor.
+#'
 #' Hämtar kandidaturdata från Valmyndigheten.
 #'
 #' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
@@ -7,7 +16,7 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -98,6 +107,10 @@ kandidaturer <- function(
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
+  if (ar == 2006L) {
+    if (source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
+    return(.read_candidacies_2006(.sources_2006(source, data_dir, update, archive), if (is.null(val)) c("RD", "RF", "KF") else val))
+  }
   if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
   if (ar %in% c(2010L, 2014L)) return(.read_candidacies_2014(
     .sources_historical(ar, source, data_dir, update, archive),

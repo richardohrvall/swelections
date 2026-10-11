@@ -1,5 +1,14 @@
 #' Personröster per personvalsområde, valdistrikt eller större valområde
 #'
+#' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
+#' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
+#' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
+#' personröster och tillgängliga strukturerade namn bevaras; okända
+#' personkopplingar och attribut förblir `NA`. Personröster över flera
+#' personvalsområden kan inte aggregeras på personnivå för 2006 och
+#' `komplettera_nollor` skapar inga oobserverade kandidatkombinationer.
+#' Slutliga rådatavärden används inte för att fylla preliminära luckor.
+#'
 #' Skapar en analysvänlig tabell med personröster för giltiga kandidaturer.
 #'
 #' En rad motsvarar valtillfälle × valtyp × personvalsområde × parti ×
@@ -59,7 +68,7 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -164,7 +173,10 @@ personroster <- function(
   }
   purrr::map(valar, function(ett_ar) {
     tryCatch(
-      if ({
+      if (ett_ar == 2006L) {
+        if (source == "canonical") .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor) else
+          .personroster_2006(.sources_2006(source, data_dir, update, archive), val, niva, per_lista, komplettera_nollor, progress)
+      } else if ({
         selected_source <- .select_public_source(source, ett_ar,
           "personroster", data_dir, update, archive)
         selected_source %in% c("canonical", "canonical_auto")

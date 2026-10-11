@@ -213,6 +213,10 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  if (ar == 2006L) {
+    if (source == "canonical") return(.canonical_source(ar, "valresultat", val, niva, rakning = rakning))
+    return(.valresultat_2006(.sources_2006(source, data_dir, update, archive), val, niva, rakning, progress))
+  }
   if (ar %in% c(2010L, 2014L)) {
     if (source == "canonical") return(.canonical_source(ar, "valresultat", val,
       niva, rakning = rakning))
@@ -264,7 +268,7 @@ valresultat <- function(
 }
 
 .valresultat_kalla <- function(val, niva, ar = 2026) {
-  if (ar %in% c(2010L, 2014L, 2018L)) {
+  if (ar %in% c(2006L, 2010L, 2014L, 2018L)) {
     .valresultat_niva_2018(val, niva)
     return("XML")
   }
