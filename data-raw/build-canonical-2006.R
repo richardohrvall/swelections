@@ -64,6 +64,9 @@ for (v in names(levels)) {
   }
 }
 save_asset(seats, "rkl2006-seats-slutlig", "seats")
+# Preserve the all-election ballot-source order used by the approved prototype.
+# Concatenating per-election subsets preserves values but changes file bytes.
+candidacies <- list(swelections:::.read_candidacies_2006(s, names(levels)))
 for (surface in c("candidacies", "candidates", "base", "elected", "substitutes"))
   save_asset(purrr::list_rbind(get(surface)), paste0("rkl2006-", if (surface == "base") "candidate-base" else surface), surface)
 for (i in seq_len(nrow(sources))) swelections:::.xml2006_source(s, sources$file[[i]])

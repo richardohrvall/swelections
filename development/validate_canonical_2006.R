@@ -39,6 +39,12 @@ check <- function(fun,arguments,label) {
  cat('PASS',label,nrow(raw),'rows\n'); flush.console()
  invisible(raw)
 }
+# Validate the whole candidacy file, including cross-election source row order.
+if (section %in% c('all','candidates')) {
+ raw_candidacies <- swelections:::.canonical_names_en(swelections:::.read_candidacies_2006(s,c('RD','RF','KF')))
+ raw_candidacies[] <- lapply(raw_candidacies,unname)
+ same(tibble::as_tibble(nanoparquet::read_parquet(file.path(dir,'rkl2006-candidacies.parquet'))),raw_candidacies,'complete candidacy asset/source order')
+}
 levels <- list(RD=c('district','municipality','municipal_constituency','county','parliamentary_constituency','national'),RF=c('district','municipality','municipal_constituency','regional_constituency','region','national'),KF=c('district','municipality','municipal_constituency','county','national'))
 for (v in names(levels)) {
  if (section %in% c('all','results')) for (level in levels[[v]]) check(results,list(election=v,level=level,count='final'),paste(v,'results',level))

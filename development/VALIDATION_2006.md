@@ -195,3 +195,22 @@ Package version, dependencies and public column schemas are unchanged.
 No raw source, SCB DTA, Python or generated Parquet file is tracked.
 No commit, push, tag or release has been made. The implementation is ready
 for review with the source limitations above retained, rather than concealed.
+
+## Clean-build candidacy ordering control
+
+The first clean rebuild reproduced 14 of the 15 approved Parquet files
+byte-identically. Candidacy values, types, keys and within-election row order
+were all identical, but the builder concatenated RD/RF/KF subsets while the
+approved prototype's final candidacy export retained the joint ballot-source
+order. A diagnostic export through the existing all-election raw reader
+reproduced the approved file byte-identically (SHA256
+`ab39024e5c57263574f765415037fb8b948c62df9a09506a342fa10156a3aa96`).
+The builder now uses that same reader for the candidacy asset. The independent
+validator compares the entire candidacy file with that raw output, including
+cross-election row order. This is a build reproducibility correction; no
+source, identifier, data value, schema or public output semantics change.
+
+The earlier prototype's one-off manifest rewrite also serialized missing
+`capture_utc` values as empty arrays instead of null. The clean builder
+retains null for missing capture dates. All known timestamps and source
+checksums remain unchanged; empty arrays never establish a capture date.
