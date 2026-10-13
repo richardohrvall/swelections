@@ -1,5 +1,13 @@
 #' Personröster per personvalsområde, valdistrikt eller större valområde
 #'
+#' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+#' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+#' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+#' exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+#' identifierar källposter, inte verifierade personer över listor eller val.
+#' Kandidatnamn och attribut utan säker källa är typade saknade värden.
+#'
+#'
 #' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
 #' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 #' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
@@ -68,7 +76,7 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2002, 2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -173,7 +181,10 @@ personroster <- function(
   }
   purrr::map(valar, function(ett_ar) {
     tryCatch(
-      if (ett_ar == 2006L) {
+      if (ett_ar == 2002L) {
+        if (source == "canonical") .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor) else
+          .personroster_2002(.sources_2002(source, data_dir, update, archive), val, niva, per_lista, komplettera_nollor, progress)
+      } else if (ett_ar == 2006L) {
         if (source == "canonical") .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor) else
           .personroster_2006(.sources_2006(source, data_dir, update, archive), val, niva, per_lista, komplettera_nollor, progress)
       } else if ({

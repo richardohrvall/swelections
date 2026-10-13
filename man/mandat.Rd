@@ -78,9 +78,16 @@ För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \code{valomradeskod}; separata kommunfält dupliceras inte.
 }
 \description{
-Hämtar mandatfördelningen.
+För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+identifierar källposter, inte verifierade personer över listor eller val.
+Kandidatnamn och attribut utan säker källa är typade saknade värden.
 }
 \details{
+Hämtar mandatfördelningen.
+
 För 2010 används bevarade slutliga XML-/valsedelskällor och samma
 historiska normalisering som 2014. Publika kandidatnamn är saknade.
 Preliminära resultat kräver en komplett separat officiell

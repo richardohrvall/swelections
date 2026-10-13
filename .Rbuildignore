@@ -14,3 +14,4 @@
 ^\.local-data$
 
 ^CONTRIBUTING\.md$
+^valresultat_[0-9].*\.tar\.gz$

@@ -19,7 +19,7 @@ valda(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2002, 2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -65,11 +65,16 @@ områdeslistor, för 2026 från verifierade områdessummeringar.
 Kandidatfilens övriga metadata och dess \code{NA} bevaras.
 }
 \description{
+För 2002 används originalvalets slutliga XML, inklusive Orsas ordinarie
+septemberval i stället för omvalet 2003. Kandidatnycklar identifierar
+utsedda källposter, inte verifierade personer. Namn och personröstkopplingar
+utan säker identifierare är saknade; lika namn används inte för koppling.
+}
+\details{
 För 2006 avser kandidatnumret en paketgenererad utsedd källpost, inte
 ett person-ID. Källans \verb{Kunde ej utses} är ett tomt mandat och ingår
 inte som vald person. Personröstetal kopplas inte genom namn.
-}
-\details{
+
 Läser personer i Valmyndighetens officiella slutliga invaldsrelation och
 kompletterar med kandidatmetadata. Preliminära resultatfiler saknar denna
 relation och används aldrig som reservkälla.

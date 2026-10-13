@@ -53,8 +53,8 @@
     args$niva <- "personvalsomrade"
   }
   data <- do.call(fun, args)
-  if (broader_preference && any(data$valar == 2006L))
-    stop("2006 preference votes identify source observations; aggregation across preference-vote areas requires unsupported person linkage.", call. = FALSE)
+  if (broader_preference && any(data$valar %in% c(2002L, 2006L)))
+    stop(paste0(min(data$valar[data$valar %in% c(2002L, 2006L)]), " preference votes identify source observations; aggregation across preference-vote areas requires unsupported person linkage."), call. = FALSE)
   if (broader_preference) data <- .aggregate_preference_area(data, requested_level)
   elections <- if (is.null(args$val)) c("RD", "RF", "KF") else args$val
   if (table == "seats" && !is.null(args$niva))
@@ -64,6 +64,10 @@
 
 #' Election results
 #'
+#' 2002 final results use preserved official XML; the original Orsa election
+#' is separate from its 2003 rerun. Candidate keys identify source observations,
+#' not persons; names are missing and full ballot candidacies are unavailable.
+#' Full preliminary collection results remain unrecovered.
 #' 2006 requires preserved local final sources or an explicitly configured
 #' unpublished canonical build; full preliminary results are unavailable.
 #' Candidate numbers in 2006 identify source observations rather than people.
@@ -75,7 +79,7 @@
 #'
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
-#'   Supported years include 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
+#'   Supported years include 2002, 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 #'   election, geographic level and count stage.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
@@ -179,6 +183,7 @@ seats <- function(
 
 #' Candidacies
 #'
+#' 2002 is not supported: a complete ballot-candidacy source has not been recovered.
 #'
 #' For 2006, `candidate_number` identifies a geographical ballot-position
 #' observation, not a person. Unstructured `ballot_info` is retained without

@@ -72,6 +72,14 @@ Inga mandat eller personröster ingår. \code{dplyr::bind_rows()} kan användas
 för att skapa unionen av kolumner från flera nivåer.
 }
 \description{
+För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+identifierar källposter, inte verifierade personer över listor eller val.
+Kandidatnamn och attribut utan säker källa är typade saknade värden.
+}
+\details{
 Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 från Valmyndighetens
 officiella primärkälla. Ingen geografisk aggregering eller automatisk
@@ -81,8 +89,7 @@ valnatts-XML kombineras med preliminära uppsamlingsdistrikt från den officiell
 presentationen och aggregeras till begärd nivå. Slutliga uppsamlingsröster
 används aldrig i preliminära resultat. Slutligt 2014 använder samma
 geografiska nivåer som 2018 och en separat XML-adapter.
-}
-\details{
+
 För 2010 kombinerar preliminär räkning ordinarie valnattsdistrikt med
 bevarade preliminära uppsamlingsdistrikt. Tomma fält förblir NA; slutliga
 uppsamlingsröster används inte. För slutlig räkning används XML och samma

@@ -1,5 +1,13 @@
 #' Officiella valresultat för 2014, 2018, 2022 och 2026
 #'
+#' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+#' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+#' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+#' exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+#' identifierar källposter, inte verifierade personer över listor eller val.
+#' Kandidatnamn och attribut utan säker källa är typade saknade värden.
+#'
+#'
 #' Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 #' från Valmyndighetens
 #' officiella primärkälla. Ingen geografisk aggregering eller automatisk
@@ -213,6 +221,10 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  if (ar == 2002L) {
+    if (source == "canonical") return(.canonical_source(ar, "valresultat", val, niva, rakning = rakning))
+    return(.valresultat_2002(.sources_2002(source, data_dir, update, archive), val, niva, rakning, progress))
+  }
   if (ar == 2006L) {
     if (source == "canonical") return(.canonical_source(ar, "valresultat", val, niva, rakning = rakning))
     return(.valresultat_2006(.sources_2006(source, data_dir, update, archive), val, niva, rakning, progress))
@@ -268,7 +280,7 @@ valresultat <- function(
 }
 
 .valresultat_kalla <- function(val, niva, ar = 2026) {
-  if (ar %in% c(2006L, 2010L, 2014L, 2018L)) {
+  if (ar %in% c(2002L, 2006L, 2010L, 2014L, 2018L)) {
     .valresultat_niva_2018(val, niva)
     return("XML")
   }

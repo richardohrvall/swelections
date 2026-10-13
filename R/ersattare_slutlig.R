@@ -73,6 +73,10 @@
 
 .ersattare_ett_ar <- function(ar, val, source, data_dir, update, archive,
                               progress) {
+  if (ar == 2002L) {
+    if (source == "canonical") return(.canonical_source(ar, "ersattare", val))
+    return(.ersattare_2002(.sources_2002(source, data_dir, update, archive), val, progress))
+  }
   if (ar == 2006L) {
     if (source == "canonical") return(.canonical_source(ar, "ersattare", val))
     return(.ersattare_2006(.sources_2006(source, data_dir, update, archive), val, progress))

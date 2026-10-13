@@ -22,7 +22,7 @@ personroster(
 )
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera exakta valår (2002, 2006, 2010, 2014, 2018, 2022, 2026), eller \code{"alla"}.
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
@@ -89,6 +89,14 @@ Partiellt eller oklart underlag ger \code{NA} när raden i övrigt finns;
 oobserverade resultat har ingen rad i en gles vy.
 }
 \description{
+För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+identifierar källposter, inte verifierade personer över listor eller val.
+Kandidatnamn och attribut utan säker källa är typade saknade värden.
+}
+\details{
 För 2006 används bevarade slutliga lokala källor. \code{kandidatnummer} är
 en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
@@ -97,8 +105,7 @@ personkopplingar och attribut förblir \code{NA}. Personröster över flera
 personvalsområden kan inte aggregeras på personnivå för 2006 och
 \code{komplettera_nollor} skapar inga oobserverade kandidatkombinationer.
 Slutliga rådatavärden används inte för att fylla preliminära luckor.
-}
-\details{
+
 Skapar en analysvänlig tabell med personröster för giltiga kandidaturer.
 
 En rad motsvarar valtillfälle × valtyp × personvalsområde × parti ×

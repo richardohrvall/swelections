@@ -68,11 +68,18 @@ alltid \code{NA}. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
 \code{source = "canonical"} använder i stället den versionerade Parquet-samlingen.
 }
 \description{
+För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+identifierar källposter, inte verifierade personer över listor eller val.
+Kandidatnamn och attribut utan säker källa är typade saknade värden.
+}
+\details{
 För 2006 identifierar kandidatnumren paketgenererade källposter, inte
 personer. Ursprungliga XML-grupper beskriver ledamot–ersättarrelationer;
 senare mandatperiodsförändringar används inte. Lika namn kopplas inte.
-}
-\details{
+
 Hämtar officiella relationer mellan valda ledamöter och deras ersättare
 från slutliga mandatfiler. Preliminära filer används aldrig för att
 uppskatta ersättare.

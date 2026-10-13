@@ -9,6 +9,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for dependencies and package checks.
 
 | Tool | Role / inputs |
 |---|---|
+| `data-raw/build-canonical-2002.R` | Hash-verified original-election XML registry and new unpublished output directory |
 | `data-raw/build-canonical-2006.R` | Preserved archive root and new unpublished output directory |
 | `data-raw/build-canonical-2010.R` | Raw archive root and new output directory |
 | `data-raw/build-canonical-2014.R` | Raw archive root and new output directory |
@@ -26,6 +27,16 @@ The [R-only preparation contract](R_ONLY_WORKFLOW.md) records reproducible ZIP/J
 selection and serialization, including differences from the retired implementation.
 
 ## Acquisition and source tools
+
+- `data-raw/preserve-final-2002.R`: sequential, cached preservation of final XML;
+  original Orsa is pinned separately from its 2003 rerun. No preliminary search.
+- [2002 implementation](IMPLEMENTATION_2002.md), [source inventory](SOURCE_INVENTORY_2002.md)
+  and [validation](VALIDATION_2002.md): source-observation keys, incomplete ballot
+  coverage and unrecovered preliminary collections are explicit limitations.
+- `validate_canonical_2002.R`, `data-raw/validate-sources-2002.R` and
+  `data-raw/validate-scb-2002.R`: public equivalence and separate XML/SCB controls.
+- `data-raw/validate-aggregates-2002.R`: independent district/municipality/national
+  final XML controls, including the 2002 collection-node placements.
 
 - `data-raw/preserve-final-2006.R`: sequential preservation of the official
   RD/RF municipality XML, with per-file URL, retrieval time, size and hashes.

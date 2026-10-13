@@ -41,6 +41,14 @@
 
 #' Mandat
 #'
+#' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+#' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+#' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+#' exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+#' identifierar källposter, inte verifierade personer över listor eller val.
+#' Kandidatnamn och attribut utan säker källa är typade saknade värden.
+#'
+#'
 #' Hämtar mandatfördelningen.
 #'
 #' För 2010 används bevarade slutliga XML-/valsedelskällor och samma
@@ -145,6 +153,10 @@ mandat <- function(
 
 .mandat_ett_ar <- function(ar, val, rakning, par, source, data_dir,
                            update, archive, progress) {
+  if (ar == 2002L) {
+    if (source == "canonical") return(.canonical_source(ar, "mandat", val, unique(par$geografiniva), rakning = rakning))
+    return(.mandat_2002(.sources_2002(source, data_dir, update, archive), par, rakning, progress))
+  }
   if (ar == 2006L) {
     if (source == "canonical") return(.canonical_source(ar, "mandat", val, unique(par$geografiniva), rakning = rakning))
     return(.mandat_2006(.sources_2006(source, data_dir, update, archive), par, rakning, progress))

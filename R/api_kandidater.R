@@ -1,5 +1,13 @@
 #' Kandidater
 #'
+#' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+#' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
+#' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
+#' exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
+#' identifierar källposter, inte verifierade personer över listor eller val.
+#' Kandidatnamn och attribut utan säker källa är typade saknade värden.
+#'
+#'
 #' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
 #' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 #' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
@@ -44,7 +52,7 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2002, 2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
@@ -147,6 +155,10 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
+  if (ar == 2002L) {
+    if (source == "canonical") return(.canonical_source(ar, "kandidater", val, resultat = resultat))
+    return(.kandidater_2002(.sources_2002(source, data_dir, update, archive), val, resultat, progress))
+  }
   if (ar == 2006L) {
     if (source == "canonical") return(.canonical_source(ar, "kandidater", val, resultat = resultat))
     return(.kandidater_2006(.sources_2006(source, data_dir, update, archive), val, resultat, progress))
@@ -234,6 +246,11 @@ kandidater <- function(
 
 #' Valda kandidater
 #'
+#' För 2002 används originalvalets slutliga XML, inklusive Orsas ordinarie
+#' septemberval i stället för omvalet 2003. Kandidatnycklar identifierar
+#' utsedda källposter, inte verifierade personer. Namn och personröstkopplingar
+#' utan säker identifierare är saknade; lika namn används inte för koppling.
+#'
 #' För 2006 avser kandidatnumret en paketgenererad utsedd källpost, inte
 #' ett person-ID. Källans `Kunde ej utses` är ett tomt mandat och ingår
 #' inte som vald person. Personröstetal kopplas inte genom namn.
@@ -243,7 +260,7 @@ kandidater <- function(
 #' relation och används aldrig som reservkälla.
 #'
 #' @inheritParams ersattare
-#' @param ar Ett eller flera exakta valår (2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera exakta valår (2002, 2006, 2010, 2014, 2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.

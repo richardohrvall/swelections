@@ -1,0 +1,17 @@
+{
+  "url": "https://historik.val.se/val/val_02/slutresultat/tillagg_ovriga.pdf",
+  "effective_url": "https://historik.val.se/val/val_02/slutresultat/tillagg_ovriga.pdf",
+  "status": 200,
+  "utc": "2026-10-13T04:16:13Z",
+  "bytes": 45650,
+  "md5": "b0094d49a33e919a9cf2d865f72fe78e",
+  "sha256": "83fa892e978ca3adac82189e8b685d262ac5e443937b9bad666ce70e56141dff",
+  "lookup_sha256": "c36d1120176d58978053713919b41a89fbcf405be04836c7af43b65335ccf406",
+  "lookup_rows": 120,
+  "constituency_disclosed": 107,
+  "constituency_undisclosed": 9,
+  "pdf_creation_time": "2002-12-13 12:26:58 +01:00 (file metadata, not verified publication time)",
+  "title": "Resultat Riksdagsval Övriga partier - en komplettering",
+  "semantics": "Explicit constituency counts and national reported sums; blank cells remain unknown inside residual other votes. No municipal/district allocation.",
+  "known_zero_rule": "Explicit constituency zero corrects existing contained observations; Gävle Pop 1 -> 0 and Hudiksvall Pop 7 -> 0. No new lower-level rows or positive allocations."
+}

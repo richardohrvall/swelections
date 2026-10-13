@@ -1,5 +1,17 @@
 # swelections 0.3.0.9000
 
+* Applies the official 2002 RD four-party supplement at disclosed aggregate
+  levels, retains unknown cells as NA and preserves all ballot/mandate totals.
+  Historical package tarballs are excluded from source-package builds.
+
+* Adds preserved-source final 2002 RD/RF/KF results, seats and source-level
+  candidate, elected, substitute and preference-vote observations, with an
+  unpublished local canonical build. The original September 2002 Orsa result
+  is pinned separately from the March 2003 rerun. Candidate keys identify
+  source observations rather than verified people. Unrecovered ballot and
+  preliminary collection sources remain explicit limitations; no election-night
+  data are relabelled as complete preliminary results.
+
 * Adds final 2006 RD/RF/KF adapters for the seven data families and a local,
   unpublished canonical prototype. Candidate keys identify source observations,
   not persons; unsupported linkage and attributes remain missing. Separate

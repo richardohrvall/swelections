@@ -7,7 +7,7 @@ as tables for analysis. The public API is English-first, with a fully supported
 Swedish interface.
 
 > [!IMPORTANT]
-> The package is under active development. It supports selected 2006, 2010, 2014, 2018, 2022 and
+> The package is under active development. It supports selected 2002, 2006, 2010, 2014, 2018, 2022 and
 > 2026 election data, but availability depends on the election, counting stage,
 > geographic level and published source files. Public interfaces may change.
 
@@ -93,8 +93,8 @@ parliamentary elections, region for regional elections and municipality for
 municipal elections. Other supported level values include `"district"`,
 `"municipal_constituency"` and `"regional_constituency"`; availability varies
 by election and year. For example, county results are supported for municipal
-elections where the official source provides them, but parliamentary county
-results are not supported. Regional county results are not yet activated.
+elections where the official source provides them. Parliamentary county
+results are available for some historical years; support is year-specific.
 Unsupported combinations give an error.
 
 The public tables default to `detail = "standard"`, a compact set of
@@ -180,6 +180,29 @@ parliamentary results in 2026, the completed district view has about 3.84
 million rows without list detail and 4.18 million with it.
 
 ## Years and source coverage
+
+2002 final RD/RF/KF data use preserved official election-result XML. The ordinary
+Orsa election on 15 September 2002 is kept separate from the 16 March 2003 rerun;
+ordinary national and geographic totals use the original Orsa result. Archived
+election-night sources are retained as provenance. Full preliminary collection
+results remain unrecovered, so election-night data are not exposed as a complete
+`preliminary` result. This is a source/recovery limitation, not evidence that
+preliminary results were never produced.
+
+For 2002, candidate keys identify source observations, not verified persons
+across lists or elections. Public names are missing; unavailable attributes and
+unattributable preference votes are not fabricated. A complete ballot-candidacy
+population has not been recovered, so `candidacies()` does not support 2002.
+Broader person-linked preference-vote aggregation and inferred zeros are
+unsupported. Complete RD district views require three unrecovered municipal
+exports. Some list preference views fail the source's own aggregate checks;
+the official RD four-party supplement corrects national and disclosed constituency
+values. Nine undisclosed constituency cells remain `NA`; county totals require
+complete disclosure. Positive municipality/district counts are not allocated;
+explicit constituency zeros correct contradicted existing lower-level counts.
+See [supplement provenance and coverage](development/SUPPLEMENT_2002.md).
+See [2002 implementation and limitations](development/IMPLEMENTATION_2002.md)
+and [validation](development/VALIDATION_2002.md).
 
 2006 final RD/RF/KF data use preserved local XML, ballot and supplementary
 candidate sources, with an opt-in unpublished canonical prototype. No complete
