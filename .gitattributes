@@ -1,0 +1,2 @@
+# Preserve the audited build lookup's bytes and recognise its CRLF line endings.
+inst/extdata/rd-2002-party-supplement.csv -text whitespace=cr-at-eol

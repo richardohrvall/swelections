@@ -66,3 +66,11 @@ content. The targeted `.Rbuildignore` expression
 `^valresultat_[0-9].*\.tar\.gz$` excludes them from the source package.
 The archives are neither deleted nor altered. Check staging deliberately retains
 those files before `R CMD build` to verify that the rule removes the note.
+
+## Byte-preserving source control
+
+The packaged supplement lookup is covered by a targeted `.gitattributes`
+`-text` rule. Its recorded SHA256 verifies the exact audited CSV bytes, so Git
+must not translate line endings on checkout. This rule applies only to that
+lookup; it changes neither the CSV values nor package output. The committed
+blob is checked against `lookup_sha256` before the clean canonical rebuild.
