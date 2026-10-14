@@ -915,3 +915,13 @@ above. The approved disclosed corrections are now incorporated in result
 output. See [SUPPLEMENT_2002.md](SUPPLEMENT_2002.md) for full provenance,
 unknown-cell handling, aggregate coverage and the two supported lower-level
 zero corrections. No candidate, preference-vote or mandate reader is changed.
+
+## Complementary result support for the three missing RD exports
+
+The missing files do not imply missing final party results. The verified
+SCB/SND route and its exact provider/file hashes are documented in
+[IMPLEMENTATION_2002.md](IMPLEMENTATION_2002.md#verified-complementary-rd-results-halmstad-laholm-and-kungsbacka).
+Valmyndigheten remains primary; complementary district observations are accepted
+only after reconciliation with its national municipal totals. The original
+SCB/SND files remain immutable. Their district candidate/list/preference and
+XML-specific metadata cannot be recovered from party cells and are not invented.

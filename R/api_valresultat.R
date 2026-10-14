@@ -6,12 +6,17 @@
 #' exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
 #' identifierar källposter, inte verifierade personer över listor eller val.
 #' Kandidatnamn och attribut utan säker källa är typade saknade värden.
+#' För slutliga RD-partiresultat i Halmstad, Laholm och Kungsbacka kompletteras
+#' saknade kommunexporter med hashverifierade SCB/SND-distriktsuppgifter som
+#' stäms av mot Valmyndighetens kommunresultat. Poströster fördelas inte till
+#' kommunvalkretsar. Kandidat-/personröstuppgifter och XML-metadata återskapas
+#' inte. Den lokala kompletteringen kräver det valfria paketet `haven`.
 #'
 #'
 #' Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 #' från Valmyndighetens
 #' officiella primärkälla. Ingen geografisk aggregering eller automatisk
-#' reservkälla används om den valda källan saknas.
+#' reservkälla används utöver de särskilt beskrivna historiska konstruktionerna.
 #' Undantaget är 2014 års fulla preliminära resultat: vanliga valdistrikt från
 #' valnatts-XML kombineras med preliminära uppsamlingsdistrikt från den officiella
 #' presentationen och aggregeras till begärd nivå. Slutliga uppsamlingsröster

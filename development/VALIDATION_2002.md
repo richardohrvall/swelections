@@ -15,10 +15,11 @@ alternatives. No further preliminary archive investigation was undertaken.
 
 Three RD exports remain unrecovered: `slutresultat_1380R.xml` (Halmstad),
 `slutresultat_1381R.xml` (Laholm), `slutresultat_1384R.xml` (Kungsbacka).
-Consequently complete RD district/municipal-constituency result views and RD
-district preference views give an informative error. They do not return a
-partial national table. Municipality, county, constituency and national RD
-results have complete coverage through the national export.
+Final RD district and municipal-constituency party results now use the verified
+SCB/SND complementary route for these three municipalities. RD district
+preference views remain unavailable: candidate/list details are not reconstructed.
+Municipality, county, constituency and national RD results continue to use
+the complete national Valmyndigheten export.
 
 No complete ballot-candidacy register has been recovered. `candidacies()` is
 unsupported for 2002; no empty population is fabricated. The other six families
@@ -270,3 +271,70 @@ therefore limit candidate analyses, not the correctness of supported final
 party-vote and allocated-mandate views. Smaller-party disclosure remains scoped:
 the nine undisclosed RD supplement cells remain NA and inside residual other;
 complete finer party breakdown is not claimed where the source lacks it.
+
+## Complementary final RD result coverage (supersedes the earlier export limitation)
+
+The preceding missing-export discussion described the XML-only implementation.
+It does not indicate missing substantive party results. The verified SCB/SND
+route now supplies all 104 missing district/postal units, with 2,496 party/category
+rows and no duplicate keys. Four public municipal-constituency units contain
+96 rows; collection votes remain outside their aggregation. Laholm is undivided.
+All other RD result observations, mandates and candidate/preference records keep
+the original Valmyndigheten route.
+
+The independent validator checks 416 district total/denominator controls and
+1,281 SCB publication controls (1,212 ordinary, 33 postal, 36 municipality):
+1,697 numerical controls passed. SCB publication `Allmänna valen 2002`, tables 5
+and 10, provides independent controls; official source:
+https://share.scb.se/ov9993/data/publikationer/statistik/me/me0104/2003m00/me01sa0301.pdf
+The preserved publication and source hashes are used without rewriting inputs.
+The separate SCB/SND electorate value for Kungsbacka is retained.
+
+Source-specific unavailable metadata and district preference data remain missing
+or unsupported, rather than being fabricated from party results. Source hierarchy,
+file hashes and denominator rules are documented in IMPLEMENTATION_2002.md.
+
+### Final validation of the complementary route (2026-10-14)
+
+- Public canonical/raw matrix: **414 comparisons passed**, covering all supported
+  RD/RF/KF result levels, seats, candidates (including base), elected, substitutes
+  and preference-vote views, standard/full and English/Swedish. Unsupported
+  candidacies and preliminary requests retain their informative errors.
+  Freshly raw-derived RD views were memoised within validation; the other views
+  were read from their preserved raw sources. Independent elected/substitute
+  checks passed. All 869 selected XML source checksums were verified twice.
+- Complete suite: **3,399 passed, 10 explicit opt-in skips, no failures/warnings**.
+  R CMD check with `--no-manual --no-vignettes`: **0 errors, 0 warnings, 0 notes**.
+  Diff, new-file syntax and whitespace checks passed.
+- Original XML geographic controls: **9,529**, no differences/unverifiable values.
+  SCB controls: **6,982**, with original Orsa separate from the rerun.
+  Four-party supplement: **1,229** controls passed; no undisclosed cells inferred.
+- Complementary/publication controls: **1,697** passed. Actual normalized
+  production outputs passed another **624** count/share/denominator checks and
+  national district-key uniqueness. All four public municipal constituencies
+  matched ordinary-district party sums; postal votes were not allocated.
+- A new ignored incremental validation prototype contains 13 Parquet assets and
+  its manifest. Only the RD result asset was rebuilt (76,729 rows across six
+  levels); the other **12 assets are byte-identical** to the approved reference.
+  Existing RD aggregate views are exactly identical. English Parquet round-trip,
+  asset sizes/SHA256 and complementary provenance checks passed. The manifest
+  truthfully records `build_tree_dirty = true`; this is not a release build.
+- Protected historical baselines: **92 assets** unchanged; both preserved 2006
+  references (15 assets each), **2,497 protected 2022 sources**, and all selected
+  2002 XML source sizes/MD5/SHA256 remained unchanged.
+
+Changed implementation/dependency files: `R/results_complement_2002.R`,
+`R/xml_2002.R`, `DESCRIPTION` (optional `haven`, for local complementary imports).
+Tests: `tests/testthat/test-results-complement-2002.R`.
+Build/validation: `data-raw/build-canonical-2002.R`,
+`data-raw/validate-complement-2002.R`, `development/rebuild_complement_2002.R`.
+Documentation: `R/api_valresultat.R`, `man/valresultat.Rd`, `README.md`, `NEWS.md`,
+`development/IMPLEMENTATION_2002.md`, `development/SOURCE_INVENTORY_2002.md`,
+`development/VALIDATION_2002.md`.
+
+No public column/identity change, source rewrite, published-asset change,
+preliminary reconstruction, commit, push or release was made. District-level
+candidate/list/preference and XML-specific metadata remain unavailable for the
+three missing exports; observed area/list preference records are preserved.
+The nine undisclosed RD supplement cells and the existing list/person-vote source
+inconsistencies remain documented and unchanged.

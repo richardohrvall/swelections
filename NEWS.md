@@ -1,5 +1,10 @@
 # swelections 0.3.0.9000
 
+* Completes final 2002 RD district party results for Halmstad, Laholm and
+  Kungsbacka using verified SCB/SND inputs reconciled with Valmyndigheten.
+  Postal votes remain outside municipal constituencies; source-specific
+  denominators and unavailable candidate/XML details are preserved.
+
 * Applies the official 2002 RD four-party supplement at disclosed aggregate
   levels, retains unknown cells as NA and preserves all ballot/mandate totals.
   Historical package tarballs are excluded from source-package builds.

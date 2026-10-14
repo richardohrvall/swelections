@@ -96,8 +96,13 @@
 }
 
 .xml2002_documents <- function(sources, val, niva) {
-  if (niva %in% c("valdistrikt", "kommunvalkrets"))
-    return(lapply(.xml2002_files(sources, val, TRUE), function(file) .xml2002_read(sources, file, val)))
+  if (niva %in% c("valdistrikt", "kommunvalkrets")) {
+    coverage <- if (val == "RD") .rd2002_result_coverage(sources) else
+      list(files = .xml2002_files(sources, val, TRUE), missing = character())
+    docs <- lapply(coverage$files, function(file) .xml2002_read(sources, file, val))
+    attr(docs, "rd_complement_municipalities") <- coverage$missing
+    return(docs)
+  }
   doc <- .xml2002_read(sources, .xml2002_files(sources, val), val)
   if (niva != "kommun") return(list(doc))
   nodes <- xml2::xml_find_all(doc, "./NATION/L\u00c4N/KRETS_RIKSDAG/KOMMUN")
@@ -156,6 +161,12 @@
       x
     }) |> purrr::list_rbind()
   }, .progress = progress) |> purrr::list_rbind()
+  complementary <- attr(docs, "rd_complement_municipalities", exact = TRUE)
+  if (length(complementary)) {
+    bundles <- .rd2002_complement(sources, complementary)
+    out <- dplyr::bind_rows(out,
+      purrr::map(bundles, .rd2002_complement_rows, niva = niva) |> purrr::list_rbind())
+  }
   if (!nrow(out)) out <- .valresultat_schema()
   out$partibeteckning[out$ovriga_partier %in% TRUE] <- "\u00d6vriga partier"
   out <- .xml2002_metadata(.komplettera_kommunnamn_2026(out, out$kommunnamn))

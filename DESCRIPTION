@@ -25,6 +25,7 @@ Imports:
     tools,
     utils
 Suggests:
+    haven,
     nanoparquet,
     roxygen2,
     testthat (>= 3.2.0),
