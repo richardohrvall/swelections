@@ -1,5 +1,10 @@
 # swelections 0.3.0.9000
 
+* Recovers 5,852 official 2002 RD district preference observations for Halmstad,
+  Laholm and Kungsbacka from preserved Valmyndigheten HTML. Source rank remains
+  distinct from ballot position and person identity; no other-party candidates
+  or unobserved zero votes are fabricated.
+
 * Completes final 2002 RD district party results for Halmstad, Laholm and
   Kungsbacka using verified SCB/SND inputs reconciled with Valmyndigheten.
   Postal votes remain outside municipal constituencies; source-specific

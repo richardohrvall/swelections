@@ -338,3 +338,128 @@ candidate/list/preference and XML-specific metadata remain unavailable for the
 three missing exports; observed area/list preference records are preserved.
 The nine undisclosed RD supplement cells and the existing list/person-vote source
 inconsistencies remain documented and unchanged.
+
+## Official RD district preference web recovery (14 October 2026)
+
+Valmyndigheten historical HTML now supplies district preference observations
+for Halmstad 1380, Laholm 1381 and Kungsbacka 1384. The original missing municipal
+XML files remain unrecovered; SCB/SND continue to supplement party results only.
+
+The 312 hash-verified pages cover 101 ordinary and three collection units. Each
+of the total/list views adds 5,852 positive observations and 26,835 votes:
+Halmstad 2,951 / 13,171; Laholm 697 / 3,195; Kungsbacka 2,204 / 10,469.
+These views are alternatives, never additive.
+
+RD total-view district coverage becomes 280,612 source rows; list-view coverage
+282,066. Both independently sum to 1,339,888 votes and agree with every one of
+203 constituency/seven-party area totals. All 1,451 official numeric party/list
+controls still pass. Unidentified other-party aggregates are not assigned to
+candidates. The +547 RD aggregate-vs-SCB source difference remains untouched.
+
+Source URLs, response hashes, sizes and retrieval timestamps are included in the
+build's `district_preference_web` provenance. Rank is retained in the original
+source and used only as source information: HTML Nr is not ballot order/identity.
+New list rows therefore have NA ballot order. Names remain typed missing.
+All prior XML source keys remain unchanged; no name-based joins are introduced.
+
+The expected district population is 5,976 ordinary + 290 collection = 6,266.
+All units have verified source arrays. Four explicitly empty collection arrays
+remain empty (R-0512-05, R-1492-18, R-1498-20, R-1762-21), so 6,262 units have
+individual positive observations. There is no missing identified source row in
+this verified population. Full ballot-candidacy population and physical-person
+linkage remain unverified/incomplete separately; these are not vote-row gaps.
+
+Reproducible validation command:
+`Rscript data-raw/validate-preference-web-2002.R RAW_ROOT ASSET_DIRECTORY REFERENCE_DIRECTORY`.
+The independent validator checks preserved HTML directly, all original XML keys
+and counts, source geography/party/list assignment, schema/projection/language
+and raw/canonical equivalence, plus SHA256 equality of all preceding assets.
+
+### Completed rebuild and validation
+
+Final local prototype:
+`.local-data/canonical-build/2002-web-recovery-20261014/`.
+It contains 14 Parquet assets plus `manifest.json`; total Parquet size is
+13,817,649 bytes. Data version remains unpublished `data-v0.0.0`, schema version 2.
+`build_tree_dirty = true` correctly records this uncommitted implementation.
+Manifest SHA256: `77bbdb600d1e50883106b0bc785175821458f33086294dcb6f1e9894a4518a03`.
+
+The only new asset is `rkl2002-preference-votes-district-rd.parquet`, containing
+280,612 total-view and 282,066 list-view rows, discriminated by `.person_view`.
+All 13 previous assets are byte-identical to the approved clean reference.
+The full raw rebuild matches the independently validated asset set and layouts.
+
+PASS results:
+- All 312 source sizes, MD5 and SHA256; all 5,852 recovered records in each view.
+- 1,451 independent party/list controls and 406 constituency/party controls.
+- Every original XML source-row ID/count unchanged; no duplicate keys.
+- Direct public raw/canonical equality in both new RD district views.
+- 16 language/detail/source projection checks and eight actual English/Swedish
+  wrapper comparisons; identical keys/counts/types/shared values.
+- 152 previously supported public outputs unchanged, including candidates,
+  elected/substitute relations, mandates and existing preference views.
+- All 14 asset checksums, English schema round trips and Parquet round trips.
+- 869 original XML checksums, 2,497 protected 2022 sources, 92 historical assets
+  and both protected 15-asset 2006 references unchanged.
+- Full suite: 3,409 passed, ten explicit opt-in skips, no failures or warnings.
+- Final `R CMD check --no-manual --no-vignettes`: zero errors/warnings/notes.
+- `git diff --check`: PASS. No source or Parquet file is tracked.
+
+Four empty collection units were additionally checked using all twelve official
+main/total/list pages and their selected XML. Each has seven explicit zero-list
+preference totals and empty individual arrays. Overall/party preference attributes
+can still be blank: those source fields are not filled with zero. The evidence
+supports no missing *reported individual observations*, not a manufactured
+zero-vote candidate population.
+
+Ballot position is missing for exactly the 5,852 new list-view rows; all 276,214
+original district-list rows retain their reported ballot position. That field gap
+is distinct from the now-complete reported preference-observation population.
+
+No commit, push, tag, release, source rewrite or published-asset change occurred.
+
+## Finalisation of the approved recovery
+
+The latest audit is authoritative for the final completeness statement; see
+[COMPLETENESS_2002.md](COMPLETENESS_2002.md). No further source recovery is part
+of this finalisation. The verified district source population is unchanged:
+6,266 RD units, 280,612 total-view observations and 1,339,888 individually
+reported preference votes. All 5,852 recovered observations / 26,835 votes are
+included once in each separately selected representation, not added to area totals.
+
+The separate exceptions remain explicit:
+- RD 41,523 other-party preference votes remain aggregate-only in 29 areas;
+  RF 13,542 in 52 and KF 8,675 in 108. Candidate/party allocations and the number
+  of underlying observations are unavailable in the inspected sources.
+- The full ballot-candidacy register remains unrecovered; its missing records
+  cannot be enumerated from anonymous result rows. SCB documents that a fuller
+  register existed. Physical-person linkage remains NOT VERIFIED, separately.
+- Zero verified preliminary collection units have been recovered. Complete
+  preliminary results are unsupported; final values do not substitute for them.
+- The original RD municipal XML exports 1380/1381/1384 remain missing source
+  files. Final party results and reported district preferences are nevertheless
+  supplied and validated. XML-specific metadata and the 5,852 undisclosed list
+  positions remain unavailable; HTML Nr remains a preference rank.
+- Nine four-party RD supplement cells remain undisclosed; corrected positive
+  lower-level allocations are not invented. RF/KF list-view source consistency
+  failures and the documented XML/SCB preference differences are unchanged.
+
+The clean-commit rebuild must match all 14 approved recovery Parquet assets
+byte-for-byte, retain the preceding 13 unchanged assets, record its exact Git
+commit and `build_tree_dirty = false`, and pass the existing independent source,
+API/projection, round-trip and checksum validations. The prototype remains local
+and unpublished; committing this implementation does not publish a data release.
+
+Reproducible validation commands (R-only; no new source requests):
+
+```r
+# Invoke with Rscript; directories are local build inputs/outputs.
+# data-raw/build-canonical-2002.R RAW_ROOT EMPTY_OUTPUT_DIRECTORY
+# development/validate_canonical_2002.R RAW_ROOT OUTPUT_DIRECTORY
+# data-raw/validate-preference-web-2002.R RAW_ROOT OUTPUT_DIRECTORY PRE_RECOVERY_REFERENCE
+# data-raw/validate-complement-2002.R RAW_ROOT
+# data-raw/validate-supplement-2002.R RAW_ROOT
+```
+
+Full package tests and `R CMD check --no-manual --no-vignettes` accompany these
+checks. Raw sources and published historical assets are not modified or committed.

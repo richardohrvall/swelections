@@ -32,8 +32,9 @@
     stop("2002 supports source preference-vote areas/districts, not person-linked broader aggregation.", call. = FALSE)
   values <- if (is.null(val)) c("RD", "RF", "KF") else val
   out <- lapply(values, function(v) {
-    files <- .xml2002_files(sources, v, niva == "valdistrikt" || v == "KF")
-    purrr::map(files, function(file) {
+    coverage <- if (v == "RD" && niva == "valdistrikt") .rd2002_result_coverage(sources) else NULL
+    files <- if (is.null(coverage)) .xml2002_files(sources, v, niva == "valdistrikt" || v == "KF") else coverage$files
+    parsed <- purrr::map(files, function(file) {
       doc <- .xml2002_read(sources, file, v)
       register <- .xml2002_register(doc, v, sources = sources)
       areas <- if (niva == "valdistrikt") .xml2002_nodes(doc, niva, v) else .xml2018_personomraden(doc, v)
@@ -80,6 +81,9 @@
         }) |> purrr::list_rbind()
       }) |> purrr::list_rbind()
     }, .progress = progress) |> purrr::list_rbind()
+    if (!is.null(coverage) && length(coverage$missing)) parsed <- dplyr::bind_rows(parsed,
+      .rd2002_preference_web(sources, coverage$missing, per_lista))
+    parsed
   }) |> purrr::list_rbind()
   # No complete ballot/person population exists: preserve explicit zeros only.
   out$partikod[grepl("^source-unresolved:", out$partikod)] <- NA_character_

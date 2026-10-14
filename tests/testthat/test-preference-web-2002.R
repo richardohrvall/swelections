@@ -1,0 +1,21 @@
+test_that('HTML Nr is rank, never candidate identity or ballot position', {
+  doc <- xml2::read_html('<html><body><a name="M-0001-00048"></a><table><tr><th>Header</th></tr><tr><td>Personuppgift borttagen</td><td>1</td><td>10</td><td>10,0</td><td></td></tr><tr><td>Personuppgift borttagen</td><td>2</td><td>5</td><td>5,0</td><td></td></tr><tr><td>Personuppgift borttagen</td><td>2</td><td>5</td><td>5,0</td><td></td></tr></table></body></html>')
+  n <- .rd2002_web_table(doc, 'M-0001-00048')
+  expect_equal(length(n), 3L)
+  expect_identical(xml2::xml_attr(n, 'ORDNING'), c('1','2','2'))
+  expect_true(all(is.na(xml2::xml_attr(n, 'KANDIDAT'))))
+  expect_identical(xml2::xml_attr(n, 'PERSONKRYSS'), c('10','5','5'))
+  expect_error(.rd2002_web_table(doc, 'absent'), 'Missing/duplicate')
+  xml2::xml_add_child(xml2::xml_find_first(doc, './/body'), 'a', name='M-0001-00048')
+  expect_error(.rd2002_web_table(doc, 'M-0001-00048'), 'Missing/duplicate')
+})
+test_that('blank collection/list preference controls remain unknown', {
+  d <- xml2::read_html('<html><body><table><tr><td><a name="personval-M"></a></td></tr><tr><td>Totalt</td><td>11</td><td>2</td><td></td><td></td></tr><tr><td>0001-00048</td><td>8</td><td>2</td><td></td><td></td></tr><tr><td>0001-90000</td><td>3</td><td>&nbsp;</td><td></td><td></td></tr></table></body></html>')
+  c <- .rd2002_web_controls(d)
+  expect_identical(c$preference, c(2L,2L,NA_integer_))
+  expect_identical(c$list, c(NA_character_,'0001-00048','0001-90000'))
+  expect_equal(sum(c$votes[!is.na(c$list)]), c$votes[is.na(c$list)])
+})
+test_that('preserved preference snapshot must be present and hash verified', {
+  expect_error(.rd2002_web_manifest(list(root=tempdir())), 'Missing or changed')
+})

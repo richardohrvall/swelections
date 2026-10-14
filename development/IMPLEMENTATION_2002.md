@@ -180,9 +180,12 @@ values are preserved, never reconciled by changing either source.
 Final party results have complete voting-district and municipality coverage,
 including Halmstad, Laholm and Kungsbacka, supported smaller-party detail and
 residual other-party votes. Combined invalid votes are reported; separate blank
-and other-invalid counts remain missing. District candidate/list/person-vote
-information, original RD collection XML metadata, timestamps and previous-election
-comparison values are not reconstructed. Area-level observed preference-vote
+and other-invalid counts remain missing. SCB/SND do not reconstruct candidate/list/
+person-vote information. The separate Valmyndigheten historical-web adapter now
+supplies reported district preference observations; source rank is not ballot
+position or identity. Original RD collection XML metadata, timestamps, undisclosed
+ballot positions and previous-election comparison values remain unavailable.
+Area-level observed preference-vote
 records and all existing candidate/mandate relationships remain unchanged.
 The absence of verified person identity never discards a source-level preference
 observation. No SCB/SND candidate records are fabricated.

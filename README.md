@@ -197,8 +197,10 @@ Broader person-linked preference-vote aggregation and inferred zeros are
 unsupported. Final RD party-vote results have complete voting-district and
 municipality coverage. They include verified SCB/SND district data for
 Halmstad, Laholm and Kungsbacka, whose municipal XML exports remain unrecovered.
-Their vote totals reconcile with Valmyndigheten; district candidate/list and
-preference-vote details remain unavailable. Some list preference views fail
+Their party totals reconcile with Valmyndigheten. Official historical web pages
+supply the three municipalities' reported district preference observations;
+HTML rank is not ballot position or person identity. XML-specific metadata and
+undisclosed ballot positions remain unavailable. Some RF/KF list preference views fail
 the source's own aggregate checks;
 the official RD four-party supplement corrects national and disclosed constituency
 values. Nine undisclosed constituency cells remain `NA`; county totals require

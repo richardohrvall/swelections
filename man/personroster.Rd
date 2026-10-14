@@ -89,7 +89,10 @@ Partiellt eller oklart underlag ger \code{NA} när raden i övrigt finns;
 oobserverade resultat har ingen rad i en gles vy.
 }
 \description{
-För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
+För 2002 används bevarad officiell slutlig XML och hashverifierade historiska
+Valmyndigheten-sidor för RD-distrikt i Halmstad, Laholm och Kungsbacka.
+HTML-fältet Nr anger personröstrang, inte valsedelsposition eller person-ID.
+Orsas ordinarie val
 den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
 exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar

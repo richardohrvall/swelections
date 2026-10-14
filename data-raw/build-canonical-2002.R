@@ -72,17 +72,19 @@ manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',v
  build_tree_dirty=length(system2('git',c('status','--porcelain'),stdout=TRUE))>0L,
  supplement=jsonlite::read_json(system.file('extdata','rd-2002-party-supplement-provenance.json',package='swelections')),
  complementary_results=lapply(get0("rd-complement-2002", s$cache, inherits=FALSE), function(x) x$provenance),
+ district_preference_web=.rd2002_web_manifest(s),
  sources=s$sources,assets=purrr::list_rbind(assets),tables=purrr::list_rbind(tables),unavailable_views=gaps,
  source_selection=list(final='Valmyndigheten original-election XML is primary; verified SCB/SND complements only three missing RD municipal exports',
   orsa='Original 15 September 2002 XML MD5 3249b5428225a4e6d0c77dbcd1d17340; March 2003 rerun excluded',
   preliminary='Unrecovered collection snapshot; election night remains provenance, never a complete preliminary result',
-  identity='XML source-observation keys, not verified people; no name-based linkage',
+  identity='XML/HTML source-observation keys, not verified people; no name-based linkage',
   names='Typed missing public names; archival names remain source/provenance only',
   candidacies='Complete ballot-candidacy source unrecovered; no candidacies asset fabricated',
   collection_placement='Final RD/RF collection nodes occur under KOMMUN; KF under KRETS_KOMMUN. Both retained once; never used as preliminary inputs',
   other_party_detail='Official four-party RD supplement: national reported sums and 107 constituency values applied; nine undisclosed cells remain NA inside residual other votes. Counties require complete disclosure; municipality/district detail is not allocated',
   other_party_known_zeros='An explicit RD constituency zero corrects existing contained result observations only; no synthetic lower-level zero rows or positive allocations',
   zeros='Explicit observed zeros only; no unsupported missing-candidate zero completion',
+  district_preference='Valmyndigheten historical HTML supplements only missing RD district exports 1380/1381/1384; Nr is rank, not list position or identity; no aggregate-other candidates fabricated',
   invalid='Combined OG retained; separate blank/other-invalid categories remain unknown'))
 jsonlite::write_json(manifest,file.path(out,'manifest.json'),pretty=TRUE,auto_unbox=TRUE,na='null')
 cat('Finished unpublished 2002 prototype:',out,'\n')
