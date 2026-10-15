@@ -57,6 +57,7 @@
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
+#'   EU-valet 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param resultat Om `TRUE`, kompletteras kandidaterna med personröster,
 #'   personval och invaldsuppgifter från slutliga resultatfiler.

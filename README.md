@@ -375,3 +375,24 @@ For the 2003 referendum, standard/full also include
 country whose sum matches Valmyndigheten's `eligible_voters`. They remain typed
 missing at finer levels; no county counts are distributed to districts.
 Blank is a **valid** 2003 voting option and is excluded from `invalid_votes`.
+
+## European Parliament election 2024
+
+All seven functions support `year = 2024, election = "european"` (official
+code `"E"`); Swedish functions use `ar = 2024, val = "E"`.
+`results()` provides national, county, municipality, municipal-constituency and
+district results. EU seats and election qualification apply nationally.
+`preference_votes()` also supports those geographic aggregates and the national
+`"preference_vote_area"`. Qualification is missing in subnational views.
+The preliminary JSON includes collection districts; final data preserve the
+original elected/substitute relations. Blank ballots are invalid, and collection
+units have no independent electorate or turnout.
+
+Use the preserved EU archive through `data_dir` (the `eu/2024` directory or its
+parent), or the official remote source. The local canonical prototype is
+unpublished and requires an explicit manifest; it is not selected automatically.
+The approved later candidate snapshot defines the final population. The earlier
+valid consent-only record for candidate 1203 is retained as historical provenance,
+not silently added to that population; its disappearance has no identified effect
+on party votes, reported preference votes, seats or original elected relations.
+See [the EU source inventory](development/SOURCE_INVENTORY_EU_2024.md).

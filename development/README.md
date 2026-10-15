@@ -119,3 +119,7 @@ CSV/ZIP ignore rules: intentional fixtures, source inventories and lookups are p
 Historical checkpoint numbers and clean/dirty status are evidence of those builds,
 not claims about present source availability. The retained documentation does not
 activate new identity rules or reconcile official source inconsistencies.
+
+- [EU 2024 source inventory](SOURCE_INVENTORY_EU_2024.md),
+  [approved candidacy snapshot exception](EU_2024_CANDIDACY_SNAPSHOT_RECONCILIATION.md)
+  and [implementation/validation](VALIDATION_EU_2024.md).

@@ -1,7 +1,7 @@
 # English argument values are translated once, before entering the existing
 # Swedish API. Geographic support and all source validation remain there.
 .english_argument_values <- list(
-  election = c(parliamentary = "RD", regional = "RF", municipal = "KF",
+  election = c(parliamentary = "RD", regional = "RF", municipal = "KF", european = "E", E = "E",
                RD = "RD", RF = "RF", KF = "KF"),
   count = c(final = "slutlig", preliminary = "preliminar"),
   level = c(
@@ -35,6 +35,10 @@
   if (!year_missing) {
     if (identical(year, "all")) year <- "alla"
     args$ar <- year
+  }
+  if (identical(args$val, "E")) {
+    data <- .eu2024_dispatch(args, year, year_missing, table)
+    return(.public_output_names(.public_detail(data, table, detail, "E"), language))
   }
   broader_preference <- identical(table, "preference_votes") &&
     !is.null(args$niva) &&
@@ -93,6 +97,18 @@
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.
+#'   All seven functions also accept `"european"` / `"E"` for 2024.
+#'   EU results support national, county, municipality, municipal constituency
+#'   and district levels. EU seats are national; preference votes additionally
+#'   support `"preference_vote_area"` (the national election constituency).
+#'   The full preliminary JSON includes collection districts. Blank ballots
+#'   are invalid. Collection units have no electorate or turnout.
+#'   The later approved official candidacy snapshot defines the final population;
+#'   historical consent-only candidate 1203 is preserved as provenance only.
+#'   Original elected/substitute relations are used, never a current roster.
+#'   Local EU input may be the `eu/2024` archive itself or its parent root;
+#'   read-only snapshots do not support `update` or `archive`. Unpublished EU
+#'   canonical builds require an explicitly configured local manifest.
 #' @param count `"final"` or `"preliminary"`.
 #' @param level English geographic level. `NULL` selects the main level for
 #'   the election. Supported combinations depend on election and year;
@@ -174,7 +190,8 @@ results <- function(
 #' @inheritParams results
 #' @param election One or more of `"parliamentary"`, `"regional"` and
 #'   `"municipal"`, or the official codes `"RD"`, `"RF"`, `"KF"`.
-#'   `NULL` selects all supported election types.
+#'   For EU 2024, explicitly select `"european"` or `"E"`; seats are national.
+#'   `NULL` retains the existing RD/RF/KF selection.
 #' @param level One or more English geographic levels, or `NULL` for all
 #'   relevant mandate levels.
 #' @return A tibble with the same rows, values and types as [mandat()].
@@ -325,7 +342,10 @@ substitutes <- function(
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
-#' @param level `"preference_vote_area"` (default), `"district"`,
+#' @param level EU 2024 also supports `"national"`, `"county"`,
+#'   `"municipality"` and `"municipal_constituency"`; qualification is only
+#'   meaningful at the national preference-vote area. Otherwise:
+#'   `"preference_vote_area"` (default), `"district"`,
 #'   `"municipality"` for municipal elections, or `"region"` for regional
 #'   elections. Broader areas aggregate non-overlapping area results and do
 #'   not currently support `by_list = TRUE`.
@@ -343,8 +363,11 @@ preference_votes <- function(
     from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
+  allowed_levels <- c("preference_vote_area", "district", "municipality", "region")
+  if (length(election) == 1L && !is.na(election) && election %in% c("european", "E"))
+    allowed_levels <- c(allowed_levels, "county", "national", "municipal_constituency")
   if (!is.character(level) || length(level) != 1L || is.na(level) ||
-      !level %in% c("preference_vote_area", "district", "municipality", "region")) {
+      !level %in% allowed_levels) {
     stop("Invalid `level`; use preference_vote_area, district, municipality or region.", call. = FALSE)
   }
   .check_flag(by_list, "by_list")

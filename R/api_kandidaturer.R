@@ -22,6 +22,7 @@
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
+#'   EU-valet 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
 #'   För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i

@@ -162,7 +162,7 @@
   data <- .public_geography(data, table, elections)
   if (detail == "full") return(data)
   keep <- intersect(.standard_fields[[table]], names(data))
-  if (!any(elections %in% c("RD", "RF"))) {
+  if (!any(elections %in% c("RD", "RF", "E"))) {
     generic <- c("valkretskod", "valkretsnamn", "kandidatur_valkretskod",
                  "kandidatur_valkretsnamn", "invald_valkretskod",
                  "invald_valkretsnamn")
@@ -171,14 +171,14 @@
   if (table == "substitutes") {
     # RF/KF parents already have specific region/municipality identifiers.
     # RD's surrounding electoral area remains available as source context.
-    if (!"RD" %in% elections)
+    if (!any(elections %in% c("RD", "E")))
       keep <- setdiff(keep, c("valomradeskod", "valomradesnamn"))
   }
   if (table == "preference_votes" && "personvalsomradeskod" %in% names(data)) {
     # These aliases describe the requested preference-vote area, regardless
     # of observed rows. RD/RF may additionally carry distinct municipal context.
     keep <- setdiff(keep, c("valkretskod", "valkretsnamn"))
-    if (!any(elections %in% c("RD", "RF")))
+    if (!any(elections %in% c("RD", "RF", "E")))
       keep <- setdiff(keep, c("kommunvalkretskod", "kommunvalkretsnamn"))
   }
   data[, keep, drop = FALSE]

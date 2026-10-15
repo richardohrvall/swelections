@@ -26,6 +26,7 @@ Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
+EU-valet 2024 väljs uttryckligen med \code{val = "E"}.
 \code{NULL} ger alla.}
 
 \item{rakning}{Exakt en räkning: \code{"slutlig"} eller \code{"preliminar"}.}

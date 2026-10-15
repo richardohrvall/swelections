@@ -1,5 +1,13 @@
 # swelections 0.3.0.9000
 
+* Add European Parliament 2024 (`european` / `E`) across all seven English and
+  Swedish functions, using the original final national result relationships and
+  the complete official preliminary result snapshot. Subnational results and
+  preference votes preserve collection-unit geography and missing electorate.
+* Add an unpublished EU 2024 Parquet build/validation workflow. The approved
+  later candidacy snapshot is complete with the documented historical exception
+  of candidate 1203; his recovered earlier row remains provenance only.
+
 * Adds final 2003 euro referendum results through `results(election = "referendum")`
   and `valresultat(val = "F")`. Valid voting options are separate from parties
   and invalid ballots; Wednesday electorates and turnout remain missing.

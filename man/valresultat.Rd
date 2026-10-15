@@ -34,7 +34,12 @@ summerar exakt till röstberättigade. Gruppvärden på finare nivåer saknas;
 inga länstal fördelas till kommuner eller distrikt.
 Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
 saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
-med \code{final.xml} och \verb{final-municipal/}. Komplett preliminär källa saknas.}
+med \code{final.xml} och \verb{final-municipal/}. Komplett preliminär källa saknas.
+\code{"E"} stöder EU-valet 2024 i alla sju funktioner. Resultat finns för
+riket, län, kommun, kommunvalkrets och valdistrikt; mandat för riket.
+Personvalsområdet är hela riket. Senare officiell kandidatsnapshot används;
+kandidat 1203 i valdagens äldre snapshot bevaras endast som proveniens.
+Blankröster är ogiltiga; uppsamlingsdistrikt saknar egen röstlängd.}
 
 \item{rakning}{Exakt en räkning: \code{"slutlig"} (default) eller \code{"preliminar"}.}
 

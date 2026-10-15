@@ -26,6 +26,7 @@ personroster(
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
+EU-valet 2024 väljs uttryckligen med \code{val = "E"}.
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.

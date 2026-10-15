@@ -60,7 +60,10 @@ typed missing values. Unsupported historical attributes remain missing.}
 
 \item{progress}{Show a progress indicator.}
 
-\item{level}{\code{"preference_vote_area"} (default), \code{"district"},
+\item{level}{EU 2024 also supports \code{"national"}, \code{"county"},
+\code{"municipality"} and \code{"municipal_constituency"}; qualification is only
+meaningful at the national preference-vote area. Otherwise:
+\code{"preference_vote_area"} (default), \code{"district"},
 \code{"municipality"} for municipal elections, or \code{"region"} for regional
 elections. Broader areas aggregate non-overlapping area results and do
 not currently support \code{by_list = TRUE}.}

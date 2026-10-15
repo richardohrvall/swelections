@@ -1,5 +1,6 @@
 # En enda intern förteckning över stödda valår per funktion och valtyp.
 .stodd_valar <- function(funktion, val) {
+  if (identical(val, "E") && funktion %in% c("valresultat", "mandat", "kandidaturer", "kandidater", "personroster", "valda", "ersattare")) return(2024L)
   register <- list(
     valresultat = list(F = 2003L, RD = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L), RF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L),
                       KF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L)),

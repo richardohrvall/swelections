@@ -62,6 +62,7 @@
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
+#'   EU-valet 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param rakning Exakt en räkning: `"slutlig"` eller `"preliminar"`.
 #' @param niva En eller flera geografiska nivåer. RD stöder `"riket"` och
