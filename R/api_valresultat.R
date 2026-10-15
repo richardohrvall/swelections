@@ -38,6 +38,14 @@
 #'   Används som alternativ till `ar`; `fran = 2021, till = 2026` väljer i
 #'   nuläget 2022 och 2026. Utelämnad gräns är öppen.
 #' @param val Exakt en valtyp: `"RD"`, `"RF"` eller `"KF"`. Inte `NULL`.
+#'   `"F"` stöder slutlig folkomröstning 2003 med `rostningsalternativkod/namn`
+#'   i stället för partifält. Blank är giltig; ogiltiga röster redovisas separat.
+#'   SCB:s tre medborgarskaps-/bosättningsgrupper finns för län och riket och
+#'   summerar exakt till röstberättigade. Gruppvärden på finare nivåer saknas;
+#'   inga länstal fördelas till kommuner eller distrikt.
+#'   Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
+#'   saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
+#'   med `final.xml` och `final-municipal/`. Komplett preliminär källa saknas.
 #' @param rakning Exakt en räkning: `"slutlig"` (default) eller `"preliminar"`.
 #' @param niva En geografisk nivå. `NULL` ger valets huvudnivå: RD `"riket"`,
 #'   RF `"region"`, KF `"kommun"`. Se nivåerna nedan.

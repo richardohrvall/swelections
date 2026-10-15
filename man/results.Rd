@@ -27,7 +27,17 @@ Supported years include 2002, 2006, 2010, 2014, 2018, 2022 and 2026, subject to 
 election, geographic level and count stage.}
 
 \item{election}{\code{"parliamentary"}, \code{"regional"} or \code{"municipal"};
-official codes \code{"RD"}, \code{"RF"} and \code{"KF"} are also accepted.}
+official codes \code{"RD"}, \code{"RF"} and \code{"KF"} are also accepted.
+\code{results()} also accepts \code{"referendum"} or \code{"F"} for final 2003 results.
+Referendum rows use \code{voting_option_code/name}, not party fields. Blank is
+valid; invalid ballots are separate. District output includes ordinary and
+Wednesday units (\code{district_type}); Wednesday electorate/turnout are missing.
+Local 2003 input is the preserved directory containing \code{final.xml} and
+\verb{final-municipal/}; complete preliminary results are not supported.
+County/national referendum results also include three SCB electorate groups:
+\code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
+and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
+Components are missing at finer levels; counts are never allocated downward.}
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}
 
@@ -100,7 +110,7 @@ Candidate numbers in 2006 identify source observations rather than people.
 See the repository's 2006 implementation documentation for source limitations.
 }
 \details{
-Read official party results at one geographic level and one count stage.
+Read official voting results at one geographic level and one count stage.
 The English interface calls \code{\link[=valresultat]{valresultat()}} and translates column names
 only; source values and data values are unchanged.
 }

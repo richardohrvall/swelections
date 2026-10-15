@@ -25,7 +25,7 @@
 }
 
 .swedish_public_call <- function(fun, args, ar, ar_missing, names, detaljniva) {
-  if (!is.null(args$election)) args$election <- .valtyper(args$election)
+  if (!is.null(args$election) && !(identical(fun, results) && identical(args$election, "F"))) args$election <- .valtyper(args$election)
   if (!ar_missing) args$year <- if (identical(ar, "alla")) "all" else ar
   args$names <- names
   args$detail <- detaljniva

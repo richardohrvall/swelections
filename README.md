@@ -336,3 +336,42 @@ MIT
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor setup, the
 [development index](development/README.md) for reproducible validation and source
 methodology, and [source references](references/README.md) for official specifications.
+## Final 2003 referendum results
+
+`results(year = 2003, election = "referendum")` reads the final euro referendum
+(short code `"F"`; Swedish: `valresultat(ar = 2003, val = "F")`).
+The rows describe voting options through `voting_option_code` and
+`voting_option_name`, without party columns. Ja, Nej and Blank are valid ballot
+categories; invalid ballots are reported separately. Geographic totals repeat
+on option rows and must not be summed across options.
+
+```r
+results(2003, election = "referendum", level = "municipality")
+results(2003, election = "referendum", level = "district")
+```
+
+Final coverage includes all 290 municipalities, 5,976 ordinary districts and
+396 Wednesday units, plus national, county and parliamentary-constituency
+aggregates. `municipal_constituency` returns the 185 actual constituencies in
+79 divided municipalities; technical `00` containers in 211 undivided
+municipalities do not create public constituencies. District output identifies
+ordinary/Wednesday units with `district_type`. Wednesday units have no own
+eligible-voter denominator or turnout.
+
+Valmyndigheten XML is authoritative; SND and SCB tables validate the results.
+The unavailable historical SCB publication does not block the verified final
+counts. A full preliminary Wednesday snapshot has not been recovered, so
+`count = "preliminary"` errors rather than returning election-night data.
+For local sources, `data_dir` is the preserved source directory containing
+`final.xml`, `final-municipal/` and, when available, `source-manifest.json`.
+An unpublished canonical build requires an explicitly configured manifest;
+`auto` chooses suitable local raw data and otherwise the official remote source.
+See [the 2003 inventory](development/SOURCE_INVENTORY_2003.md) and
+[validation documentation](development/VALIDATION_2003.md).
+
+For the 2003 referendum, standard/full also include
+`eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad` and
+`eligible_foreign_citizens`. These are verified SCB counts for counties and the
+country whose sum matches Valmyndigheten's `eligible_voters`. They remain typed
+missing at finer levels; no county counts are distributed to districts.
+Blank is a **valid** 2003 voting option and is excluded from `invalid_votes`.

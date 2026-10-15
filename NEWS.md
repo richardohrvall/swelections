@@ -1,5 +1,9 @@
 # swelections 0.3.0.9000
 
+* Adds final 2003 euro referendum results through `results(election = "referendum")`
+  and `valresultat(val = "F")`. Valid voting options are separate from parties
+  and invalid ballots; Wednesday electorates and turnout remain missing.
+
 * Recovers 5,852 official 2002 RD district preference observations for Halmstad,
   Laholm and Kungsbacka from preserved Valmyndigheten HTML. Source rank remains
   distinct from ballot position and person identity; no other-party candidates

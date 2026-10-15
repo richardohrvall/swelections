@@ -73,7 +73,7 @@
 #' Candidate numbers in 2006 identify source observations rather than people.
 #' See the repository's 2006 implementation documentation for source limitations.
 #'
-#' Read official party results at one geographic level and one count stage.
+#' Read official voting results at one geographic level and one count stage.
 #' The English interface calls [valresultat()] and translates column names
 #' only; source values and data values are unchanged.
 #'
@@ -83,6 +83,16 @@
 #'   election, geographic level and count stage.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
+#'   `results()` also accepts `"referendum"` or `"F"` for final 2003 results.
+#'   Referendum rows use `voting_option_code/name`, not party fields. Blank is
+#'   valid; invalid ballots are separate. District output includes ordinary and
+#'   Wednesday units (`district_type`); Wednesday electorate/turnout are missing.
+#'   Local 2003 input is the preserved directory containing `final.xml` and
+#'   `final-municipal/`; complete preliminary results are not supported.
+#'   County/national referendum results also include three SCB electorate groups:
+#'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
+#'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
+#'   Components are missing at finer levels; counts are never allocated downward.
 #' @param count `"final"` or `"preliminary"`.
 #' @param level English geographic level. `NULL` selects the main level for
 #'   the election. Supported combinations depend on election and year;
@@ -145,6 +155,10 @@ results <- function(
     from = NULL, to = NULL, names = NULL, detail = "standard"
 ) {
   year_missing <- missing(year)
+  if (is.character(election) && length(election) == 1L &&
+      !is.na(election) && election %in% c("referendum", "F"))
+    return(.referendum2003_results(year, year_missing, from, to, count, level,
+      source, data_dir, update, archive, progress, names, detail))
   .english_call(.raw_public_api$valresultat, list(
     val = election, rakning = .english_argument_value(count, "count"),
     niva = .english_argument_value(level, "level", nullable = TRUE),

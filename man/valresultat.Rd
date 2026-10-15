@@ -26,7 +26,15 @@ valresultat(
 den först angivna årsordningen bevarad. Standard är 2026 när inga
 intervallgränser anges.}
 
-\item{val}{Exakt en valtyp: \code{"RD"}, \code{"RF"} eller \code{"KF"}. Inte \code{NULL}.}
+\item{val}{Exakt en valtyp: \code{"RD"}, \code{"RF"} eller \code{"KF"}. Inte \code{NULL}.
+\code{"F"} stöder slutlig folkomröstning 2003 med \code{rostningsalternativkod/namn}
+i stället för partifält. Blank är giltig; ogiltiga röster redovisas separat.
+SCB:s tre medborgarskaps-/bosättningsgrupper finns för län och riket och
+summerar exakt till röstberättigade. Gruppvärden på finare nivåer saknas;
+inga länstal fördelas till kommuner eller distrikt.
+Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
+saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
+med \code{final.xml} och \verb{final-municipal/}. Komplett preliminär källa saknas.}
 
 \item{rakning}{Exakt en räkning: \code{"slutlig"} (default) eller \code{"preliminar"}.}
 
