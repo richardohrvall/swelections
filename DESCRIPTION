@@ -27,6 +27,7 @@ Imports:
 Suggests:
     haven,
     nanoparquet,
+    readxl,
     roxygen2,
     testthat (>= 3.2.0),
     withr

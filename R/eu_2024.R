@@ -215,7 +215,7 @@
   .eu2024_preference_view(base, level, kd, by_list, zeros, ids)
 }
 
-.eu2024_preference_view <- function(base, level, kd, by_list, zeros, ids) {
+.eu2024_preference_view <- function(base, level, kd, by_list, zeros, ids, year = 2024L) {
   key <- c('.geo', 'partikod', 'listnummer', 'kandidatnummer')
   votes <- base$votes[c(key, 'antal_personroster', 'kandidatnamn_lista')]
   if (zeros) {
@@ -249,8 +249,8 @@
   # Ineligible source rows retain the official result placeholder, not an invented name.
   out$namn <- dplyr::coalesce(out$kandidatnamn_lista, out$namn)
   out <- dplyr::left_join(out, base$context, by = '.geo', relationship = 'many-to-one')
-  out$valtillfalle <- 'EU-val_2024'; out$valar <- 2024L; out$valtyp <- 'E'
-  out$geografiniva <- level; out$rakningstillfalle <- 'slutlig'; out$valdatum <- '2024-06-09'
+  out$valtillfalle <- paste0('EU-val_', year); out$valar <- as.integer(year); out$valtyp <- 'E'
+  out$geografiniva <- level; out$rakningstillfalle <- 'slutlig'; out$valdatum <- if (year == 2019L) '2019-05-26' else '2024-06-09'
   out$andel_personroster <- .exakt_andel_2026(out$antal_personroster, out$antal_partiroster)
   if (by_list) {
     out$andel_personroster_lista <- .exakt_andel_2026(out$antal_personroster, out$antal_listroster)
@@ -325,7 +325,7 @@
 }
 
 .eu2024_dispatch <- function(args, year, year_missing, table) {
-  .resolve_valar(if (identical(year, 'all')) 'alla' else if (year_missing &&
+  years <- .resolve_valar(if (identical(year, 'all')) 'alla' else if (year_missing &&
     is.null(args$fran) && is.null(args$till)) 2024L else year,
     args$fran, args$till, c(results='valresultat', seats='mandat',
       candidacies='kandidaturer', candidates='kandidater', elected='valda',
@@ -333,8 +333,10 @@
   args$source <- match.arg(args$source, c('auto', 'local', 'remote', 'canonical'))
   for (flag in c('update', 'archive', 'progress', 'resultat'))
     if (!is.null(args[[flag]])) .check_flag(args[[flag]], flag)
-  if (isTRUE(args$update) || isTRUE(args$archive)) stop('EU 2024 snapshots are read-only; preserve updates separately.', call. = FALSE)
+  if (isTRUE(args$update) || isTRUE(args$archive)) stop('EU snapshots are read-only; preserve updates separately.', call. = FALSE)
   if (!is.null(args$rakning) && (length(args$rakning) != 1L || !args$rakning %in% c('slutlig', 'preliminar'))) stop('Unknown EU count stage.', call. = FALSE)
-  if (args$source == 'canonical') return(.eu2024_canonical(table, args))
-  .eu2024_read(table, args)
+  return(purrr::list_rbind(lapply(years, function(y) {
+    if (args$source == 'canonical') return(if (y == 2019L) .eu2019_canonical(table, args) else .eu2024_canonical(table, args))
+    if (y == 2019L) .eu2019_read(table, args) else .eu2024_read(table, args)
+  })))
 }

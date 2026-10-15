@@ -13,7 +13,8 @@ eu2024_kd_fixture <- function() tibble::tibble(partikod='0001',kandidatnummer=c(
 test_that('EU public dispatch is shared across all seven interfaces and years', {
  fixture <- tibble::tibble(valar=2024L,valtyp='E',kandidatnummer='1',namn='A',
    partikod='0001',antal_roster=10L,antal_personroster=3L,valklass='ordinarie val')
- local_mocked_bindings(.eu2024_read=function(table,args) fixture)
+ local_mocked_bindings(.eu2024_read=function(table,args) fixture,
+   .eu2019_read=function(table,args) dplyr::mutate(fixture,valar=2019L))
  en <- c('results','seats','candidacies','candidates','elected','substitutes','preference_votes')
  sv <- c('valresultat','mandat','kandidaturer','kandidater','valda','ersattare','personroster')
  for(i in seq_along(en)) {
@@ -22,7 +23,7 @@ test_that('EU public dispatch is shared across all seven interfaces and years', 
    expect_identical(a,.public_output_names(b,'en'))
    st <- do.call(get(en[i]),list(year=2024,election='E',source='local'))
    expect_identical(st,a[names(st)])
-   expect_identical(do.call(get(en[i]),list(year='all',election='E',source='local',detail='full')),a)
+   expect_identical(do.call(get(en[i]),list(year='all',election='E',source='local',detail='full')),dplyr::bind_rows(dplyr::mutate(a,election_year=2019L),a))
    expect_identical(do.call(get(en[i]),list(from=2023,to=2025,election='E',source='local',detail='full')),a)
  }
  expect_error(results(2022,election='E'), '2022')
@@ -50,7 +51,7 @@ test_that('EU list totals guard zero completion and never propagate qualificatio
 test_that('EU candidate snapshot completeness is bound to approved content hashes', {
  expect_length(.eu2024_candidate_hashes,2L)
  expect_false('c47cd8e967c4dbc72d3fd7293aea1199c103c005729eb1c3cd64a456768c5375' %in% .eu2024_candidate_hashes)
- expect_identical(.stodd_valar('kandidaturer','E'),2024L)
+ expect_identical(.stodd_valar('kandidaturer','E'),c(2019L,2024L))
  expect_identical(.english_argument_value('european','election'),'E')
 })
 

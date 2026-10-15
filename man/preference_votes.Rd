@@ -60,7 +60,7 @@ typed missing values. Unsupported historical attributes remain missing.}
 
 \item{progress}{Show a progress indicator.}
 
-\item{level}{EU 2024 also supports \code{"national"}, \code{"county"},
+\item{level}{EU 2019/2024 also supports \code{"national"}, \code{"county"},
 \code{"municipality"} and \code{"municipal_constituency"}; qualification is only
 meaningful at the national preference-vote area. Otherwise:
 \code{"preference_vote_area"} (default), \code{"district"},

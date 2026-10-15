@@ -1,5 +1,14 @@
 # swelections 0.3.0.9000
 
+* Add European Parliament 2019 across all seven interfaces, using preserved
+  original final/preliminary XML and the reconciled electorate snapshot.
+  Final handwritten-party detail is separated from the ten-party preliminary
+  presentation. Preserve all reported preference votes, including invalid
+  candidacies, without conflating party-specific candidate records.
+* Add an unpublished 15-asset EU 2019 canonical workflow and independent
+  XML/SCB/Excel validation. Original 20-seat election relationships remain
+  separate from subsequent mandate-period changes.
+
 * Add European Parliament 2024 (`european` / `E`) across all seven English and
   Swedish functions, using the original final national result relationships and
   the complete official preliminary result snapshot. Subnational results and

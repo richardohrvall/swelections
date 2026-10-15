@@ -219,3 +219,19 @@ this work. The release procedure is:
    replace published assets in place; a change requires a new data version.
 5. Test explicit canonical and `auto` with no local raw archive against the
    published release, then record the release URL and checksums.
+
+## European Parliament 2019 local prototype
+
+The 2019 build follows the existing EU asset inventory (15 Parquet files) and
+English schema version 2. Run `data-raw/build-canonical-eu-2019.R` with a preserved
+raw archive and an empty output directory. The manifest pins six official source
+inputs, includes sizes/hashes/acquisition metadata, and records the build SHA and
+clean/dirty state. It remains unpublished and ineligible for automatic canonical
+selection. Explicit canonical reads require a configured local build manifest.
+
+Final and preliminary party detail intentionally differ: the complete preliminary
+XML identifies ten parties and an other-party aggregate. Final handwritten-party
+votes replace the matching XML residual and are never mixed into preliminary
+results. Original 20-seat relationships exclude subsequent Brexit changes.
+See [COMPLETENESS_EU_2019.md](COMPLETENESS_EU_2019.md) for exact populations,
+source selection, missing source attributes and independent R validation commands.

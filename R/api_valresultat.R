@@ -46,7 +46,7 @@
 #'   Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
 #'   saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
 #'   med `final.xml` och `final-municipal/`. Komplett preliminär källa saknas.
-#'   `"E"` stöder EU-valet 2024 i alla sju funktioner. Resultat finns för
+#'   `"E"` stöder EU-valen 2019 och 2024 i alla sju funktioner. Resultat finns för
 #'   riket, län, kommun, kommunvalkrets och valdistrikt; mandat för riket.
 #'   Personvalsområdet är hela riket. Senare officiell kandidatsnapshot används;
 #'   kandidat 1203 i valdagens äldre snapshot bevaras endast som proveniens.

@@ -97,7 +97,7 @@
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.
-#'   All seven functions also accept `"european"` / `"E"` for 2024.
+#'   All seven functions also accept `"european"` / `"E"` for 2019 and 2024.
 #'   EU results support national, county, municipality, municipal constituency
 #'   and district levels. EU seats are national; preference votes additionally
 #'   support `"preference_vote_area"` (the national election constituency).
@@ -106,6 +106,11 @@
 #'   The later approved official candidacy snapshot defines the final population;
 #'   historical consent-only candidate 1203 is preserved as provenance only.
 #'   Original elected/substitute relations are used, never a current roster.
+#'   EU 2019 uses preserved original XML, the official handwritten-party
+#'   supplement and the final-compatible electorate SKV; raw XLS reading
+#'   requires optional `readxl`. Public redacted candidate names are `NA`.
+#'   Preliminary 2019 results retain ten named parties plus other parties.
+#'   The fixed final result has 20 seats; later Brexit changes are excluded.
 #'   Local EU input may be the `eu/2024` archive itself or its parent root;
 #'   read-only snapshots do not support `update` or `archive`. Unpublished EU
 #'   canonical builds require an explicitly configured local manifest.
@@ -190,7 +195,7 @@ results <- function(
 #' @inheritParams results
 #' @param election One or more of `"parliamentary"`, `"regional"` and
 #'   `"municipal"`, or the official codes `"RD"`, `"RF"`, `"KF"`.
-#'   For EU 2024, explicitly select `"european"` or `"E"`; seats are national.
+#'   For EU 2019/2024, explicitly select `"european"` or `"E"`; seats are national.
 #'   `NULL` retains the existing RD/RF/KF selection.
 #' @param level One or more English geographic levels, or `NULL` for all
 #'   relevant mandate levels.
@@ -342,7 +347,7 @@ substitutes <- function(
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
-#' @param level EU 2024 also supports `"national"`, `"county"`,
+#' @param level EU 2019/2024 also supports `"national"`, `"county"`,
 #'   `"municipality"` and `"municipal_constituency"`; qualification is only
 #'   meaningful at the national preference-vote area. Otherwise:
 #'   `"preference_vote_area"` (default), `"district"`,

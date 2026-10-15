@@ -57,6 +57,30 @@ library(swelections)
 `remotes::install_github("richardohrvall/swelections")` is another option if
 you use `remotes`.
 
+## European Parliament elections
+
+All seven functions support the 2019 and 2024 elections with explicit
+`election = "european"` (or `"E"`). The default EU year is 2024; select 2019
+explicitly or use `year = "all"`. Swedish calls use `val = "E"`.
+
+EU 2019 final and complete preliminary results use the preserved official XML.
+Raw builds require the pinned preserved archive; a local canonical build can
+also be selected explicitly. See the source documentation for required inputs.
+Final results include the separately reported handwritten-party votes.
+Preliminary results retain ten named parties plus aggregated other parties.
+The fixed 2019 allocation is 20 seats, before the subsequent Brexit change.
+Public 2019 candidate names are `NA`, consistent with the official redacted file.
+Candidate numbers identify official election records, not verified physical
+persons across elections. Wednesday units have no independent electorate or
+turnout. See [2019 coverage and provenance](development/COMPLETENESS_EU_2019.md).
+
+```r
+results(2019, election = "european", count = "final", level = "municipality",
+        source = "local", data_dir = "my_archive")
+preference_votes(2019, election = "european", level = "district",
+                 source = "local", data_dir = "my_archive")
+```
+
 ## Getting started
 
 The English `election` values are `"parliamentary"`, `"regional"` and

@@ -123,3 +123,9 @@ activate new identity rules or reconcile official source inconsistencies.
 - [EU 2024 source inventory](SOURCE_INVENTORY_EU_2024.md),
   [approved candidacy snapshot exception](EU_2024_CANDIDACY_SNAPSHOT_RECONCILIATION.md)
   and [implementation/validation](VALIDATION_EU_2024.md).
+
+- [EU 2019 source inventory](SOURCE_INVENTORY_EU_2019.md),
+  [explicit completeness and schema decisions](COMPLETENESS_EU_2019.md), and
+  [independent XML/SCB/Excel and canonical validation](VALIDATION_EU_2019.md).
+  The unpublished build uses original 20-seat final relations, complete
+  preliminary XML and the reconciled electorate snapshot.
