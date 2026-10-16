@@ -264,3 +264,13 @@
   2026 rehearsal files. Preliminary and O sources remain fixture-tested only.
 
 This is an experimental first release focused on the 2026 election.
+
+## EU2009 development support
+
+- Add the fixed final EU2009 result, original18 mandates/elected and substitute
+  relations, archived named500 ballot positions and preserved small-party
+  preference source observations. Generated keys are source/candidacy coordinates,
+  not person IDs. Preserve the documented small-party numerical discrepancies,
+  three handwritten votes with unreported designations and absence of verified
+  full preliminary Wednesday data. Add unpublished R-only canonical build and
+  independent validation tooling; existing releases remain unchanged.

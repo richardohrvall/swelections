@@ -26,7 +26,7 @@ personroster(
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
-EU-valen 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"}.
+EU-valen 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"}.
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
@@ -168,6 +168,14 @@ För 2010 används bevarade slutliga XML-/valsedelskällor och samma
 historiska normalisering som 2014. Publika kandidatnamn är saknade.
 Preliminära resultat kräver en komplett separat officiell
 uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
+
+EU 2009: funktionen visar rapporterade kandidat-/källobservationer, inte
+en officiell totalrad för alla partier. Den avstämda officiella totalen är
+1 876 785 (huvudpartierna 1 874 130 + officiellt småpartiaggregat 2 655).
+De nationella kandidatraderna summerar till 1 876 795 eftersom källans
+småpartikolumner summerar till 2 665. Skillnaden på tio röster är en
+olöst källinkonsistens. Kandidatvärdena bevaras; radsumman är inte den
+officiella totalen.
 }
 \examples{
 \dontrun{

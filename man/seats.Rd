@@ -28,7 +28,7 @@ election, geographic level and count stage.}
 
 \item{election}{One or more of \code{"parliamentary"}, \code{"regional"} and
 \code{"municipal"}, or the official codes \code{"RD"}, \code{"RF"}, \code{"KF"}.
-For EU 2014/2019/2024, explicitly select \code{"european"} or \code{"E"}; seats are national.
+For EU 2009/2014/2019/2024, explicitly select \code{"european"} or \code{"E"}; seats are national.
 \code{NULL} retains the existing RD/RF/KF selection.}
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}

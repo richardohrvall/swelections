@@ -38,7 +38,7 @@ County/national referendum results also include three SCB electorate groups:
 \code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
 and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
 Components are missing at finer levels; counts are never allocated downward.
-All seven functions also accept \code{"european"} / \code{"E"} for 2014, 2019 and 2024.
+All seven functions also accept \code{"european"} / \code{"E"} for 2009, 2014, 2019 and 2024.
 EU results support national, county, municipality, municipal constituency
 and district levels. EU seats are national; preference votes additionally
 support \code{"preference_vote_area"} (the national election constituency).
@@ -47,6 +47,13 @@ are invalid. Collection units have no electorate or turnout.
 For EU 2024, the later approved official candidacy snapshot defines the final population;
 historical consent-only candidate 1203 is preserved as provenance only.
 Original elected/substitute relations are used, never a current roster.
+EU 2009 uses preserved original final XML and archived named ballot XML.
+Its 500 candidate keys identify list positions, not distinct physical persons.
+Small-party workbook columns retain separate source-observation keys and
+unknown list positions. National small-party candidate sums (2,665) differ
+from the official aggregate (2,655); county/municipal sums are 2,677.
+Values are preserved without name-based deduplication or inferred Wednesday
+allocation. Complete preliminary results are not verified and give an error.
 EU 2014 uses the preserved original final XML with geographic names;
 complete preliminary results are unavailable and give an error. Its valid
 handwritten-vote residual remains an other-party category with no invented

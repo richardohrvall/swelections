@@ -59,8 +59,8 @@ you use `remotes`.
 
 ## European Parliament elections
 
-All seven functions support the 2014, 2019 and 2024 elections with explicit
-`election = "european"` (or `"E"`). The default EU year is 2024; select 2014 or 2019
+All seven functions support the 2009, 2014, 2019 and 2024 elections with explicit
+`election = "european"` (or `"E"`). The default EU year is 2024; select 2009, 2014 or 2019
 explicitly or use `year = "all"`. Swedish calls use `val = "E"`.
 
 EU 2019 final and complete preliminary results use the preserved official XML.
@@ -431,3 +431,21 @@ valid consent-only record for candidate 1203 is retained as historical provenanc
 not silently added to that population; its disappearance has no identified effect
 on party votes, reported preference votes, seats or original elected relations.
 See [the EU source inventory](development/SOURCE_INVENTORY_EU_2024.md).
+
+### European Parliament 2009
+
+The final 2009 EU result is supported through all seven functions using preserved
+original sources or a configured unpublished canonical build. Archived ballot XML
+provides 500 named list positions; these are not 500 verified distinct persons.
+Generated `candidate_number` keys identify ballot positions or independent
+small-party preference source columns. Unlinked candidate enrichment stays missing.
+The reconciled official preference-vote total is **1,876,785**: the main-party
+component of 1,874,130 plus the official small-party aggregate of 2,655.
+`preference_votes()` returns source-reported candidate observations, not an
+official all-party total row. Its national candidate rows sum to **1,876,795**,
+because the small-party candidate columns total 2,665, an unresolved ten-vote
+source inconsistency. That row sum must not be described as the official total.
+The small-party source reports inconsistent national/county/municipal preference
+sums, which are preserved without inferred corrections. Complete preliminary
+Wednesday results are not verified; election-night results are not substituted.
+See the [2009 completeness statement](development/COMPLETENESS_EU_2009.md).

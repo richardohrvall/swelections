@@ -23,7 +23,7 @@ valda(
 Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.}
 
 \item{val}{En eller flera valtyper: \code{"RD"}, \code{"RF"} eller \code{"KF"}.
-EU-valen 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"}.
+EU-valen 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"}.
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.

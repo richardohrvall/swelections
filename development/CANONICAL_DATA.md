@@ -239,3 +239,17 @@ source selection, missing source attributes and independent R validation command
 ## EU 2014 unpublished prototype
 
 Use the pinned original final XML with geographic names; the current ZIP has redacted place names. The R-only builder is data-raw/build-canonical-eu-2014.R and the public/source validation entry point is data-raw/validate-eu-2014.R. Fourteen English Parquet assets are expected: final results/seats, candidacies/candidates/elected/substitutes, candidate base, six preference bases, and exact source designations. No release or auto eligibility is enabled. Full-only source_votes_without_party_designation identifies the ten valid Vårdsberg votes without assigning them to a party. See development/COMPLETENESS_EU_2014.md and development/VALIDATION_EU_2014.md.
+
+## EU 2009
+
+All seven English/Swedish interfaces support the fixed final2009 EU result from
+pinned preserved originals. See [completeness](COMPLETENESS_EU_2009.md) and
+[validation](VALIDATION_EU_2009.md). The unpublished local prototype has14 English
+schema2 Parquet assets: `eu2009-results-final`, `eu2009-seats-final`,
+`eu2009-candidacies`, `eu2009-candidates`, `eu2009-elected`, `eu2009-substitutes`,
+`eu2009-candidate-base`, `eu2009-source-designations`, and
+`eu2009-preference-base-{area,national,county,municipality,municipal-constituency,district}`,
+all with `.parquet` suffix. The manifest records source and asset SHA256/size,
+original/archive URL, source-selection semantics, Git SHA and actual dirty status.
+No2009 release is published or auto-eligible. No complete preliminary Wednesday
+result is inferred from the election-night archive.

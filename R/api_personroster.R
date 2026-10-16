@@ -84,7 +84,7 @@
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till
 #'   `ar`. En utelämnad gräns är öppen.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
-#'   EU-valen 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
+#'   EU-valen 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
 #'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
@@ -132,6 +132,14 @@
 #'   kräver komplett listunderlag eller ett fullständigt avstämt slutresultat.
 #'   Partiellt eller oklart underlag ger `NA` när raden i övrigt finns;
 #'   oobserverade resultat har ingen rad i en gles vy.
+#' @details
+#' EU 2009: funktionen visar rapporterade kandidat-/källobservationer, inte
+#' en officiell totalrad för alla partier. Den avstämda officiella totalen är
+#' 1 876 785 (huvudpartierna 1 874 130 + officiellt småpartiaggregat 2 655).
+#' De nationella kandidatraderna summerar till 1 876 795 eftersom källans
+#' småpartikolumner summerar till 2 665. Skillnaden på tio röster är en
+#' olöst källinkonsistens. Kandidatvärdena bevaras; radsumman är inte den
+#' officiella totalen.
 #' @examples
 #' \dontrun{
 #' personroster(val = "RD", source = "local", data_dir = "mitt_arkiv")

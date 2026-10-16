@@ -131,3 +131,8 @@ activate new identity rules or reconcile official source inconsistencies.
   preliminary XML and the reconciled electorate snapshot.
 
 - [EU 2014 coverage](COMPLETENESS_EU_2014.md), [validation](VALIDATION_EU_2014.md) and [source inventory](SOURCE_INVENTORY_EU_2014.md).
+
+EU2009: [source inventory](SOURCE_INVENTORY_EU_2009.md),
+[completeness](COMPLETENESS_EU_2009.md), [validation](VALIDATION_EU_2009.md).
+The source keys describe ballot positions or independent preference columns,
+not asserted physical-person identities.

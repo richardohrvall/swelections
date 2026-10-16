@@ -60,7 +60,7 @@ typed missing values. Unsupported historical attributes remain missing.}
 
 \item{progress}{Show a progress indicator.}
 
-\item{level}{EU 2014/2019/2024 also supports \code{"national"}, \code{"county"},
+\item{level}{EU 2009/2014/2019/2024 also supports \code{"national"}, \code{"county"},
 \code{"municipality"} and \code{"municipal_constituency"}; qualification is only
 meaningful at the national preference-vote area. Otherwise:
 \code{"preference_vote_area"} (default), \code{"district"},
@@ -98,6 +98,15 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=personroster]{personroster()}}.
 }
 \description{
+For EU 2009, this function returns preserved candidate/source observations,
+not an official all-party aggregate row. The reconciled official total is
+1,876,785: 1,874,130 for the main eleven parties plus the official small-party
+aggregate of 2,655. The national candidate rows instead sum to 1,876,795:
+small-party source columns report 2,665, an unresolved source inconsistency
+of ten votes. Do not label that candidate-row sum as the official total.
+Values remain source-reported and are not adjusted to force agreement.
+}
+\details{
 For 2006, rows identify observed source records, not linked persons.
 \code{include_zeros} adds no unsupported combinations; explicit zeros remain.
 Area and list views are alternative representations, not additive totals.
