@@ -129,3 +129,5 @@ activate new identity rules or reconcile official source inconsistencies.
   [independent XML/SCB/Excel and canonical validation](VALIDATION_EU_2019.md).
   The unpublished build uses original 20-seat final relations, complete
   preliminary XML and the reconciled electorate snapshot.
+
+- [EU 2014 coverage](COMPLETENESS_EU_2014.md), [validation](VALIDATION_EU_2014.md) and [source inventory](SOURCE_INVENTORY_EU_2014.md).

@@ -250,7 +250,7 @@
   out$namn <- dplyr::coalesce(out$kandidatnamn_lista, out$namn)
   out <- dplyr::left_join(out, base$context, by = '.geo', relationship = 'many-to-one')
   out$valtillfalle <- paste0('EU-val_', year); out$valar <- as.integer(year); out$valtyp <- 'E'
-  out$geografiniva <- level; out$rakningstillfalle <- 'slutlig'; out$valdatum <- if (year == 2019L) '2019-05-26' else '2024-06-09'
+  out$geografiniva <- level; out$rakningstillfalle <- 'slutlig'; out$valdatum <- switch(as.character(year), `2014`='2014-05-25', `2019`='2019-05-26', `2024`='2024-06-09')
   out$andel_personroster <- .exakt_andel_2026(out$antal_personroster, out$antal_partiroster)
   if (by_list) {
     out$andel_personroster_lista <- .exakt_andel_2026(out$antal_personroster, out$antal_listroster)
@@ -336,7 +336,7 @@
   if (isTRUE(args$update) || isTRUE(args$archive)) stop('EU snapshots are read-only; preserve updates separately.', call. = FALSE)
   if (!is.null(args$rakning) && (length(args$rakning) != 1L || !args$rakning %in% c('slutlig', 'preliminar'))) stop('Unknown EU count stage.', call. = FALSE)
   return(purrr::list_rbind(lapply(years, function(y) {
-    if (args$source == 'canonical') return(if (y == 2019L) .eu2019_canonical(table, args) else .eu2024_canonical(table, args))
-    if (y == 2019L) .eu2019_read(table, args) else .eu2024_read(table, args)
+    if (args$source == 'canonical') return(if (y == 2014L) .eu2014_canonical(table, args) else if (y == 2019L) .eu2019_canonical(table, args) else .eu2024_canonical(table, args))
+    if (y == 2014L) .eu2014_read(table, args) else if (y == 2019L) .eu2019_read(table, args) else .eu2024_read(table, args)
   })))
 }

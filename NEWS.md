@@ -1,3 +1,11 @@
+# Development
+
+- Add EU2014 final results, original mandates/elected/substitutes, documented
+  candidacies and all reported candidate preferences. Retain the ten unidentified
+  handwritten votes in the official other-party category, with full-only source
+  disclosure metadata and separate source-designation provenance. No complete
+  preliminary result or physical-person identity is inferred.
+
 # swelections 0.3.0.9000
 
 * Add European Parliament 2019 across all seven interfaces, using preserved

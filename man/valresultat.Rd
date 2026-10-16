@@ -35,11 +35,15 @@ inga länstal fördelas till kommuner eller distrikt.
 Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
 saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
 med \code{final.xml} och \verb{final-municipal/}. Komplett preliminär källa saknas.
-\code{"E"} stöder EU-valen 2019 och 2024 i alla sju funktioner. Resultat finns för
+\code{"E"} stöder EU-valen 2014, 2019 och 2024 i alla sju funktioner. Resultat finns för
 riket, län, kommun, kommunvalkrets och valdistrikt; mandat för riket.
-Personvalsområdet är hela riket. Senare officiell kandidatsnapshot används;
+Personvalsområdet är hela riket. För EU 2024 används senare officiell kandidatsnapshot;
 kandidat 1203 i valdagens äldre snapshot bevaras endast som proveniens.
-Blankröster är ogiltiga; uppsamlingsdistrikt saknar egen röstlängd.}
+Blankröster är ogiltiga; uppsamlingsdistrikt saknar egen röstlängd.
+EU 2014 kräver bevarad ursprunglig slutlig XML med geografiska namn.
+Komplett preliminär källa saknas och sådana anrop ger fel. Tio röster
+utan partibeteckning i Vårdsberg ingår i den handskrivna samlingsposten;
+fullfältet \code{kall_roster_utan_partibeteckning} är metadata, inte extra röster.}
 
 \item{rakning}{Exakt en räkning: \code{"slutlig"} (default) eller \code{"preliminar"}.}
 

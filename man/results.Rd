@@ -38,15 +38,21 @@ County/national referendum results also include three SCB electorate groups:
 \code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
 and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
 Components are missing at finer levels; counts are never allocated downward.
-All seven functions also accept \code{"european"} / \code{"E"} for 2019 and 2024.
+All seven functions also accept \code{"european"} / \code{"E"} for 2014, 2019 and 2024.
 EU results support national, county, municipality, municipal constituency
 and district levels. EU seats are national; preference votes additionally
 support \code{"preference_vote_area"} (the national election constituency).
-The full preliminary JSON includes collection districts. Blank ballots
+EU 2024's full preliminary JSON includes collection districts. Blank ballots
 are invalid. Collection units have no electorate or turnout.
-The later approved official candidacy snapshot defines the final population;
+For EU 2024, the later approved official candidacy snapshot defines the final population;
 historical consent-only candidate 1203 is preserved as provenance only.
 Original elected/substitute relations are used, never a current roster.
+EU 2014 uses the preserved original final XML with geographic names;
+complete preliminary results are unavailable and give an error. Its valid
+handwritten-vote residual remains an other-party category with no invented
+party code. Full-only \code{source_votes_without_party_designation} identifies
+ten votes at district 05803201; it is metadata, not additional votes.
+Candidate names are missing; source validity/consent attributes are unavailable.
 EU 2019 uses preserved original XML, the official handwritten-party
 supplement and the final-compatible electorate SKV; raw XLS reading
 requires optional \code{readxl}. Public redacted candidate names are \code{NA}.

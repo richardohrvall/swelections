@@ -235,3 +235,7 @@ votes replace the matching XML residual and are never mixed into preliminary
 results. Original 20-seat relationships exclude subsequent Brexit changes.
 See [COMPLETENESS_EU_2019.md](COMPLETENESS_EU_2019.md) for exact populations,
 source selection, missing source attributes and independent R validation commands.
+
+## EU 2014 unpublished prototype
+
+Use the pinned original final XML with geographic names; the current ZIP has redacted place names. The R-only builder is data-raw/build-canonical-eu-2014.R and the public/source validation entry point is data-raw/validate-eu-2014.R. Fourteen English Parquet assets are expected: final results/seats, candidacies/candidates/elected/substitutes, candidate base, six preference bases, and exact source designations. No release or auto eligibility is enabled. Full-only source_votes_without_party_designation identifies the ten valid Vårdsberg votes without assigning them to a party. See development/COMPLETENESS_EU_2014.md and development/VALIDATION_EU_2014.md.

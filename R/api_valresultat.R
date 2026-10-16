@@ -46,11 +46,15 @@
 #'   Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
 #'   saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
 #'   med `final.xml` och `final-municipal/`. Komplett preliminär källa saknas.
-#'   `"E"` stöder EU-valen 2019 och 2024 i alla sju funktioner. Resultat finns för
+#'   `"E"` stöder EU-valen 2014, 2019 och 2024 i alla sju funktioner. Resultat finns för
 #'   riket, län, kommun, kommunvalkrets och valdistrikt; mandat för riket.
-#'   Personvalsområdet är hela riket. Senare officiell kandidatsnapshot används;
+#'   Personvalsområdet är hela riket. För EU 2024 används senare officiell kandidatsnapshot;
 #'   kandidat 1203 i valdagens äldre snapshot bevaras endast som proveniens.
 #'   Blankröster är ogiltiga; uppsamlingsdistrikt saknar egen röstlängd.
+#'   EU 2014 kräver bevarad ursprunglig slutlig XML med geografiska namn.
+#'   Komplett preliminär källa saknas och sådana anrop ger fel. Tio röster
+#'   utan partibeteckning i Vårdsberg ingår i den handskrivna samlingsposten;
+#'   fullfältet `kall_roster_utan_partibeteckning` är metadata, inte extra röster.
 #' @param rakning Exakt en räkning: `"slutlig"` (default) eller `"preliminar"`.
 #' @param niva En geografisk nivå. `NULL` ger valets huvudnivå: RD `"riket"`,
 #'   RF `"region"`, KF `"kommun"`. Se nivåerna nedan.

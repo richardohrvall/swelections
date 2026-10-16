@@ -59,8 +59,8 @@ you use `remotes`.
 
 ## European Parliament elections
 
-All seven functions support the 2019 and 2024 elections with explicit
-`election = "european"` (or `"E"`). The default EU year is 2024; select 2019
+All seven functions support the 2014, 2019 and 2024 elections with explicit
+`election = "european"` (or `"E"`). The default EU year is 2024; select 2014 or 2019
 explicitly or use `year = "all"`. Swedish calls use `val = "E"`.
 
 EU 2019 final and complete preliminary results use the preserved official XML.
@@ -80,6 +80,17 @@ results(2019, election = "european", count = "final", level = "municipality",
 preference_votes(2019, election = "european", level = "district",
                  source = "local", data_dir = "my_archive")
 ```
+
+
+For EU 2014, final results use the preserved original XML with geographic names.
+A complete preliminary Wednesday snapshot has not been recovered; election-night
+data are not exposed as a full preliminary result. The final handwritten-vote
+category retains all 5,618 valid votes. Source detail identifies 5,608 by their
+reported designation; ten votes in Vårdsberg, Linköping, remain unidentified.
+Full results include `source_votes_without_party_designation` as disclosure
+metadata, never as additional votes. Candidate names are missing in public output,
+and the historical source does not provide modern consent/validity attributes.
+
 
 ## Getting started
 
