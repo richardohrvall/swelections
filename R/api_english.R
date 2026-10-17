@@ -97,7 +97,7 @@
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.
-#'   All seven functions also accept `"european"` / `"E"` for 2009, 2014, 2019 and 2024.
+#'   All seven functions also accept `"european"` / `"E"` for 2004, 2009, 2014, 2019 and 2024.
 #'   EU results support national, county, municipality, municipal constituency
 #'   and district levels. EU seats are national; preference votes additionally
 #'   support `"preference_vote_area"` (the national election constituency).
@@ -208,7 +208,7 @@ results <- function(
 #' @inheritParams results
 #' @param election One or more of `"parliamentary"`, `"regional"` and
 #'   `"municipal"`, or the official codes `"RD"`, `"RF"`, `"KF"`.
-#'   For EU 2009/2014/2019/2024, explicitly select `"european"` or `"E"`; seats are national.
+#'   For EU 2004/2009/2014/2019/2024, explicitly select `"european"` or `"E"`; seats are national.
 #'   `NULL` retains the existing RD/RF/KF selection.
 #' @param level One or more English geographic levels, or `NULL` for all
 #'   relevant mandate levels.
@@ -367,7 +367,7 @@ substitutes <- function(
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
-#' @param level EU 2009/2014/2019/2024 also supports `"national"`, `"county"`,
+#' @param level EU 2004/2009/2014/2019/2024 also supports `"national"`, `"county"`,
 #'   `"municipality"` and `"municipal_constituency"`; qualification is only
 #'   meaningful at the national preference-vote area. Otherwise:
 #'   `"preference_vote_area"` (default), `"district"`,

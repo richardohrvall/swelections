@@ -33,3 +33,7 @@ and [development/CANONICAL_DATA.md](development/CANONICAL_DATA.md).
 - Do not commit, push, tag, rewrite history or publish releases without explicit
   authorisation. Before a data release, build from a clean committed tree and
   validate manifest provenance, asset checksums and canonical/raw equivalence.
+
+- For final outcomes and source disagreements, follow
+  [development/SOURCE_POLICY.md](development/SOURCE_POLICY.md): official final
+  protocols define the outcome, and SCB is an independent validation source.

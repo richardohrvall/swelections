@@ -136,3 +136,11 @@ EU2009: [source inventory](SOURCE_INVENTORY_EU_2009.md),
 [completeness](COMPLETENESS_EU_2009.md), [validation](VALIDATION_EU_2009.md).
 The source keys describe ballot positions or independent preference columns,
 not asserted physical-person identities.
+
+## EU 2004
+
+- [Source policy](SOURCE_POLICY.md): legally established results and independent source reconciliation.
+- [Source inventory](SOURCE_INVENTORY_EU_2004.md), [completeness](COMPLETENESS_EU_2004.md) and [validation](VALIDATION_EU_2004.md).
+- `data-raw/build-canonical-eu-2004.R`: pinned preserved sources to an unpublished Parquet prototype.
+- `data-raw/validate-eu-2004.R` and `data-raw/validate-eu-2004-sources.R`: public API equivalence and separate XML/text/SCB/SND checks.
+- `data-raw/eu2004-validation-sources.csv`: protocol/SCB acquisition provenance; raw sources remain local.

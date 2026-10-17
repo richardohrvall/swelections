@@ -253,3 +253,13 @@ all with `.parquet` suffix. The manifest records source and asset SHA256/size,
 original/archive URL, source-selection semantics, Git SHA and actual dirty status.
 No2009 release is published or auto-eligible. No complete preliminary Wednesday
 result is inferred from the election-night archive.
+
+## EU 2004 unpublished prototype
+
+The existing EU schema-version2 structure is reused:14 Parquet assets for final
+results/seats, candidacies/candidates/elected/substitutes, candidate base,
+source designations, and six normalized preference bases. No release or automatic
+eligibility is enabled. Build with `data-raw/build-canonical-eu-2004.R`; validate
+with `data-raw/validate-eu-2004.R`. See
+[completeness](COMPLETENESS_EU_2004.md) and
+[validation](VALIDATION_EU_2004.md) for source populations and exact commands.

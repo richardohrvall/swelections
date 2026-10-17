@@ -59,9 +59,16 @@ you use `remotes`.
 
 ## European Parliament elections
 
-All seven functions support the 2009, 2014, 2019 and 2024 elections with explicit
-`election = "european"` (or `"E"`). The default EU year is 2024; select 2009, 2014 or 2019
+All seven functions support the 2004, 2009, 2014, 2019 and 2024 elections with explicit
+`election = "european"` (or `"E"`). The default EU year is 2024; select 2004, 2009, 2014 or 2019
 explicitly or use `year = "all"`. Swedish calls use `val = "E"`.
+
+EU 2004 final results preserve 27 named parties and the reported aggregate of
+943 valid handwritten votes for other parties. All 1,480,960 reported preference
+votes reconcile with the final decision, including 14,450 for SD; erroneous SD
+zeros in the current SCB table are not used. Candidate keys identify ballot/list
+positions, not physical persons. A complete preliminary Wednesday snapshot has
+not been recovered. See [2004 coverage and provenance](development/COMPLETENESS_EU_2004.md).
 
 EU 2019 final and complete preliminary results use the preserved official XML.
 Raw builds require the pinned preserved archive; a local canonical build can

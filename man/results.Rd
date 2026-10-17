@@ -38,7 +38,7 @@ County/national referendum results also include three SCB electorate groups:
 \code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
 and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
 Components are missing at finer levels; counts are never allocated downward.
-All seven functions also accept \code{"european"} / \code{"E"} for 2009, 2014, 2019 and 2024.
+All seven functions also accept \code{"european"} / \code{"E"} for 2004, 2009, 2014, 2019 and 2024.
 EU results support national, county, municipality, municipal constituency
 and district levels. EU seats are national; preference votes additionally
 support \code{"preference_vote_area"} (the national election constituency).

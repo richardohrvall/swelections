@@ -19,7 +19,7 @@
 #' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Standard är 2026.
 #' @param val En eller flera valtyper: `"RD"`, `"RF"` eller `"KF"`.
-#'   EU-valen 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
+#'   EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
 #'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
