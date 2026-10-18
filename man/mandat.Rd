@@ -4,24 +4,19 @@
 \alias{mandat}
 \title{Mandat}
 \usage{
-mandat(
-  ar = 2026,
-  val = NULL,
-  rakning = c("slutlig", "preliminar"),
-  niva = NULL,
-  source = c("auto", "local", "remote", "canonical"),
-  data_dir = NULL,
-  update = FALSE,
-  archive = FALSE,
-  progress = interactive(),
-  fran = NULL,
-  till = NULL,
-  names = "sv",
-  detaljniva = "standard"
-)
+mandat(ar = 2026, val = NULL,
+  rakning = c("slutlig", "preliminar"), niva = NULL,
+  source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
+  update = FALSE, archive = FALSE, progress = interactive(),
+  fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+  valklass = "ordinary", efter_omval = FALSE)
 }
 \arguments{
-\item{ar}{Ett eller flera exakta valår (2018, 2022, 2026), eller \code{"alla"}.
+\item{ar}{Ett eller flera stödda valår, eller \code{"alla"}. Ordinarie RD/RF/KF-val
+stöds för 2002, 2006, 2010, 2014, 2018, 2022 och 2026 beroende på källa/nivå.
+Normalt avser urvalet och \code{valar} valhändelsens faktiska år. Med
+\code{efter_omval = TRUE} avser båda det ursprungliga ordinarie valet;
+sammansättningen omfattar dess verifierade efterföljande omval.
 Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 används 2026.}
 
@@ -33,14 +28,19 @@ EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"
 
 \item{niva}{En eller flera geografiska nivåer. RD stöder \code{"riket"} och
 \code{"riksdagsvalkrets"}, RF \code{"region"} och \code{"regionvalkrets"}, och KF
-\code{"kommun"} och \code{"kommunvalkrets"}. \code{NULL} ger alla relevanta nivåer.}
+\code{"kommun"} och \code{"kommunvalkrets"}. För ordinarie mandat ger \code{NULL} alla
+relevanta nivåer. För omval väljs omvalets omfattningsnivå. Med
+\code{efter_omval = TRUE} väljer \code{NULL} en helområdesnivå: KF \code{"kommun"},
+RF \code{"region"} eller RD \code{"riket"}; endast denna nivå kan väljas explicit.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
 \code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
-\item{data_dir}{Lokal rotmapp för rådata.}
+\item{data_dir}{Lokal rotmapp för rådata. Omval kräver bevarade lokala
+slutkällor med \code{source = "local"} eller \code{"auto"}. Fjärr-/canonical-källor,
+uppdatering/arkivering och preliminär omvalsräkning stöds inte.}
 
 \item{update}{Om \code{TRUE}, uppdateras lokala arbetskopior.}
 
@@ -56,8 +56,24 @@ väljas via \code{options(swelections.canonical_manifest = "...")}.}
 \item{detaljniva}{\code{"standard"} för centrala analysvariabler eller \code{"full"}
 för alla tillgängliga harmoniserade fält.
 Endast kolumnnamn ändras.}
+
+\item{valklass}{Valhändelser: \code{ordinary}/\code{ordinarie} (standard),
+\code{re_election}/\code{omval} eller \code{all}/\code{alla}. Omval är separata valhändelser
+inom samma fortsatta mandatperiod, inte nya ordinarie val eller mandatperioder.}
+
+\item{efter_omval}{Om \code{TRUE}, härled ursprungsvalets mandatfördelning efter
+verifierade omval. Kräver ordinarie val och slutlig räkning. Urval och
+\code{valar} behåller ursprungsvalets år; komponentfält visar respektive källval.
+Se \code{\link[=seats]{seats()}}.}
 }
 \value{
+Med \code{efter_omval = TRUE} redovisas källkomponenter på separata rader;
+samma parti kan ha flera rader inom kommunen/regionen. Summera
+\code{antal_mandat}, inte upprepade områdestotaler. \code{komponent_valtillfalle},
+\code{komponent_valar}, \code{komponent_geografiniva} och \code{komponent_geografikod}
+bevarar proveniensen. Örebro behåller \code{valar = 2010}: 48 mandat från 2010
+och 17 från 2011. Detta är valets mandatfördelning, inte medlemskapshistorik.
+För vanliga mandatresultat gäller följande.
 En tibble där en rad avser val, räkning, geografisk nivå och
 område samt parti. Områdestotaler upprepas på partirader och nivåerna
 ska inte summeras tillsammans. Saknade totalsummor är \code{NA} när någon

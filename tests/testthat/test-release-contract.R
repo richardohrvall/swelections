@@ -271,7 +271,7 @@ test_that("the intended public namespace is fixed", {
                   c("results", "seats", "candidacies", "candidates",
                     "elected", "substitutes", "valresultat", "mandat",
                     "kandidaturer", "kandidater", "personroster", "valda",
-                    "ersattare", "preference_votes"))
+                    "ersattare", "preference_votes", "election_events"))
 })
 
 test_that("candidacy parser preserves its public source-row schema", {

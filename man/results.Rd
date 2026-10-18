@@ -17,7 +17,8 @@ results(
   from = NULL,
   to = NULL,
   names = NULL,
-  detail = "standard"
+  detail = "standard",
+  election_kind = "ordinary"
 )
 }
 \arguments{
@@ -125,6 +126,9 @@ results. In substitute views, \verb{electoral_area_*} describes RD's distinct
 surrounding area; RF/KF parents use region/municipality identifiers.
 Full output preserves the original parent fields as
 \verb{source_electoral_area_*}.}
+
+\item{election_kind}{Ordinary elections (default), re-elections, or all events:
+\code{"ordinary"}, \code{"re_election"}, or \code{"all"}. Year selects the actual poll year.}
 }
 \value{
 A tibble with the same rows, values and types as \code{\link[=valresultat]{valresultat()}}.
@@ -144,10 +148,40 @@ Read official voting results at one geographic level and one count stage.
 The English interface calls \code{\link[=valresultat]{valresultat()}} and translates column names
 only; source values and data values are unchanged.
 }
+\section{Re-elections}{
+
+A re-election is a separate election event within the original continuing
+mandate period. It is neither a new ordinary election in a longitudinal series
+nor the start of a new mandate period. Ordinary elections remain the default.
+Use \code{election_kind = "re_election"} for the re-election event, or \code{"all"} for
+separate ordinary and re-election events. \code{year} and \code{election_year} refer to
+the actual polling year. Örebro 2011 covers Nordöstra only, not all Örebro.
+Use \code{\link[=election_events]{election_events()}} to discover events, scopes and original-election links.
+
+Current re-election readers require preserved local final-result sources in
+\code{data_dir} or explicit paths through \code{options(swelections.re_election_sources = ...)}.
+Use \code{source = "local"} or \code{"auto"}. The ordinary-election source rules below
+do not enable remote/canonical re-election sources, update/archive operations
+or preliminary re-election readers; these are unavailable.
+No post-re-election combined vote or turnout result is provided.
+}
+
 \examples{
 \dontrun{
 results(year = 2026, election = "municipal", count = "final",
         level = "municipality")
+archive <- "path/to/preserved/archive"
+# Requires preserved final inputs, including the separate Orsa 2003 XML.
+results(year = 2003, election = "municipal", election_kind = "re_election",
+        source = "local", data_dir = archive) # Orsa
+results(year = 2011, election = "regional", election_kind = "re_election",
+        source = "local", data_dir = archive) # Västra Götaland
+results(year = 2011, election = "municipal", election_kind = "re_election",
+        source = "local", data_dir = archive) # Örebro Nordöstra only
+results(year = 2015, election = "municipal", election_kind = "re_election",
+        source = "local", data_dir = archive) # Båstad
+results(year = 2019, election = "municipal", election_kind = "re_election",
+        source = "local", data_dir = archive) # Falun
 }
 }
 \seealso{

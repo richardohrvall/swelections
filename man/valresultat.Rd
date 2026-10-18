@@ -4,21 +4,12 @@
 \alias{valresultat}
 \title{Officiella valresultat för 2014, 2018, 2022 och 2026}
 \usage{
-valresultat(
-  ar = 2026,
-  val = "RD",
-  rakning = c("slutlig", "preliminar"),
-  niva = NULL,
-  source = c("auto", "local", "remote", "canonical"),
-  data_dir = NULL,
-  update = FALSE,
-  archive = FALSE,
-  progress = interactive(),
-  fran = NULL,
-  till = NULL,
-  names = "sv",
-  detaljniva = "standard"
-)
+valresultat(ar = 2026, val = "RD",
+  rakning = c("slutlig", "preliminar"), niva = NULL,
+  source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
+  update = FALSE, archive = FALSE, progress = interactive(),
+  fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+  valklass = "ordinary")
 }
 \arguments{
 \item{ar}{Ett eller flera exakta valår, till exempel \code{c(2018, 2022, 2026)}, eller
@@ -55,7 +46,9 @@ RF \code{"region"}, KF \code{"kommun"}. Se nivåerna nedan.}
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
-\item{data_dir}{Lokal rotmapp för rådata.}
+\item{data_dir}{Lokal rotmapp för rådata. Omval kräver bevarade lokala
+slutkällor med \code{source = "local"} eller \code{"auto"}. Fjärr-/canonical-källor,
+uppdatering/arkivering och preliminär omvalsräkning stöds inte.}
 
 \item{update}{Om \code{TRUE}, uppdateras lokala arbetskopior.}
 
@@ -81,6 +74,12 @@ I ersättarvyer avser \verb{valomrades*} RD:s omgivande geografi; RF/KF:s
 föräldraområden anges som region/kommun. Ursprungliga områdesfält
 bevaras i fullutdata som \verb{kall_valomrades*}.
 Endast kolumnnamn ändras; datavärden och typer bevaras.}
+
+\item{valklass}{Valhändelser: \code{ordinary}/\code{ordinarie} (standard),
+\code{re_election}/\code{omval} eller \code{all}/\code{alla}. Omval är separata valhändelser
+inom samma fortsatta mandatperiod, inte nya ordinarie val eller mandatperioder.
+\code{ar} och \code{valar} avser valhändelsens faktiska år. Örebro 2011 avser endast
+Nordöstra kommunvalkrets, inte hela kommunen.}
 }
 \value{
 En tibble i long format med ett nivåspecifikt publikt

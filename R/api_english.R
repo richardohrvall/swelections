@@ -81,10 +81,27 @@
 #' The English interface calls [valresultat()] and translates column names
 #' only; source values and data values are unchanged.
 #'
+#' @section Re-elections:
+#' A re-election is a separate election event within the original continuing
+#' mandate period. It is neither a new ordinary election in a longitudinal series
+#' nor the start of a new mandate period. Ordinary elections remain the default.
+#' Use `election_kind = "re_election"` for the re-election event, or `"all"` for
+#' separate ordinary and re-election events. `year` and `election_year` refer to
+#' the actual polling year. Örebro 2011 covers Nordöstra only, not all Örebro.
+#' Use [election_events()] to discover events, scopes and original-election links.
+#'
+#' Current re-election readers require preserved local final-result sources in
+#' `data_dir` or explicit paths through `options(swelections.re_election_sources = ...)`.
+#' Use `source = "local"` or `"auto"`. The ordinary-election source rules below
+#' do not enable remote/canonical re-election sources, update/archive operations
+#' or preliminary re-election readers; these are unavailable.
+#' No post-re-election combined vote or turnout result is provided.
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
 #'   Supported years include 2002, 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
 #'   election, geographic level and count stage.
+#' @param election_kind Ordinary elections (default), re-elections, or all events:
+#'   `"ordinary"`, `"re_election"`, or `"all"`. Year selects the actual poll year.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
 #'   `results()` also accepts `"referendum"` or `"F"` for final 2003 results.
@@ -179,6 +196,18 @@
 #' \dontrun{
 #' results(year = 2026, election = "municipal", count = "final",
 #'         level = "municipality")
+#' archive <- "path/to/preserved/archive"
+#' # Requires preserved final inputs, including the separate Orsa 2003 XML.
+#' results(year = 2003, election = "municipal", election_kind = "re_election",
+#'         source = "local", data_dir = archive) # Orsa
+#' results(year = 2011, election = "regional", election_kind = "re_election",
+#'         source = "local", data_dir = archive) # Västra Götaland
+#' results(year = 2011, election = "municipal", election_kind = "re_election",
+#'         source = "local", data_dir = archive) # Örebro Nordöstra only
+#' results(year = 2015, election = "municipal", election_kind = "re_election",
+#'         source = "local", data_dir = archive) # Båstad
+#' results(year = 2019, election = "municipal", election_kind = "re_election",
+#'         source = "local", data_dir = archive) # Falun
 #' }
 #' @seealso [valresultat()], [seats()]
 #' @export
@@ -186,9 +215,13 @@ results <- function(
     year = 2026, election = "parliamentary", count = "final", level = NULL,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    from = NULL, to = NULL, names = NULL, detail = "standard"
+    from = NULL, to = NULL, names = NULL, detail = "standard",
+    election_kind = "ordinary"
 ) {
   year_missing <- missing(year)
+  election_kind <- .check_election_kind(election_kind)
+  if (election_kind != "ordinary") return(.re_dispatch("results", year, year_missing, election, count, level, source, data_dir, update, archive, progress, from, to, names, detail, election_kind))
+  if (!any(election %in% c("F", "referendum"))) .re_ordinary_hint(year, election, from, to)
   if (is.character(election) && length(election) == 1L &&
       !is.na(election) && election %in% c("referendum", "F"))
     return(.referendum2003_results(year, year_missing, from, to, count, level,
@@ -203,25 +236,113 @@ results <- function(
 
 #' Seats and mandates
 #'
-#' Read official seat allocations through [mandat()]. `election = NULL` and
-#' `level = NULL` retain the Swedish function's supported combinations.
+#' Read official seat allocations through [mandat()]. Ordinary elections remain
+#' the default. A re-election is a separate election event within the original
+#' continuing mandate period: it is neither a new ordinary election in a
+#' longitudinal series nor the start of a new mandate period.
+#'
+#' @section Event allocation and post-re-election composition:
+#' `seats(..., election_kind = "re_election")` returns only mandates allocated
+#' in the re-election event. Örebro 2011 returns 17 mandates for Nordöstra,
+#' not 65 mandates for the whole municipality.
+#'
+#' `seats(..., after_re_election = TRUE)` returns the derived composition
+#' associated with the original ordinary election after verified replacement
+#' events. Örebro has 48 unaffected seats from 2010 plus 17 from the 2011
+#' re-election, with `election_year = 2010` in the same continuing mandate period.
+#' This is not a municipality-wide 2011 election. Year bounds select original
+#' ordinary elections; linked re-elections may fall outside those bounds.
+#' Areas without re-elections keep their original allocations. No allocation
+#' is recalculated from combined votes.
+#'
+#' Component rows retain `component_election_event`, `component_election_year`,
+#' `component_geographic_level` and `component_geographic_code`. A party can
+#' have several component rows: sum `seats`; repeated `total_seats` is not
+#' additive. This is an electoral composition, not membership history.
+#'
+#' @section Local re-election sources:
+#' Current re-election allocations and compositions require preserved local
+#' final sources (`source = "local"` or `"auto"`). Compositions also require
+#' the original ordinary inputs through the selected source route. Remote and
+#' canonical re-election routes, update/archive and preliminary re-election
+#' readers are unavailable. Configure `data_dir` or explicit source paths via
+#' `options(swelections.re_election_sources = ...)`. See [election_events()].
+#' @param after_re_election If `TRUE`, derive the composition after verified
+#'   linked re-elections, anchored on the original ordinary election. Requires
+#'   `election_kind = "ordinary"`, `count = "final"` and a whole-area level.
+#'   Selection and output `election_year` retain the original ordinary year;
+#'   component metadata identifies subsequent re-election sources.
 #' @inheritParams results
+#' @param year Normally the actual election-event year; output `election_year`
+#'   has the same meaning. Accepts supported years or `"all"`; defaults to
+#'   2026 unless `from`/`to` is supplied. With `after_re_election = TRUE`,
+#'   selection and output `election_year` instead refer to the original
+#'   ordinary election, while incorporating its verified subsequent re-elections.
+#' @param election_kind `"ordinary"` (default), `"re_election"` or `"all"`.
+#'   Normally year selects actual polling years. With `after_re_election = TRUE`,
+#'   only `"ordinary"` is accepted and year selection refers to original elections.
 #' @param election One or more of `"parliamentary"`, `"regional"` and
 #'   `"municipal"`, or the official codes `"RD"`, `"RF"`, `"KF"`.
 #'   For EU 2004/2009/2014/2019/2024, explicitly select `"european"` or `"E"`; seats are national.
 #'   `NULL` retains the existing RD/RF/KF selection.
-#' @param level One or more English geographic levels, or `NULL` for all
-#'   relevant mandate levels.
+#' @param level For ordinary mandate results, `NULL` retains all relevant
+#'   mandate levels; one or more supported levels may be selected explicitly.
+#'   For re-election events, `NULL` selects the event scope (region,
+#'   municipality or municipal constituency). With `after_re_election = TRUE`,
+#'   `NULL` selects one whole-area level: `"municipality"` for KF, `"region"`
+#'   for RF or `"national"` for RD. An explicit composition level must be that
+#'   same whole-area level.
 #' @return A tibble with the same rows, values and types as [mandat()].
+#'   Post-re-election compositions retain the original ordinary-election year
+#'   and separate source-component rows.
+#' @examples
+#' \dontrun{
+#' archive <- "path/to/preserved/archive"
+#' # Event allocations: 31, 149, 17, 41 and 61 seats respectively.
+#' seats(year = 2003, election = "municipal", election_kind = "re_election",
+#'       source = "local", data_dir = archive) # Orsa
+#' seats(year = 2011, election = "regional", election_kind = "re_election",
+#'       source = "local", data_dir = archive) # Västra Götaland
+#' seats(year = 2011, election = "municipal", election_kind = "re_election",
+#'       source = "local", data_dir = archive) # Örebro Nordöstra: 17
+#' seats(year = 2015, election = "municipal", election_kind = "re_election",
+#'       source = "local", data_dir = archive) # Båstad
+#' seats(year = 2019, election = "municipal", election_kind = "re_election",
+#'       source = "local", data_dir = archive) # Falun
+#'
+#' # Original-year selections include other municipalities/regions as well.
+#' orebro <- seats(year = 2010, election = "municipal", after_re_election = TRUE,
+#'                 source = "local", data_dir = archive)
+#' orebro <- orebro[orebro$municipality_code == "1880", ]
+#' sum(orebro$seats) # 65 = 48 from 2010 + 17 from 2011; election_year is 2010
+#' orsa <- seats(year = 2002, election = "municipal", after_re_election = TRUE,
+#'               source = "local", data_dir = archive)
+#' orsa <- orsa[orsa$municipality_code == "2034", ]
+#' vg <- seats(year = 2010, election = "regional", after_re_election = TRUE,
+#'             source = "local", data_dir = archive)
+#' vg <- vg[vg$region_code == "14", ]
+#' bastad <- seats(year = 2014, election = "municipal", after_re_election = TRUE,
+#'                 source = "local", data_dir = archive)
+#' bastad <- bastad[bastad$municipality_code == "1278", ]
+#' falun <- seats(year = 2018, election = "municipal", after_re_election = TRUE,
+#'                source = "local", data_dir = archive)
+#' falun <- falun[falun$municipality_code == "2080", ]
+#' }
 #' @seealso [mandat()], [results()]
 #' @export
 seats <- function(
     year = 2026, election = NULL, count = "final", level = NULL,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    from = NULL, to = NULL, names = NULL, detail = "standard"
+    from = NULL, to = NULL, names = NULL, detail = "standard",
+    election_kind = "ordinary", after_re_election = FALSE
 ) {
   year_missing <- missing(year)
+  election_kind <- .check_election_kind(election_kind)
+  if (!is.logical(after_re_election) || length(after_re_election)!=1L || is.na(after_re_election)) stop("`after_re_election` must be TRUE or FALSE.", call.=FALSE)
+  if (after_re_election) return(.re_after_seats(year, year_missing, election, count, level, source, data_dir, update, archive, progress, from, to, names, detail, election_kind))
+  if (election_kind != "ordinary") return(.re_dispatch("seats", year, year_missing, election, count, level, source, data_dir, update, archive, progress, from, to, names, detail, election_kind))
+  .re_ordinary_hint(year, election, from, to)
   .english_call(.raw_public_api$mandat, list(
     val = election, rakning = .english_argument_value(count, "count"),
     niva = .english_argument_value(level, "level", nullable = TRUE),

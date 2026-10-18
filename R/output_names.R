@@ -1,6 +1,14 @@
 # Public column names are translated only after a complete Swedish result has
 # been constructed and validated. Values, types, keys and row order are untouched.
 .public_name_base_en <- c(
+  ursprungligt_valtillfalle = "original_election_event", mandatperiod = "mandate_period",
+  valhandelse_omfattningsniva = "event_scope_level", valhandelse_omfattningskod = "event_scope_code",
+  valhandelse_omfattningsnamn = "event_scope_name", kalla_sha256 = "source_sha256",
+  kalla_url = "source_url", protokollreferens = "protocol_reference",
+  rostlangd_referensdatum = "electoral_roll_reference_date",
+  komponent_valtillfalle = "component_election_event", komponent_valar = "component_election_year",
+  komponent_geografiniva = "component_geographic_level", komponent_geografikod = "component_geographic_code",
+  sammansattningstyp = "composition_type", sammansattningsid = "composition_id",
   valtillfalle = "election_event",
   valar = "election_year",
   valklass = "election_kind",

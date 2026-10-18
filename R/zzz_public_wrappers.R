@@ -36,13 +36,15 @@ valresultat <- function(
     ar = 2026, val = "RD", rakning = c("slutlig", "preliminar"),
     niva = NULL, source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    fran = NULL, till = NULL, names = "sv", detaljniva = "standard"
+    fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+    valklass = "ordinary"
 ) {
   if (!is.null(niva)) .check_text(niva, "niva")
   .swedish_public_call(results, list(
     election = val, count = .swedish_count_en(if (missing(rakning)) "slutlig" else rakning),
     level = .swedish_level_en(niva), source = source, data_dir = data_dir,
-    update = update, archive = archive, progress = progress, from = fran, to = till
+    update = update, archive = archive, progress = progress, from = fran, to = till,
+    election_kind = .swedish_election_kind(valklass)
   ), ar, missing(ar), names, detaljniva)
 }
 
@@ -50,12 +52,14 @@ mandat <- function(
     ar = 2026, val = NULL, rakning = c("slutlig", "preliminar"), niva = NULL,
     source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
     update = FALSE, archive = FALSE, progress = interactive(),
-    fran = NULL, till = NULL, names = "sv", detaljniva = "standard"
+    fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+    valklass = "ordinary", efter_omval = FALSE
 ) {
   .swedish_public_call(seats, list(
     election = val, count = .swedish_count_en(if (missing(rakning)) "slutlig" else rakning),
     level = .swedish_level_en(niva), source = source, data_dir = data_dir,
-    update = update, archive = archive, progress = progress, from = fran, to = till
+    update = update, archive = archive, progress = progress, from = fran, to = till,
+    election_kind = .swedish_election_kind(valklass), after_re_election = efter_omval
   ), ar, missing(ar), names, detaljniva)
 }
 

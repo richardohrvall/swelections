@@ -456,3 +456,35 @@ The small-party source reports inconsistent national/county/municipal preference
 sums, which are preserved without inferred corrections. Complete preliminary
 Wednesday results are not verified; election-night results are not substituted.
 See the [2009 completeness statement](development/COMPLETENESS_EU_2009.md).
+## Re-elections
+
+Ordinary elections remain the default for year ranges. Re-elections are separate
+polling events within the original mandate period; they do not overwrite the
+original result.
+
+```r
+election_events(election_kind = "re_election")
+results(year = 2011, election = "municipal",
+        election_kind = "re_election", source = "local", data_dir = archive)
+seats(year = 2011, election = "municipal",
+      election_kind = "re_election", source = "local", data_dir = archive)
+orebro <- seats(year = 2010, election = "municipal", after_re_election = TRUE,
+                source = "local", data_dir = archive)
+orebro <- orebro[orebro$municipality_code == "1880", ]
+sum(orebro$seats) # 65: 48 from 2010 + 17 from 2011; election_year remains 2010
+seats(from = 2002, to = 2022, election = "municipal",
+      after_re_election = TRUE, source = "local", data_dir = archive)
+```
+
+Örebro's 2011 event contains Nordöstra and 17 seats only. The adjusted 2010
+composition contains 48 unaffected seats from 2010 plus the 17 from 2011.
+Composition rows retain the source event, component year and geography; sum
+`seats` by party and municipality across those components. This is an electoral
+allocation, not a history of who held office. No combined vote/turnout view is
+provided. Orsa 2003, Västra Götaland 2011, Båstad 2015 and Falun 2019 are also
+registered. `election_kind = "all"` returns distinct events, never an adjusted
+series. Re-election readers currently require preserved local final sources;
+there is no published re-election canonical release.
+
+See [the implementation and source requirements](development/IMPLEMENTATION_OMVAL.md)
+for archive layout, provenance, supported levels and historical source gaps.

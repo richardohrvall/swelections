@@ -17,14 +17,17 @@ seats(
   from = NULL,
   to = NULL,
   names = NULL,
-  detail = "standard"
+  detail = "standard",
+  election_kind = "ordinary",
+  after_re_election = FALSE
 )
 }
 \arguments{
-\item{year}{One or more supported election years, or \code{"all"}. Defaults to
-2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2002, 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
-election, geographic level and count stage.}
+\item{year}{Normally the actual election-event year; output \code{election_year}
+has the same meaning. Accepts supported years or \code{"all"}; defaults to
+2026 unless \code{from}/\code{to} is supplied. With \code{after_re_election = TRUE},
+selection and output \code{election_year} instead refer to the original
+ordinary election, while incorporating its verified subsequent re-elections.}
 
 \item{election}{One or more of \code{"parliamentary"}, \code{"regional"} and
 \code{"municipal"}, or the official codes \code{"RD"}, \code{"RF"}, \code{"KF"}.
@@ -33,8 +36,13 @@ For EU 2004/2009/2014/2019/2024, explicitly select \code{"european"} or \code{"E
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}
 
-\item{level}{One or more English geographic levels, or \code{NULL} for all
-relevant mandate levels.}
+\item{level}{For ordinary mandate results, \code{NULL} retains all relevant
+mandate levels; one or more supported levels may be selected explicitly.
+For re-election events, \code{NULL} selects the event scope (region,
+municipality or municipal constituency). With \code{after_re_election = TRUE},
+\code{NULL} selects one whole-area level: \code{"municipality"} for KF, \code{"region"}
+for RF or \code{"national"} for RD. An explicit composition level must be that
+same whole-area level.}
 
 \item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
 For 2018, \code{"auto"} prefers a complete configured local raw set, then an
@@ -86,13 +94,92 @@ results. In substitute views, \verb{electoral_area_*} describes RD's distinct
 surrounding area; RF/KF parents use region/municipality identifiers.
 Full output preserves the original parent fields as
 \verb{source_electoral_area_*}.}
+
+\item{election_kind}{\code{"ordinary"} (default), \code{"re_election"} or \code{"all"}.
+Normally year selects actual polling years. With \code{after_re_election = TRUE},
+only \code{"ordinary"} is accepted and year selection refers to original elections.}
+
+\item{after_re_election}{If \code{TRUE}, derive the composition after verified
+linked re-elections, anchored on the original ordinary election. Requires
+\code{election_kind = "ordinary"}, \code{count = "final"} and a whole-area level.
+Selection and output \code{election_year} retain the original ordinary year;
+component metadata identifies subsequent re-election sources.}
 }
 \value{
 A tibble with the same rows, values and types as \code{\link[=mandat]{mandat()}}.
+Post-re-election compositions retain the original ordinary-election year
+and separate source-component rows.
 }
 \description{
-Read official seat allocations through \code{\link[=mandat]{mandat()}}. \code{election = NULL} and
-\code{level = NULL} retain the Swedish function's supported combinations.
+Read official seat allocations through \code{\link[=mandat]{mandat()}}. Ordinary elections remain
+the default. A re-election is a separate election event within the original
+continuing mandate period: it is neither a new ordinary election in a
+longitudinal series nor the start of a new mandate period.
+}
+\section{Event allocation and post-re-election composition}{
+
+\code{seats(..., election_kind = "re_election")} returns only mandates allocated
+in the re-election event. Örebro 2011 returns 17 mandates for Nordöstra,
+not 65 mandates for the whole municipality.
+
+\code{seats(..., after_re_election = TRUE)} returns the derived composition
+associated with the original ordinary election after verified replacement
+events. Örebro has 48 unaffected seats from 2010 plus 17 from the 2011
+re-election, with \code{election_year = 2010} in the same continuing mandate period.
+This is not a municipality-wide 2011 election. Year bounds select original
+ordinary elections; linked re-elections may fall outside those bounds.
+Areas without re-elections keep their original allocations. No allocation
+is recalculated from combined votes.
+
+Component rows retain \code{component_election_event}, \code{component_election_year},
+\code{component_geographic_level} and \code{component_geographic_code}. A party can
+have several component rows: sum \code{seats}; repeated \code{total_seats} is not
+additive. This is an electoral composition, not membership history.
+}
+
+\section{Local re-election sources}{
+
+Current re-election allocations and compositions require preserved local
+final sources (\code{source = "local"} or \code{"auto"}). Compositions also require
+the original ordinary inputs through the selected source route. Remote and
+canonical re-election routes, update/archive and preliminary re-election
+readers are unavailable. Configure \code{data_dir} or explicit source paths via
+\code{options(swelections.re_election_sources = ...)}. See \code{\link[=election_events]{election_events()}}.
+}
+
+\examples{
+\dontrun{
+archive <- "path/to/preserved/archive"
+# Event allocations: 31, 149, 17, 41 and 61 seats respectively.
+seats(year = 2003, election = "municipal", election_kind = "re_election",
+      source = "local", data_dir = archive) # Orsa
+seats(year = 2011, election = "regional", election_kind = "re_election",
+      source = "local", data_dir = archive) # Västra Götaland
+seats(year = 2011, election = "municipal", election_kind = "re_election",
+      source = "local", data_dir = archive) # Örebro Nordöstra: 17
+seats(year = 2015, election = "municipal", election_kind = "re_election",
+      source = "local", data_dir = archive) # Båstad
+seats(year = 2019, election = "municipal", election_kind = "re_election",
+      source = "local", data_dir = archive) # Falun
+
+# Original-year selections include other municipalities/regions as well.
+orebro <- seats(year = 2010, election = "municipal", after_re_election = TRUE,
+                source = "local", data_dir = archive)
+orebro <- orebro[orebro$municipality_code == "1880", ]
+sum(orebro$seats) # 65 = 48 from 2010 + 17 from 2011; election_year is 2010
+orsa <- seats(year = 2002, election = "municipal", after_re_election = TRUE,
+              source = "local", data_dir = archive)
+orsa <- orsa[orsa$municipality_code == "2034", ]
+vg <- seats(year = 2010, election = "regional", after_re_election = TRUE,
+            source = "local", data_dir = archive)
+vg <- vg[vg$region_code == "14", ]
+bastad <- seats(year = 2014, election = "municipal", after_re_election = TRUE,
+                source = "local", data_dir = archive)
+bastad <- bastad[bastad$municipality_code == "1278", ]
+falun <- seats(year = 2018, election = "municipal", after_re_election = TRUE,
+               source = "local", data_dir = archive)
+falun <- falun[falun$municipality_code == "2080", ]
+}
 }
 \seealso{
 \code{\link[=mandat]{mandat()}}, \code{\link[=results]{results()}}

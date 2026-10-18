@@ -192,6 +192,17 @@
 #' valresultat(ar = "alla", val = "RD", niva = "riket")
 #' valresultat(fran = 2010, till = 2026, val = "RD", niva = "riket")
 #' }
+#' @usage valresultat(ar = 2026, val = "RD",
+#'   rakning = c("slutlig", "preliminar"), niva = NULL,
+#'   source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
+#'   update = FALSE, archive = FALSE, progress = interactive(),
+#'   fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+#'   valklass = "ordinary")
+#' @param valklass Valhändelser: `ordinary`/`ordinarie` (standard),
+#'   `re_election`/`omval` eller `all`/`alla`. Omval är separata valhändelser
+#'   inom samma fortsatta mandatperiod, inte nya ordinarie val eller mandatperioder.
+#'   `ar` och `valar` avser valhändelsens faktiska år. Örebro 2011 avser endast
+#'   Nordöstra kommunvalkrets, inte hela kommunen.
 #' @export
 valresultat <- function(
     ar = 2026, val = "RD", rakning = c("slutlig", "preliminar"),

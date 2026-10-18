@@ -56,7 +56,11 @@
 #' Preliminära resultat kräver en komplett separat officiell
 #' uppsamlingsdistriktssnapshot; valnatt ersätter aldrig preliminär räkning.
 #'
-#' @param ar Ett eller flera exakta valår (2018, 2022, 2026), eller `"alla"`.
+#' @param ar Ett eller flera stödda valår, eller `"alla"`. Ordinarie RD/RF/KF-val
+#'   stöds för 2002, 2006, 2010, 2014, 2018, 2022 och 2026 beroende på källa/nivå.
+#'   Normalt avser urvalet och `valar` valhändelsens faktiska år. Med
+#'   `efter_omval = TRUE` avser båda det ursprungliga ordinarie valet;
+#'   sammansättningen omfattar dess verifierade efterföljande omval.
 #'   Dubbletter tas bort med den första årsordningen bevarad. Utan årsurval
 #'   används 2026.
 #' @param fran,till Inklusiva gränser bland stödda valår, som alternativ till
@@ -67,12 +71,17 @@
 #' @param rakning Exakt en räkning: `"slutlig"` eller `"preliminar"`.
 #' @param niva En eller flera geografiska nivåer. RD stöder `"riket"` och
 #'   `"riksdagsvalkrets"`, RF `"region"` och `"regionvalkrets"`, och KF
-#'   `"kommun"` och `"kommunvalkrets"`. `NULL` ger alla relevanta nivåer.
+#'   `"kommun"` och `"kommunvalkrets"`. För ordinarie mandat ger `NULL` alla
+#'   relevanta nivåer. För omval väljs omvalets omfattningsnivå. Med
+#'   `efter_omval = TRUE` väljer `NULL` en helområdesnivå: KF `"kommun"`,
+#'   RF `"region"` eller RD `"riket"`; endast denna nivå kan väljas explicit.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
 #'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
-#' @param data_dir Lokal rotmapp för rådata.
+#' @param data_dir Lokal rotmapp för rådata. Omval kräver bevarade lokala
+#'   slutkällor med `source = "local"` eller `"auto"`. Fjärr-/canonical-källor,
+#'   uppdatering/arkivering och preliminär omvalsräkning stöds inte.
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
@@ -80,7 +89,14 @@
 #' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
 #'   för alla tillgängliga harmoniserade fält.
 #'   Endast kolumnnamn ändras.
-#' @return En tibble där en rad avser val, räkning, geografisk nivå och
+#' @return Med `efter_omval = TRUE` redovisas källkomponenter på separata rader;
+#'   samma parti kan ha flera rader inom kommunen/regionen. Summera
+#'   `antal_mandat`, inte upprepade områdestotaler. `komponent_valtillfalle`,
+#'   `komponent_valar`, `komponent_geografiniva` och `komponent_geografikod`
+#'   bevarar proveniensen. Örebro behåller `valar = 2010`: 48 mandat från 2010
+#'   och 17 från 2011. Detta är valets mandatfördelning, inte medlemskapshistorik.
+#'   För vanliga mandatresultat gäller följande.
+#'   En tibble där en rad avser val, räkning, geografisk nivå och
 #'   område samt parti. Områdestotaler upprepas på partirader och nivåerna
 #'   ska inte summeras tillsammans. Saknade totalsummor är `NA` när någon
 #'   mandatkomponent är okänd. `antal_tomma_stolar` är `NA` utan verifierat
@@ -107,6 +123,19 @@
 #' mandat(fran = 2022, till = 2026, val = "KF", niva = "kommun")
 #' }
 #' @seealso [seats()], [valda()], [ersattare()], [swelections-package]
+#' @usage mandat(ar = 2026, val = NULL,
+#'   rakning = c("slutlig", "preliminar"), niva = NULL,
+#'   source = c("auto", "local", "remote", "canonical"), data_dir = NULL,
+#'   update = FALSE, archive = FALSE, progress = interactive(),
+#'   fran = NULL, till = NULL, names = "sv", detaljniva = "standard",
+#'   valklass = "ordinary", efter_omval = FALSE)
+#' @param valklass Valhändelser: `ordinary`/`ordinarie` (standard),
+#'   `re_election`/`omval` eller `all`/`alla`. Omval är separata valhändelser
+#'   inom samma fortsatta mandatperiod, inte nya ordinarie val eller mandatperioder.
+#' @param efter_omval Om `TRUE`, härled ursprungsvalets mandatfördelning efter
+#'   verifierade omval. Kräver ordinarie val och slutlig räkning. Urval och
+#'   `valar` behåller ursprungsvalets år; komponentfält visar respektive källval.
+#'   Se [seats()].
 #' @export
 mandat <- function(
     ar = 2026,

@@ -3,6 +3,7 @@
 export(candidacies)
 export(candidates)
 export(elected)
+export(election_events)
 export(ersattare)
 export(kandidater)
 export(kandidaturer)
