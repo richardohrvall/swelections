@@ -1,3 +1,19 @@
+# Unqualified XPath names do not use namespace bindings, even
+# when a document declares namespaces. Reuse the empty mapping instead of
+# rediscovering namespaces throughout the document for every node access.
+# Qualified names still use xml2's normal mapping; XPath axes (::) are not prefixes.
+.xml2018_query_ns <- function(node, query) {
+  if (any(grepl("(?<!:):(?!:)", query, perl = TRUE))) xml2::xml_ns(node) else character()
+}
+
+.xml2018_find_all <- function(node, xpath, ...) {
+  xml2::xml_find_all(node, xpath, ns = .xml2018_query_ns(node, xpath), ...)
+}
+
+.xml2018_find_first <- function(node, xpath, ...) {
+  xml2::xml_find_first(node, xpath, ns = .xml2018_query_ns(node, xpath), ...)
+}
+
 # 2018 års XML är ett separat råformat. Funktionerna nedan översätter dess
 # officiella noder till samma interna resultat- och mandatscheman som senare år.
 .xml2018_attr <- function(node, namn) {
@@ -28,8 +44,8 @@
   paste0(substr(x, 1L, 4L), "-", substr(x, 5L, 6L), "-", substr(x, 7L, 8L))
 }
 
-.xml2018_barn <- function(node, namn) xml2::xml_find_all(node, paste0("./", namn))
-.xml2018_forsta <- function(node, namn) xml2::xml_find_first(node, paste0("./", namn))
+.xml2018_barn <- function(node, namn) .xml2018_find_all(node, paste0("./", namn))
+.xml2018_forsta <- function(node, namn) .xml2018_find_first(node, paste0("./", namn))
 
 .xml2018_fil <- function(zip, member, val) {
   con <- unz(zip, member, open = "rb")
@@ -44,7 +60,7 @@
       !identical(.xml2018_attr(root, "FILNAMN"), member)) {
     stop("XML-filens valtyp, valdag eller r\u00e4kning st\u00e4mmer inte med filnamnet.", call. = FALSE)
   }
-  doc
+  .xml2018_ragunda_elected(doc, val)
 }
 
 .xml2018_members <- function(zip, val, niva, mandat = FALSE) {
@@ -110,17 +126,17 @@
   members <- .xml2018_members(zip, val, "kommun")
   extra <- purrr::map(members, function(member) {
     doc <- .xml2018_fil(zip, member, val)
-    area <- xml2::xml_find_first(doc, "./KOMMUN")
-    grupper <- xml2::xml_find_all(area,
+    area <- .xml2018_find_first(doc, "./KOMMUN")
+    grupper <- .xml2018_find_all(area,
       "./KRETS_KOMMUN/GILTIGA|./KRETS_KOMMUN/\u00d6VRIGA_GILTIGA/GILTIGA")
     purrr::map(grupper, function(g) {
-      listor <- xml2::xml_find_all(g, "./VALSEDEL|./PARTISEDEL")
+      listor <- .xml2018_find_all(g, "./VALSEDEL|./PARTISEDEL")
       nummer <- xml2::xml_attr(listor, "LISTNUMMER")
       koder <- unique(substr(nummer[grepl("^[0-9]{4}-", nummer)], 1L, 4L))
       if (!length(koder)) return(NULL)
       if (length(koder) != 1L) stop("En 2018-lista har mots\u00e4gande partikoder.", call. = FALSE)
       alias <- .xml2018_attr(g, "PARTI")
-      rootparty <- xml2::xml_find_all(doc, "./PARTI")
+      rootparty <- .xml2018_find_all(doc, "./PARTI")
       hit <- rootparty[xml2::xml_attr(rootparty, "F\u00d6RKORTNING") == alias]
       tibble::tibble(
         valtyp = val, valomradeskod = .xml2018_attr(area, "KOD"),
@@ -148,11 +164,11 @@
   kandidater <- register$data[index, , drop = FALSE]
   koder <- unique(kandidater$partikod)
   if ((length(koder) != 1L || is.na(koder)) && !is.null(parti)) {
-    listor <- xml2::xml_find_all(parti, "./VALSEDEL|./PARTISEDEL")
+    listor <- .xml2018_find_all(parti, "./VALSEDEL|./PARTISEDEL")
     if (!length(listor) && !is.null(omrade)) {
-      under <- xml2::xml_find_all(omrade, ".//GILTIGA")
+      under <- .xml2018_find_all(omrade, ".//GILTIGA")
       under <- under[xml2::xml_attr(under, "PARTI") == rawkod]
-      listor <- xml2::xml_find_all(under, "./VALSEDEL|./PARTISEDEL",
+      listor <- .xml2018_find_all(under, "./VALSEDEL|./PARTISEDEL",
                                    flatten = TRUE)
     }
     nummer <- xml2::xml_attr(listor, "LISTNUMMER")
@@ -166,7 +182,7 @@
   beteckningar <- unique(kandidater$partibeteckning)
   beteckning <- if (length(beteckningar) == 1L) beteckningar else NA_character_
   if (is.na(beteckning) && !is.null(parti)) {
-    rotpartier <- xml2::xml_find_all(xml2::xml_root(parti), "./PARTI")
+    rotpartier <- .xml2018_find_all(xml2::xml_root(parti), "./PARTI")
     hit <- rotpartier[xml2::xml_attr(rotpartier, "F\u00d6RKORTNING") == rawkod]
     if (length(hit) == 1L) beteckning <- .xml2018_attr(hit[[1]], "BETECKNING")
   }
@@ -183,7 +199,7 @@
     kommun = "./KOMMUN", kommunvalkrets = "./KOMMUN/KRETS_KOMMUN",
     valdistrikt = "./KOMMUN/KRETS_KOMMUN/VALDISTRIKT|./KOMMUN/KRETS_KOMMUN/ONSDAGSDISTRIKT"
   )
-  noder <- xml2::xml_find_all(doc, xpath)
+  noder <- .xml2018_find_all(doc, xpath)
   if (niva == "kommunvalkrets") {
     # Kod xx00 är endast den tekniska enda kretsen i ett odelat område.
     noder <- noder[!grepl("00$", xml2::xml_attr(noder, "KOD"))]
@@ -192,10 +208,10 @@
 }
 
 .xml2018_geo <- function(node, val, niva, doc) {
-  root <- xml2::xml_find_first(doc, "./NATION|./KOMMUN")
+  root <- .xml2018_find_first(doc, "./NATION|./KOMMUN")
   kommun <- if (niva %in% c("valdistrikt", "kommun", "kommunvalkrets")) root else
-    xml2::xml_find_first(node, "ancestor-or-self::KOMMUN[1]")
-  lan <- xml2::xml_find_first(node, "ancestor-or-self::L\u00c4N[1]")
+    .xml2018_find_first(node, "ancestor-or-self::KOMMUN[1]")
+  lan <- .xml2018_find_first(node, "ancestor-or-self::L\u00c4N[1]")
   if (inherits(lan, "xml_missing") && !inherits(kommun, "xml_missing")) {
     lankod <- substr(.xml2018_attr(kommun, "KOD"), 1L, 2L)
   } else {
@@ -209,8 +225,8 @@
                             KF = .xml2018_attr(kommun, "NAMN"))
   krets <- if (niva == "riksdagsvalkrets" || niva == "regionvalkrets") node else
     if (niva == "kommunvalkrets" || niva == "valdistrikt") {
-      xml2::xml_find_first(node, "ancestor-or-self::KRETS_KOMMUN[1]")
-    } else xml2::xml_find_first(node, "./__saknas__")
+      .xml2018_find_first(node, "ancestor-or-self::KRETS_KOMMUN[1]")
+    } else .xml2018_find_first(node, "./__saknas__")
   distrikt <- niva == "valdistrikt"
   list(
     geografiniva = niva,

@@ -42,7 +42,11 @@ fullfältet \code{kall_roster_utan_partibeteckning} är metadata, inte extra rö
 RF \code{"region"}, KF \code{"kommun"}. Se nivåerna nedan.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
-\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
+\code{auto} prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+\code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
+den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
+\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
@@ -60,7 +64,9 @@ uppdatering/arkivering och preliminär omvalsräkning stöds inte.}
 Används som alternativ till \code{ar}; \verb{fran = 2021, till = 2026} väljer i
 nuläget 2022 och 2026. Utelämnad gräns är öppen.}
 
-\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+\item{names}{Språk för kolumnnamn och tekniska kategorier: \code{"sv"}
+(standard) eller \code{"en"}. Egentliga namn och källidentifierare bevaras;
+booleska egenskaper är logical \code{TRUE}/\code{FALSE} i båda språken.}
 
 \item{detaljniva}{\code{"standard"} (standard) för en kompakt analystabell eller
 \code{"full"} för alla tillgängliga harmoniserade fält. Påverkar inte rader

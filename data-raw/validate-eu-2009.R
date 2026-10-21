@@ -4,7 +4,7 @@ pkgload::load_all('.',quiet=TRUE)
 options(swelections.canonical_manifest=file.path(args[2],'manifest.json'),
  swelections.canonical_cache_dir=file.path(args[2],'validation-cache'))
 m<-jsonlite::read_json(file.path(args[2],'manifest.json'),simplifyVector=TRUE)
-stopifnot(m$valar==2009L,m$schema_version==2L,nrow(m$assets)==14L)
+stopifnot(m$valar==2009L,m$schema_version==3L,nrow(m$assets)==14L)
 for(i in seq_len(nrow(m$assets))){f<-file.path(args[2],m$assets$file[i]);stopifnot(file.info(f)$size==m$assets$bytes[i],swelections:::.canonical_sha256(f)==m$assets$sha256[i])}
 files<-setNames(vapply(m$sources$role,function(r)swelections:::.eu2009_file(r,'local',args[1]),''),m$sources$role)
 before<-unname(tools::sha256sum(files));stopifnot(identical(before,m$sources$sha256))
@@ -14,9 +14,9 @@ compare<-function(fun,extra=list()){
  full<-do.call(get(fun,envir=asNamespace("swelections")),c(common,list(source='local',names='en',detail='full')))
  for(lang in c('en','sv'))for(detail in c('standard','full')) {
   raw<-do.call(get(fun,envir=asNamespace("swelections")),c(common,list(source='local',names=lang,detail=detail)))
-  canonical<-do.call(get(fun,envir=asNamespace("swelections")),c(common,list(source='canonical',names=lang,detail=detail)))
+  canonical<-do.call(get(fun,envir=asNamespace("swelections")),c(common[setdiff(names(common),'data_dir')],list(source='canonical',names=lang,detail=detail)))
   stopifnot(identical(raw,canonical))
-  translated<-if(lang=='en')raw else swelections:::.public_output_names(raw,'en')
+  translated<-if(lang=='en')raw else swelections:::.public_output(raw,'en')
   stopifnot(identical(translated,full[names(translated)]),nrow(translated)==nrow(full))
  }
  compares<<-compares+1L;cat('PASS API',fun,paste(extra,collapse='/'),nrow(full),'\n');flush.console();full

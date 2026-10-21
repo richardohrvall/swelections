@@ -129,72 +129,13 @@ test_that("canonical is explicit and separate from raw local files", {
     if (missing_ok) return(NULL)
     stop("Published canonical manifest is unavailable.")
   })
-  expect_error(results(year = 2018, source = "canonical"), "unavailable")
+  expect_error(results(year = 2018, source = "canonical"), "Published canonical manifest is unavailable")
   options(swelections.canonical_manifest = "nonexistent-canonical.json")
   local_mocked_bindings(.valresultat_2018 = function(...) {
     tibble::tibble(valtyp = "RD")
   })
   expect_error(results(year = 2018, source = "canonical"), "valid canonical")
-  expect_identical(results(year = 2018, source = "auto")$election_code, "RD")
-})
-
-test_that("auto uses complete local raw files, then eligible published coverage", {
-  skip_if_not_installed("nanoparquet")
-  root <- tempfile("raw-2018-")
-  dir.create(root)
-  on.exit(unlink(root, recursive = TRUE), add = TRUE)
-  local_mocked_bindings(.canonical_release_manifest = function(release,
-      missing_ok = FALSE) "published-manifest.json")
-  choose <- function(surface, include_results = TRUE, update = FALSE,
-                     archive = FALSE, source = "auto", year = 2018L)
-    .select_public_source(source, year, surface, root, update, archive,
-                          include_results)
-  expect_identical(choose("valresultat"), "canonical_auto")
-  expect_identical(choose("kandidater", FALSE), "canonical_auto")
-  expect_identical(choose("valresultat", source = "remote"), "remote")
-  expect_identical(choose("valresultat", source = "local"), "local")
-  expect_identical(choose("valresultat", source = "canonical"), "canonical")
-  expect_identical(choose("valresultat", year = 2022L), "auto")
-  expect_identical(choose("valresultat", update = TRUE), "auto")
-  expect_identical(choose("valresultat", archive = TRUE), "auto")
-  create <- function(path) {
-    file <- file.path(root, "2018", path)
-    dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
-    writeBin(as.raw(1L), file)
-  }
-  create("valresultat/slutresultat.zip")
-  expect_identical(choose("valresultat"), "canonical_auto")
-  create("valresultat/deltagande_partier.skv")
-  expect_identical(choose("valresultat"), "local")
-  expect_identical(choose("kandidater"), "canonical_auto")
-  create("kandidater/kandidaturer.skv")
-  expect_identical(choose("kandidater"), "local")
-  expect_identical(choose("kandidater", FALSE), "local")
-  expect_identical(choose("valda"), "local")
-  expect_identical(choose("personroster"), "local")
-})
-
-test_that("auto uses remote when release is absent and preserves unapproved raw policy", {
-  local_mocked_bindings(.canonical_release_manifest = function(release,
-      missing_ok = FALSE) NULL)
-  expect_identical(.select_public_source("auto", 2018L, "valresultat"),
-                   "remote")
-  local_mocked_bindings(.canonical_release_registry = function() {
-    x <- data.frame(year = 2018L, series = "rkl", data_version = "data-v0.1.0",
-      schema_version = 2L, auto_eligible = FALSE, base_url = "example.invalid")
-    x
-  })
-  expect_identical(.select_public_source("auto", 2018L, "valresultat"),
-                   "auto")
-})
-
-test_that("a new eligible year requires an explicit raw-coverage check", {
-  local_mocked_bindings(.canonical_release_registry = function()
-    data.frame(year = 2022L, series = "rkl", data_version = "data-v0.2.0",
-      schema_version = 2L, auto_eligible = TRUE,
-      base_url = "https://example.invalid/release"))
-  expect_error(.select_public_source("auto", 2022L, "valresultat"),
-               "Define the local raw-file requirements")
+  expect_error(results(year = 2018, source = "auto"), "valid canonical")
 })
 
 test_that("release manifest is fetched, checked and cached separately", {
@@ -203,11 +144,11 @@ test_that("release manifest is fetched, checked and cached separately", {
   dir.create(release_dir)
   on.exit(unlink(c(release_dir, cache_dir), recursive = TRUE), add = TRUE)
   release <- list(year = 2018L, series = "rkl", data_version = "data-v9.9.9",
-                  schema_version = 2L,
+                  schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L,
                   base_url = paste0("file:///", gsub("\\\\", "/",
                     normalizePath(release_dir))))
   manifest <- list(data_version = release$data_version,
-    schema_version = 2L, valserie = "rkl", valar = 2018L,
+    schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L, valserie = "rkl", valar = 2018L,
     format = "parquet", sources = list(),
     assets = data.frame(asset = "small", file = "small.parquet", bytes = 1L,
       sha256 = paste(rep("a", 64L), collapse = "")),
@@ -219,7 +160,7 @@ test_that("release manifest is fetched, checked and cached separately", {
   cached <- .canonical_release_manifest(release)
   expect_true(file.exists(cached))
   expect_identical(.canonical_release_manifest(release), cached)
-  manifest$schema_version <- 3L
+  manifest$schema_version <- 4L
   jsonlite::write_json(manifest, file, auto_unbox = TRUE)
   unlink(cached)
   expect_null(.canonical_release_manifest(release, missing_ok = TRUE))

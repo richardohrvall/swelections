@@ -101,23 +101,23 @@ test_that("canonical 2022 person bases reproduce all raw views and missingness",
         stats::setNames(p[c("kandidat", "lista", "alla")],
                         paste0("population_", c("kandidat", "lista", "alla"))))
       parts <- lapply(parts, function(data) {
-        data$.source_area <- rep("00", nrow(data)); .canonical_names_en(data)
+        data$.source_area <- rep("00", nrow(data)); .canonical_encode(data)
       })
       asset <- paste0("rkl2022-preference-votes-base-",
         if (level == "valdistrikt") "district" else "area", "-rd")
-      layouts <- data.frame(asset = asset, table = names(parts),
+      layouts <- data.frame(asset = asset, table = .canonical_storage_key(names(parts)),
         columns = vapply(parts, function(z) paste(names(z), collapse = ","), ""))
       combined <- dplyr::bind_rows(lapply(names(parts), function(component) {
         out <- parts[[component]]
-        out$.component <- rep(component, nrow(out)); out
+        out$.component <- rep(.canonical_storage_key(component), nrow(out)); out
       }))
       file <- tempfile(fileext = ".parquet")
       nanoparquet::write_parquet(combined, file)
       roundtrip <- tibble::as_tibble(nanoparquet::read_parquet(file))
       unlink(file)
       fetch <- function(name) {
-        if (name == "rkl2022-candidacies") return(.canonical_names_en(x$kandidaturer))
-        if (name == "rkl2022-candidates") return(.canonical_names_en(x$kandidater))
+        if (name == "rkl2022-candidacies") return(.canonical_encode(x$kandidaturer))
+        if (name == "rkl2022-candidates") return(.canonical_encode(x$kandidater))
         roundtrip
       }
       for (by_list in c(FALSE, TRUE)) for (zeros in c(FALSE, TRUE)) {
@@ -127,9 +127,9 @@ test_that("canonical 2022 person bases reproduce all raw views and missingness",
           dplyr::arrange(.data$valtyp, .data$valomradeskod,
             .data$personvalsomradeskod, .data$partikod, .data$kandidatnummer,
             dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
-        got <- .canonical_person_2022(list(tables = layouts, schema_version = 2L),
+        got <- .canonical_person_2022(list(tables = layouts, schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L),
           fetch, "RD", level, by_list, zeros)
-        expect_identical(got, expected)
+        expect_identical(.canonical_encode(got), .canonical_encode(expected))
       }
     }
   }
@@ -292,7 +292,7 @@ test_that("all four person vote views share multi-year dispatch", {
   for (n in c("personvalsomrade", "valdistrikt")) {
     for (l in c(FALSE, TRUE)) {
       for (z in c(FALSE, TRUE)) {
-        out <- personroster(detaljniva = "full", ar = c(2022, 2026), niva = n,
+        out <- personroster(source = "local", detaljniva = "full", ar = c(2022, 2026), niva = n,
           per_lista = l, komplettera_nollor = z)
         expect_identical(out$valar, c(2022L, 2026L))
       }

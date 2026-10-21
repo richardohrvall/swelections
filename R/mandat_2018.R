@@ -7,7 +7,7 @@
     kommun = "./KOMMUN",
     kommunvalkrets = "./KOMMUN/KRETS_KOMMUN"
   )
-  noder <- xml2::xml_find_all(doc, xpath)
+  noder <- .xml2018_find_all(doc, xpath)
   if (niva == "kommunvalkrets") {
     noder <- noder[!grepl("00$", xml2::xml_attr(noder, "KOD"))]
   }
@@ -15,16 +15,16 @@
 }
 
 .xml2018_valda_for_parti <- function(node, parti, val) {
-  valda <- xml2::xml_find_all(parti, "./GRUPP_VALDA/VALD")
+  valda <- .xml2018_find_all(parti, "./GRUPP_VALDA/VALD")
   if (length(valda) || .xml2018_int(parti, "MANDAT") == 0L) return(valda)
   xpath <- switch(val,
     RD = ".//KRETS_RIKSDAG/GILTIGA",
     RF = ".//KRETS_LANDSTING/GILTIGA",
     KF = ".//KRETS_KOMMUN/GILTIGA"
   )
-  under <- xml2::xml_find_all(node, xpath)
+  under <- .xml2018_find_all(node, xpath)
   under <- under[xml2::xml_attr(under, "PARTI") == .xml2018_attr(parti, "PARTI")]
-  xml2::xml_find_all(under, "./GRUPP_VALDA/VALD", flatten = TRUE)
+  .xml2018_find_all(under, "./GRUPP_VALDA/VALD", flatten = TRUE)
 }
 
 .xml2018_tomma_stolar <- function(node, parti, val, mandat) {
@@ -45,7 +45,7 @@
 
 .xml2018_mandatrader <- function(node, doc, root, val, niva, register) {
   geo <- .xml2018_geo(node, val, niva, doc)
-  partier <- xml2::xml_find_all(node, "./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA")
+  partier <- .xml2018_find_all(node, "./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA")
   # En partirad utan mandatfält hör till röstfördelningen, inte mandatlistan.
   partier <- partier[!is.na(xml2::xml_attr(partier, "MANDAT"))]
   if (!length(partier)) return(dplyr::mutate(.mandat_schema_2026(),
@@ -126,7 +126,7 @@
     members <- .xml2018_members(zip, valt, niva, mandat = TRUE)
     purrr::map(members, function(member) {
       doc <- .xml2018_fil(zip, member, valt)
-      root <- xml2::xml_find_first(doc, "./NATION|./KOMMUN")
+      root <- .xml2018_find_first(doc, "./NATION|./KOMMUN")
       noder <- .xml2018_mandat_noder(doc, valt, niva)
       purrr::map(noder, .xml2018_mandatrader, doc = doc, root = root,
                  val = valt, niva = niva, register = register) |>

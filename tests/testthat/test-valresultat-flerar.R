@@ -52,26 +52,26 @@ test_that("multi-year results equal bound single-year results without changing o
   )) {
     val <- case[[1]]
     niva <- case[[2]]
-    a <- valresultat(detaljniva = "full", ar = 2022, val = val, niva = niva, progress = FALSE)
-    b <- valresultat(detaljniva = "full", ar = 2026, val = val, niva = niva, progress = FALSE)
-    ab <- valresultat(detaljniva = "full", ar = c(2022, 2026), val = val, niva = niva,
+    a <- valresultat(source = "local", detaljniva = "full", ar = 2022, val = val, niva = niva, progress = FALSE)
+    b <- valresultat(source = "local", detaljniva = "full", ar = 2026, val = val, niva = niva, progress = FALSE)
+    ab <- valresultat(source = "local", detaljniva = "full", ar = c(2022, 2026), val = val, niva = niva,
                      progress = FALSE)
     expect_identical(ab, dplyr::bind_rows(a, b), info = paste(val, niva))
-    expect_identical(valresultat(detaljniva = "full", ar = c(2026, 2022, 2026), val = val,
+    expect_identical(valresultat(source = "local", detaljniva = "full", ar = c(2026, 2022, 2026), val = val,
                                 niva = niva, progress = FALSE),
                      dplyr::bind_rows(b, a), info = paste(val, niva))
     expect_identical(names(ab)[1:2], c("valtillfalle", "valar"))
     expect_identical(typeof(ab$valar), "integer")
     expect_identical(unique(ab$valar), c(2022L, 2026L))
-    expect_identical(valresultat(detaljniva = "full", fran = 2022, val = val, niva = niva,
+    expect_identical(valresultat(source = "local", detaljniva = "full", fran = 2022, val = val, niva = niva,
                                 progress = FALSE), ab)
-    expect_identical(valresultat(detaljniva = "full", fran = 2022, till = 2022, val = val, niva = niva,
+    expect_identical(valresultat(source = "local", detaljniva = "full", fran = 2022, till = 2022, val = val, niva = niva,
                                 progress = FALSE), a)
   }
-  expect_identical(valresultat(detaljniva = "full", progress = FALSE),
-                   valresultat(detaljniva = "full", ar = 2026, progress = FALSE))
-  expect_identical(valresultat(detaljniva = "full", 2026, "RD", "slutlig", "riket", progress = FALSE),
-                   valresultat(detaljniva = "full", ar = 2026, val = "RD", rakning = "slutlig",
+  expect_identical(valresultat(source = "local", detaljniva = "full", progress = FALSE),
+                   valresultat(source = "local", detaljniva = "full", ar = 2026, progress = FALSE))
+  expect_identical(valresultat(source = "local", detaljniva = "full", 2026, "RD", "slutlig", "riket", progress = FALSE),
+                   valresultat(source = "local", detaljniva = "full", ar = 2026, val = "RD", rakning = "slutlig",
                                niva = "riket", progress = FALSE))
 })
 

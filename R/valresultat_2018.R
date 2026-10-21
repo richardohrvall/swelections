@@ -17,14 +17,15 @@
   as.integer(x)
 }
 
-.xml2018_partirader <- function(node, geo, root, val, register) {
+.xml2018_partirader <- function(node, geo, root, val, register,
+                                  schema = .valresultat_schema()) {
   direkta <- .xml2018_barn(node, "GILTIGA")
   ovriga <- .xml2018_forsta(node, "\u00d6VRIGA_GILTIGA")
   detaljer <- .xml2018_barn(ovriga, "GILTIGA")
   handskrivna <- .xml2018_barn(ovriga, "HANDSKRIVNA")
   partier <- c(direkta, detaljer, handskrivna)
   if (!length(partier)) return(.valresultat_schema())
-  out <- .valresultat_schema()[rep(NA_integer_, length(partier)), , drop = FALSE]
+  out <- schema[rep(NA_integer_, length(partier)), , drop = FALSE]
   out$valtillfalle <- "Val_2018"
   out$rakningstillfalle <- "slutlig"
   out$valtyp <- val
@@ -73,6 +74,8 @@
     paste("ej j\u00e4mf\u00f6rbar:", indelning)
   } else indelning
   for (namn in intersect(names(geo), names(out))) out[[namn]] <- geo[[namn]]
+  # Build party vectors without repeated tibble cell replacement.
+  out <- as.list(out)
   for (i in seq_along(partier)) {
     parti <- partier[[i]]
     hand <- i > length(direkta) + length(detaljer)
@@ -99,7 +102,7 @@
       sum(as.double(out$antal_roster)) != out$giltiga_roster[[1]]) {
     stop("Partir\u00f6sterna i 2018-XML st\u00e4mmer inte med giltiga r\u00f6ster.", call. = FALSE)
   }
-  out
+  tibble::new_tibble(out, nrow = length(partier))
 }
 
 .valresultat_2018 <- function(val, niva, source, data_dir, update, archive, progress) {
@@ -113,14 +116,16 @@
     register <- .xml2018_reg_fran_listor(zip, val, register)
   }
   members <- .xml2018_members(zip, val, niva)
+  # The fixed empty prototype is shared only within this read operation.
+  schema <- .valresultat_schema()
   parsed <- purrr::map(members, function(member) {
     doc <- .xml2018_fil(zip, member, val)
-    root <- xml2::xml_find_first(doc, "./NATION|./KOMMUN")
+    root <- .xml2018_find_first(doc, "./NATION|./KOMMUN")
     noder <- .xml2018_noder(doc, niva, val)
     if (!length(noder)) return(.valresultat_schema())
     purrr::map(noder, function(node) {
       geo <- .xml2018_geo(node, val, niva, doc)
-      .xml2018_partirader(node, geo, root, val, register)
+      .xml2018_partirader(node, geo, root, val, register, schema)
     }) |> purrr::list_rbind()
   }, .progress = progress) |> purrr::list_rbind()
   if (niva == "valdistrikt") parsed$raknat <- rep(TRUE, nrow(parsed))

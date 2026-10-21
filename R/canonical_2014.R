@@ -6,17 +6,10 @@
     stop(ar, " canonical data require a configured local build manifest.", call. = FALSE)
   manifest <- .canonical_manifest(path)
   if (!identical(as.integer(manifest$valar), as.integer(ar)) ||
-      !identical(as.integer(manifest$schema_version), 2L) ||
+      !identical(as.integer(manifest$schema_version), 3L) ||
       !identical(manifest$format, "parquet") || !identical(manifest$valserie, "rkl"))
-    stop("Expected RKL ", ar, " English Parquet schema version 2.", call. = FALSE)
-  directory <- getOption("swelections.canonical_assets_dir", dirname(path))
-  fetch <- function(asset) {
-    entry <- manifest$assets[manifest$assets$asset == asset, ]
-    if (nrow(entry) != 1L) stop("Missing ", ar, " asset: ", asset, call. = FALSE)
-    file <- normalizePath(file.path(directory, entry$file), winslash = "/", mustWork = TRUE)
-    .canonical_asset(manifest, asset, getOption("swelections.canonical_cache_dir", NULL),
-      paste0("file:///", file))
-  }
+    stop("Expected RKL ", ar, " English Parquet schema version 3.", call. = FALSE)
+  fetch <- .canonical_fetcher(manifest, path)
   values <- if (is.null(val)) c("RD", "RF", "KF") else val
   if (surface == "valresultat") {
     asset <- paste0(paste0(prefix, "results-"), rakning, "-", tolower(val))
@@ -28,7 +21,7 @@
     x <- fetch(asset)
     out <- purrr::list_rbind(lapply(values, function(v)
       .canonical_table(manifest, x, asset, v)))
-    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% niva)
+    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% .canonical_storage_key(niva))
     return(out)
   }
   population <- function() dplyr::filter(
@@ -42,7 +35,7 @@
     read_base <- function(short) {
       asset <- paste0(paste0(prefix, "preference-votes-base-"), short, "-", tolower(val))
       x <- fetch(asset)
-      components <- manifest$tables$table[manifest$tables$asset == asset]
+      components <- c("geo", "parti", "lista", "roster", "listroster")
       stats::setNames(lapply(components, function(component)
         .canonical_table(manifest, x, asset, component, ".component")), components)
     }

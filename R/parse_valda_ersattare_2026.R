@@ -93,102 +93,58 @@ parse_valda_ersattare_2026 <- function(raw) {
 
     parti_list <- valda$partiLedamoterLista
 
-    valda_rows <- purrr::map_dfr(
-      parti_list,
-      \(parti) {
 
-        ledamoter <- parti$ledamoter
-
-        if (is.null(ledamoter) || length(ledamoter) == 0) {
-          return(empty_valda())
-        }
-
-        purrr::map_dfr(
-          ledamoter,
-          \(ledamot) tibble::tibble(
-            valtillfalle = as_chr_na(raw$valtillfalle),
-            valklass = as_chr_na(raw$valklass),
-            rakningstillfalle = .normalisera_rakningstillfalle_2026(raw$rakningstillfalle),
-            valtyp = valtyp,
-            valdatum = as_chr_na(raw$valdatum),
-            valdatum_fg = as_chr_na(raw$tidigareValdatum),
-            test = as_lgl_na(raw$test),
-            geografiniva = geografiniva,
-            valomradeskod = as_chr_na(valomrade$kod),
-            valomradesnamn = as_chr_na(valomrade$namn),
-            valkretskod = valkretskod,
-            valkretsnamn = valkretsnamn,
-            partibeteckning = as_chr_na(parti$partibeteckning),
-            partiforkortning = as_chr_na(parti$partiforkortning),
-            partikod = as_chr_na(parti$partikod),
-            partifarg = as_chr_na(parti$partiFarg),
-            kandidatnummer = as_chr_na(ledamot$kandidatnummer),
-            namn = as_chr_na(ledamot$namn),
-            invalsordning = as_int_na(ledamot$invalsordning),
-            valgrund_id = as_chr_na(ledamot$valgrundId),
-            valgrund_text = as_chr_na(ledamot$valgrundText),
-            ersattargrupp = as_chr_na(ledamot$ersattargrupp)
-          )
-        )
-      }
+    # Metadata is shared by the entire elected/substitute group.
+    common <- function(parti) tibble::tibble(
+      valtillfalle = as_chr_na(raw$valtillfalle),
+      valklass = as_chr_na(raw$valklass),
+      rakningstillfalle = .normalisera_rakningstillfalle_2026(raw$rakningstillfalle),
+      valtyp = valtyp, valdatum = as_chr_na(raw$valdatum),
+      valdatum_fg = as_chr_na(raw$tidigareValdatum), test = as_lgl_na(raw$test),
+      geografiniva = geografiniva,
+      valomradeskod = as_chr_na(valomrade$kod),
+      valomradesnamn = as_chr_na(valomrade$namn),
+      valkretskod = valkretskod, valkretsnamn = valkretsnamn,
+      partibeteckning = as_chr_na(parti$partibeteckning),
+      partiforkortning = as_chr_na(parti$partiforkortning),
+      partikod = as_chr_na(parti$partikod), partifarg = as_chr_na(parti$partiFarg)
     )
-
-    ersattare_rows <- purrr::map_dfr(
-      parti_list,
-      \(parti) {
-
-        ledamoter <- parti$ledamoter
-
-        if (is.null(ledamoter) || length(ledamoter) == 0) {
-          return(empty_ersattare())
-        }
-
-        purrr::map_dfr(
-          ledamoter,
-          \(ledamot) {
-
-            ersattare <- ledamot$ersattareList
-
-            if (is.null(ersattare) || length(ersattare) == 0) {
-              return(empty_ersattare())
-            }
-
-            purrr::map_dfr(
-              ersattare,
-              \(ers) tibble::tibble(
-                valtillfalle = as_chr_na(raw$valtillfalle),
-                valklass = as_chr_na(raw$valklass),
-                rakningstillfalle = .normalisera_rakningstillfalle_2026(raw$rakningstillfalle),
-                valtyp = valtyp,
-                valdatum = as_chr_na(raw$valdatum),
-                valdatum_fg = as_chr_na(raw$tidigareValdatum),
-                test = as_lgl_na(raw$test),
-                geografiniva = geografiniva,
-                valomradeskod = as_chr_na(valomrade$kod),
-                valomradesnamn = as_chr_na(valomrade$namn),
-                valkretskod = valkretskod,
-                valkretsnamn = valkretsnamn,
-                partibeteckning = as_chr_na(parti$partibeteckning),
-                partiforkortning = as_chr_na(parti$partiforkortning),
-                partikod = as_chr_na(parti$partikod),
-                partifarg = as_chr_na(parti$partiFarg),
-                ledamot_kandidatnummer =
-                  as_chr_na(ledamot$kandidatnummer),
-                ledamot_namn = as_chr_na(ledamot$namn),
-                ersattargrupp = as_chr_na(ledamot$ersattargrupp),
-                ersattare_kandidatnummer =
-                  as_chr_na(ers$kandidatnummer),
-                ersattare_namn = as_chr_na(ers$namn),
-                ersattarordning = as_int_na(ers$ersattarordning),
-                valgrund_id = as_chr_na(ers$valgrundId),
-                valgrund_text = as_chr_na(ers$valgrundText)
-              )
-            )
-          }
-        )
-      }
-    )
-
+    chars <- function(rows, value) vapply(rows,
+      function(row) as_chr_na(value(row)), character(1), USE.NAMES = FALSE)
+    ints <- function(rows, value) vapply(rows,
+      function(row) as_int_na(value(row)), integer(1), USE.NAMES = FALSE)
+    valda_rows <- purrr::map_dfr(parti_list, function(parti) {
+      ledamoter <- parti$ledamoter
+      if (!length(ledamoter)) return(empty_valda())
+      columns <- tibble::tibble(
+        kandidatnummer = chars(ledamoter, \(x) x$kandidatnummer),
+        namn = chars(ledamoter, \(x) x$namn),
+        invalsordning = ints(ledamoter, \(x) x$invalsordning),
+        valgrund_id = chars(ledamoter, \(x) x$valgrundId),
+        valgrund_text = chars(ledamoter, \(x) x$valgrundText),
+        ersattargrupp = chars(ledamoter, \(x) x$ersattargrupp)
+      )
+      dplyr::bind_cols(common(parti)[rep(1L, nrow(columns)), ], columns)
+    })
+    ersattare_rows <- purrr::map_dfr(parti_list, function(parti) {
+      ledamoter <- parti$ledamoter
+      if (!length(ledamoter)) return(empty_ersattare())
+      lists <- lapply(ledamoter, function(l) l$ersattareList)
+      ersattare <- unlist(lists, recursive = FALSE, use.names = FALSE)
+      if (!length(ersattare)) return(empty_ersattare())
+      parents <- ledamoter[rep(seq_along(ledamoter), lengths(lists))]
+      columns <- tibble::tibble(
+        ledamot_kandidatnummer = chars(parents, \(x) x$kandidatnummer),
+        ledamot_namn = chars(parents, \(x) x$namn),
+        ersattargrupp = chars(parents, \(x) x$ersattargrupp),
+        ersattare_kandidatnummer = chars(ersattare, \(x) x$kandidatnummer),
+        ersattare_namn = chars(ersattare, \(x) x$namn),
+        ersattarordning = ints(ersattare, \(x) x$ersattarordning),
+        valgrund_id = chars(ersattare, \(x) x$valgrundId),
+        valgrund_text = chars(ersattare, \(x) x$valgrundText)
+      )
+      dplyr::bind_cols(common(parti)[rep(1L, nrow(columns)), ], columns)
+    })
     list(
       valda = valda_rows,
       ersattare = ersattare_rows

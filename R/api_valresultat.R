@@ -58,7 +58,9 @@
 #' @param rakning Exakt en räkning: `"slutlig"` (default) eller `"preliminar"`.
 #' @param niva En geografisk nivå. `NULL` ger valets huvudnivå: RD `"riket"`,
 #'   RF `"region"`, KF `"kommun"`. Se nivåerna nedan.
-#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param names Språk för kolumnnamn och tekniska kategorier: `"sv"`
+#'   (standard) eller `"en"`. Egentliga namn och källidentifierare bevaras;
+#'   booleska egenskaper är logical `TRUE`/`FALSE` i båda språken.
 #' @param detaljniva `"standard"` (standard) för en kompakt analystabell eller
 #'   `"full"` för alla tillgängliga harmoniserade fält. Påverkar inte rader
 #'   eller värden och är oberoende av `names`.
@@ -254,17 +256,20 @@ valresultat <- function(
 
 .valresultat_ett_ar <- function(ar, val, rakning, niva, kalla, source,
                                data_dir, update, archive, progress) {
+  source <- .select_public_source(source, ar, "valresultat", data_dir,
+    update, archive, val = val, niva = niva, rakning = rakning)
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_source(ar, "valresultat", val, niva = niva, rakning = rakning,
+      auto_selected = identical(source, "canonical_auto")))
+  raw_options <- options(swelections.internal_raw_request = TRUE)
+  on.exit(options(raw_options), add = TRUE)
   if (ar == 2002L) {
-    if (source == "canonical") return(.canonical_source(ar, "valresultat", val, niva, rakning = rakning))
     return(.valresultat_2002(.sources_2002(source, data_dir, update, archive), val, niva, rakning, progress))
   }
   if (ar == 2006L) {
-    if (source == "canonical") return(.canonical_source(ar, "valresultat", val, niva, rakning = rakning))
     return(.valresultat_2006(.sources_2006(source, data_dir, update, archive), val, niva, rakning, progress))
   }
   if (ar %in% c(2010L, 2014L)) {
-    if (source == "canonical") return(.canonical_source(ar, "valresultat", val,
-      niva, rakning = rakning))
     sources <- .sources_historical(ar, source, data_dir, update, archive)
     if (rakning == "preliminar")
       return(.valresultat_preliminary_2014(sources, val, niva, progress))
@@ -274,11 +279,6 @@ valresultat <- function(
     stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
          call. = FALSE)
   }
-  source <- .select_public_source(source, ar, "valresultat", data_dir,
-                                  update, archive)
-  if (source %in% c("canonical", "canonical_auto"))
-    return(.canonical_source(ar, "valresultat", val, niva,
-        rakning = rakning, auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
     return(.valresultat_2018(val, niva, source, data_dir, update, archive, progress))
   }

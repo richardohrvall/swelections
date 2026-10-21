@@ -11,6 +11,7 @@
  'alkon/alkandur_E.skv','alkon/E/rostberattigade.skv','handskrivna/handskrivna.skv')))
 
 .eu2014_file <- function(role, source, data_dir) {
+ .auto_requires_local(source, "EU 2014 raw data")
  entry <- .eu2014_sources();entry <- entry[match(role,entry$role),]
  if(nrow(entry)!=1L||anyNA(entry))stop('Unknown EU 2014 source role.',call.=FALSE)
  if(source=='remote')stop('EU 2014 requires preserved original local sources: current final XML redacts geographic names. Use local or a configured canonical build.',call.=FALSE)
@@ -84,23 +85,23 @@
  x
 }
 
-.eu2014_result_node <- function(node,doc,level,register) {
- out<-.eu2019_result_node(node,doc,level,register,'slutlig')
- inv<-xml2::xml_find_all(node,'./OGILTIGA')
+.eu2014_result_node <- function(node,doc,level,register, schema = .valresultat_schema()) {
+ out<-.eu2019_result_node(node,doc,level,register,'slutlig',schema)
+ inv<-.xml2018_find_all(node,'./OGILTIGA')
  out$ogiltiga_roster<-sum(as.integer(xml2::xml_attr(inv,'R\u00d6STER')))
  previous<-as.integer(xml2::xml_attr(inv,'R\u00d6STER_FGVAL'))
  out$ogiltiga_roster_fg<-if(anyNA(previous))NA_integer_ else sum(previous)
  if(all(is.na(out$totalt_antal_roster)))out$totalt_antal_roster<-out$giltiga_roster+out$ogiltiga_roster
  # Missing numeric code is not the same as an aggregated other-party category.
  out$ovriga_partier<-rep(FALSE,nrow(out))
- other<-xml2::xml_find_first(node,'./\u00d6VRIGA_GILTIGA/HANDSKRIVNA')
+ other<-.xml2018_find_first(node,'./\u00d6VRIGA_GILTIGA/HANDSKRIVNA')
  if(!inherits(other,'xml_missing')){
   i<-nrow(out);out$ovriga_partier[i]<-TRUE
   out$partibeteckning[i]<-'Handskrivna r\u00f6ster'
  }
  zero<-which(is.na(out$partikod)&!out$ovriga_partier)
  if(length(zero)) {
-  p<-xml2::xml_find_all(node,'./GILTIGA | ./\u00d6VRIGA_GILTIGA/GILTIGA')
+  p<-.xml2018_find_all(node,'./GILTIGA | ./\u00d6VRIGA_GILTIGA/GILTIGA')
   info<-.eu2019_party(p,register);out$partibeteckning[zero]<-info$partibeteckning[zero]
  }
  .eu2014_retag(out)
@@ -135,13 +136,15 @@
  zip<-.eu2014_file('final',args$source,args$data_dir)
  key<-paste(normalizePath(zip,winslash='/'),file.info(zip)$mtime)
  if(exists(key,.eu2014_cache,inherits=FALSE))return(get(key,.eu2014_cache))
+ # Reuse the immutable empty prototype within this bundle only.
+ schema <- .valresultat_schema()
  members<-sort(utils::unzip(zip,list=TRUE)$Name)
  municipal<-members[grepl('^slutresultat_[0-9]{4}E[.]xml$',members)]
  if(length(municipal)!=290L||anyDuplicated(municipal))stop('Incomplete original EU 2014 archive.',call.=FALSE)
  doc<-.eu2014_doc(zip,'slutresultat_00E.xml');reg<-.eu2014_register(doc)
  r<-ctx<-pv<-ls<-list();i<-0L
  consume<-function(node,level,d){
-  i<<-i+1L;r[[i]]<<-.eu2014_result_node(node,d,level,reg)
+  i<<-i+1L;r[[i]]<<-.eu2014_result_node(node,d,level,reg,schema)
   ctx[[i]]<<-.eu2019_geo(node,level)
   if(level%in%c('riket','valdistrikt')){
    p<-.eu2019_preferences_node(node,reg,.xml2018_attr(node,'KOD'))

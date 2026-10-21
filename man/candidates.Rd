@@ -32,15 +32,17 @@ election, geographic level and count stage.}
 results when \code{TRUE}; corresponds to \code{resultat} in \code{\link[=kandidater]{kandidater()}}.}
 
 \item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
-For 2018, \code{"auto"} prefers a complete configured local raw set, then an
-explicitly auto-eligible published canonical release, then the official
-remote raw source. Other years retain the official raw-data route.
-Explicit \code{"canonical"} resolves the published 2018 English-schema Parquet
-release. Unpublished 2014/2022 builds require an explicitly configured manifest;
-they are not selected by \code{"auto"}. A local build may be selected through
-\code{options(swelections.canonical_manifest = "path/to/manifest.json")}.
-A named character vector of manifest paths keyed by year supports requests
-spanning published 2018 and configured 2022 data.
+\code{auto} prefers approved canonical coverage for the requested election family,
+event, year and view, even when local raw files exist. Without that coverage,
+it uses a supported remote route, never the user's local raw files.
+If neither is available, select \code{source = "local"} explicitly for a saved
+archive. Explicit \code{remote} uses Valmyndigheten
+where supported; \code{local} requires the user's saved raw archive and never
+uses the network. \code{canonical} requires canonical data without raw fallback.
+Use \code{source = "local"} to select \code{data_dir} instead of canonical under \code{auto}.
+Private prototypes cannot extend automatic permission. Configured manifests may be
+a single path or named paths keyed by \code{series:ordinary:year} (e.g.
+\code{eu:ordinary:2014}), \code{series:year}, or legacy year keys. See \link{data_sources}.
 Canonical Parquet reading requires optional package \code{nanoparquet}.
 The 2014 raw route requires a preserved local archive: final XML under
 \code{2014/valresultat/slutresultat_20141001}, election-night XML under
@@ -65,7 +67,10 @@ typed missing values. Unsupported historical attributes remain missing.}
 alternative to \code{year}.}
 
 \item{names}{Output column language: \code{"en"} or \code{"sv"}. \code{NULL} uses
-\code{getOption("swelections.names", "en")}. This changes column names only.}
+\code{getOption("swelections.names", "en")}. This controls column names and
+technical categories. Proper names/source identifiers remain unchanged.
+Booleans are logical in both languages. Consent/declaration in full output
+have separate \verb{*_applicable} flags; not applicable is not false.}
 
 \item{detail}{\code{"standard"} (default) selects analysis-facing columns;
 \code{"full"} retains all available harmonised fields. This is independent

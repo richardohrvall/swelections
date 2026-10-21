@@ -5,16 +5,10 @@
     stop("2006 canonical data require a configured local build manifest.", call. = FALSE)
   manifest <- .canonical_manifest(path)
   if (!identical(as.integer(manifest$valar), 2006L) ||
-      !identical(as.integer(manifest$schema_version), 2L) ||
+      !identical(as.integer(manifest$schema_version), 3L) ||
       !identical(manifest$format, "parquet") || !identical(manifest$valserie, "rkl"))
-    stop("Expected RKL 2006 English Parquet schema version 2.", call. = FALSE)
-  directory <- getOption("swelections.canonical_assets_dir", dirname(path))
-  fetch <- function(asset) {
-    entry <- manifest$assets[manifest$assets$asset == asset, ]
-    if (nrow(entry) != 1L) stop("Missing 2006 asset: ", asset, call. = FALSE)
-    file <- normalizePath(file.path(directory, entry$file), winslash = "/", mustWork = TRUE)
-    .canonical_asset(manifest, asset, getOption("swelections.canonical_cache_dir", NULL), paste0("file:///", file))
-  }
+    stop("Expected RKL 2006 English Parquet schema version 3.", call. = FALSE)
+  fetch <- .canonical_fetcher(manifest, path)
   values <- if (is.null(val)) c("RD", "RF", "KF") else val
   if (surface == "valresultat") {
     if (rakning != "slutlig") stop("2006 has no complete preliminary collection source.", call. = FALSE)
@@ -26,7 +20,7 @@
     asset <- "rkl2006-seats-slutlig"
     out <- purrr::list_rbind(lapply(values, function(v)
       .canonical_table(manifest, fetch(asset), asset, v)))
-    if (!is.null(niva)) out <- out[out$geografiniva %in% niva, ]
+    if (!is.null(niva)) out <- out[out$geografiniva %in% .canonical_storage_key(niva), ]
     return(out)
   }
   if (surface == "personroster") {

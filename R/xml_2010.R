@@ -1,5 +1,6 @@
 # ZIP-backed 2010 read adapter. Sources are never extracted or rewritten.
 .sources_2010 <- function(source, data_dir, update = FALSE, archive = FALSE) {
+  .auto_requires_local(source, "RKL 2010 raw data")
   .check_source_update(source, update)
   if (source == "remote" || update || archive)
     stop("2010 requires preserved local sources; update/archive are not supported.", call. = FALSE)

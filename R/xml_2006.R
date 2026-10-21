@@ -1,5 +1,6 @@
 # Preserved 2006 sources are immutable; adaptation only changes in-memory XML.
 .sources_2006 <- function(source, data_dir, update = FALSE, archive = FALSE) {
+  .auto_requires_local(source, "RKL 2006 raw data")
   if (!source %in% c("auto", "local") || update || archive)
     stop("2006 requires preserved local sources; remote/update/archive are not supported.", call. = FALSE)
   root <- val_data_dir(data_dir)

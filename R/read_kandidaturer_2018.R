@@ -57,5 +57,5 @@
                           "listnummer", "ordning", "kandidatnummer")])) {
     stop("Duplicerad kandidatur i 2018 \u00e5rs k\u00e4lla.", call. = FALSE)
   }
-  out
+  .xml2018_ragunda_candidacy(out)
 }

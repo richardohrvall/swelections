@@ -18,7 +18,8 @@ return Swedish column names by default. English functions return English
 column names by default; `names = "sv"` requests Swedish column names for an
 English call. Set `options(swelections.names = "sv")` to make that the default
 for English calls. An explicit `names` argument always overrides the option.
-Column-name selection does not translate data values.
+Language selection also localizes technical categories. Booleans remain logical;
+party, geographic and personal names retain their source spelling.
 
 | English | Swedish |
 | --- | --- |
@@ -71,8 +72,9 @@ positions, not physical persons. A complete preliminary Wednesday snapshot has
 not been recovered. See [2004 coverage and provenance](development/COMPLETENESS_EU_2004.md).
 
 EU 2019 final and complete preliminary results use the preserved official XML.
-Raw builds require the pinned preserved archive; a local canonical build can
-also be selected explicitly. See the source documentation for required inputs.
+Raw builds require the pinned preserved archive. Approved canonical data are
+the normal source after publication; preserved raw inputs remain an explicit
+local alternative. See the source documentation for required inputs.
 Final results include the separately reported handwritten-party votes.
 Preliminary results retain ten named parties plus aggregated other parties.
 The fixed 2019 allocation is 20 seats, before the subsequent Brexit change.
@@ -105,8 +107,8 @@ The English `election` values are `"parliamentary"`, `"regional"` and
 `"municipal"`. The corresponding official Valmyndigheten codes `"RD"`, `"RF"`
 and `"KF"` are accepted too. The output column `election_code` contains these
 official codes. `election_kind` describes the kind of election, such as an
-ordinary election, re-election or extra election; its source values are not
-translated.
+ordinary election, re-election or extra election. Technical categories use
+English values in canonical/English output and Swedish equivalents in Swedish output.
 
 ```r
 # Official party results at each election's main geographic level
@@ -253,7 +255,7 @@ See [2002 implementation and limitations](development/IMPLEMENTATION_2002.md)
 and [validation](development/VALIDATION_2002.md).
 
 2006 final RD/RF/KF data use preserved local XML, ballot and supplementary
-candidate sources, with an opt-in unpublished canonical prototype. No complete
+candidate sources, included in the reviewed canonical release candidate. No complete
 preliminary collection source is available. For 2006, `candidate_number` is a
 package-generated **source-observation/candidacy key**, not a person identifier.
 Equal names are not merged across lists, source structures or elections.
@@ -269,7 +271,7 @@ The seven data families support 2022 and 2026 where their official source
 files contain the requested information. Final 2018 data are also supported
 through separate XML and candidacy readers. Published 2018 candidate names
 are unavailable in the public output, even if a local historical snapshot
-contains names. Result-dependent 2018 calls currently require a local copy of
+contains names. Raw result-dependent 2018 calls require a local copy of
 the official XML archive. The official 2018 candidacy source can be read
 remotely.
 
@@ -279,15 +281,15 @@ preliminary collection-district presentation snapshot; final collection votes
 are not substituted. Candidate data include identifiers documented in the final
 results even when absent from the ballot files. Public candidate names and
 unsupported historical attributes are missing. Later membership snapshots are
-excluded. A 2014 canonical prototype is available only through an explicitly
-configured local manifest and is not selected automatically.
+excluded. The 2014 canonical product is registered for automatic use in the release
+candidate; publication remains a separate step.
 
 2010 final results use preserved election-result XML and ballot candidacies,
 with identified result-only candidates retained. Names and unsupported attributes
 remain missing. Preliminary results combine ordinary election-night districts
 with a separately preserved preliminary collection-district reporting snapshot.
 Unreported districts and blank category fields remain missing; final collection
-votes are never substituted. The local canonical prototype is opt-in and unpublished.
+votes are never substituted. The reviewed canonical product is included in the release candidate.
 
 For supported combinations, exact year vectors, `year = "all"`, and inclusive
 `from`/`to` ranges return years stacked in long format with integer
@@ -320,26 +322,32 @@ Rehearsal files can be selected explicitly for development with
 
 All main functions accept `source` and `data_dir`:
 
-- `source = "auto"` prefers the required official raw files in the configured
-  local archive. If they are unavailable, it uses a published canonical
-  release only when that election and release are explicitly approved for
-  automatic use; otherwise it uses the official remote source. The 2022 and
-  2026 elections stay on the raw-data route until separately approved.
-- `source = "local"` requires local files and never accesses the network.
-- `source = "remote"` selects the remote source.
-- `source = "canonical"` explicitly reads the versioned `swelections` Parquet
-  collection, currently for 2018 only. It is separate from locally stored
-  official raw files.
+- `source = "auto"` prioritizes approved canonical coverage for the requested
+  election family, event, year and view. Otherwise it uses a supported remote
+  source, never user-saved local raw files. If neither is available, it errors
+  and points to an explicit `source = "local"` request. The release candidate
+  activates the twelve reviewed products; EU 2009 excludes automatic preference
+  votes, RKL 2002 excludes candidacies, and referendum 2003 supports results only.
+  The new GitHub assets remain unpublished until the release is approved.
+- `source = "local"` requires local raw files and never accesses the network.
+- `source = "remote"` selects Valmyndigheten where that raw route is supported.
+- `source = "canonical"` explicitly reads published or configured canonical
+  data. It never falls back to raw files. See `?data_sources`.
+
+To force your own archive when canonical is available, use `source = "local"`
+with `data_dir`; specifying `data_dir` alone does not override canonical.
 
 Set `data_dir` per call or configure a local archive for the R session with
-`options(swelections.data_dir = "C:/path/to/valdata")`. `update` and `archive`
+`options(swelections.data_dir = "my_archive")`. `update` and `archive`
 control working-copy updates and dated raw-file snapshots where applicable.
 Raw source files are kept outside the package repository. `data_dir` applies
 to official raw files, not canonical Parquet assets.
 
-For 2018, an explicit canonical request resolves the versioned GitHub Release
-manifest and downloads only the required Parquet assets. To use a local build
-instead, configure its manifest:
+Approved canonical requests resolve a product-specific GitHub Release manifest
+and download only the required Parquet assets. This includes the corrected 2018
+generation with Ragunda and value/storage contract 1/1, replacing the old 2018
+default without overwriting its historical release. To test an unpublished build,
+configure its manifest:
 
 ```r
 options(swelections.canonical_manifest = "path/to/manifest.json")
@@ -347,15 +355,26 @@ results(year = 2018, election = "parliamentary", level = "national",
         source = "canonical")
 ```
 
-Unpublished 2014 and 2022 canonical builds can also be selected explicitly
-through their local manifests. They cover the supported historical levels and
-are not selected by `auto`; neither has a published canonical release yet.
+The first distribution contains **190 Parquet assets and 12 product manifests**
+under `data-v0.4.0`: RKL 2002/2006/2010/2014/2018/2022, referendum 2003, and
+EU 2004/2009/2014/2019/2024. RKL 2002 excludes candidacies; EU 2009 excludes
+all six preference-vote bases; the referendum has results only. The two historical
+mandate-history assets are shared by their three query functions. Assets remain
+unpublished until a separate publication step. See
+[the release review](development/RELEASE_CANDIDATE_REVIEW.md).
 
 Canonical assets are read next to the manifest by default and cached with
 checksum verification. `nanoparquet` is needed only for Parquet use. The
 explicit canonical request does not fall back to raw files when an asset is
 missing. `update` and `archive` keep their official raw-data meaning; they do
 not select canonical data automatically.
+
+Indexed remote result ZIPs use a persistent user cache. Every public request
+checks a fresh official `index.md5` and verifies cached bytes before reuse; changed
+or corrupt files are downloaded again. Failure to verify the index is an error,
+not permission to use stale data. The unindexed 2026 candidacy CSV is still fetched
+fresh. Only raw files persist, not parsed tables or API results. See `?data_sources`
+and [remote-cache validation](development/REMOTE_RAW_CACHE.md).
 
 ## Development status
 
@@ -406,8 +425,9 @@ counts. A full preliminary Wednesday snapshot has not been recovered, so
 `count = "preliminary"` errors rather than returning election-night data.
 For local sources, `data_dir` is the preserved source directory containing
 `final.xml`, `final-municipal/` and, when available, `source-manifest.json`.
-An unpublished canonical build requires an explicitly configured manifest;
-`auto` chooses suitable local raw data and otherwise the official remote source.
+The reviewed canonical product is registered for `auto` in the release candidate.
+Until publication, an explicit canonical manifest can be used for validation.
+User raw archives always require `source = "local"`; `auto` never selects them.
 See [the 2003 inventory](development/SOURCE_INVENTORY_2003.md) and
 [validation documentation](development/VALIDATION_2003.md).
 
@@ -430,9 +450,10 @@ The preliminary JSON includes collection districts; final data preserve the
 original elected/substitute relations. Blank ballots are invalid, and collection
 units have no independent electorate or turnout.
 
-Use the preserved EU archive through `data_dir` (the `eu/2024` directory or its
-parent), or the official remote source. The local canonical prototype is
-unpublished and requires an explicit manifest; it is not selected automatically.
+Use `source = "local"` for the preserved EU archive through `data_dir` (the
+`eu/2024` directory or its parent), or explicitly select the supported remote
+source. Reviewed canonical data are registered for automatic use in the release
+candidate, pending publication; explicit manifests remain available for validation.
 The approved later candidate snapshot defines the final population. The earlier
 valid consent-only record for candidate 1203 is retained as historical provenance,
 not silently added to that population; its disappearance has no identified effect
@@ -441,8 +462,10 @@ See [the EU source inventory](development/SOURCE_INVENTORY_EU_2024.md).
 
 ### European Parliament 2009
 
-The final 2009 EU result is supported through all seven functions using preserved
-original sources or a configured unpublished canonical build. Archived ballot XML
+EU 2009 has approved canonical coverage for six functions; `preference_votes()`
+requires explicit `source = "local"` and the preserved original sources. Its six
+preference-vote bases are deliberately excluded from the first distribution.
+A private full prototype cannot enable automatic preference-vote access. Archived ballot XML
 provides 500 named list positions; these are not 500 verified distinct persons.
 Generated `candidate_number` keys identify ballot positions or independent
 small-party preference source columns. Unlinked candidate enrichment stays missing.
@@ -488,3 +511,18 @@ there is no published re-election canonical release.
 
 See [the implementation and source requirements](development/IMPLEMENTATION_OMVAL.md)
 for archive layout, provenance, supported levels and historical source gaps.
+
+### Mandate-period membership
+
+`mandate_history()` / `mandathistorik()` describe holder and vacancy intervals
+for the 2014 and 2018 periods through approved canonical data. The 2022 period
+uses current remote member/history files; it is not a canonical history product.
+Explicit local sources remain supported. No user archive is needed for the
+normal canonical/remote routes.
+`members_at()` / `ledamoter_vid()` and `vacant_seats_at()` /
+`tomma_stolar_vid()` query the same population of allocated mandates on a date.
+The three functions filter shared intervals, rather than separate duplicated
+member/vacancy datasets. Requests beyond verified source-date coverage fail
+explicitly; a remote source is not assumed to describe future dates.
+Dates follow Valmyndigheten's electoral-history convention; temporary substitute
+attendance is not included. See [source requirements, semantics and validation](development/MANDATE_HISTORY.md).

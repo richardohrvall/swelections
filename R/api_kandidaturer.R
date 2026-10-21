@@ -25,10 +25,14 @@
 #'   EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `auto` prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+#'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+#'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
+#'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
 #'   För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
 #'   `alkandur_R/L/K.skv`. Källan saknar bland annat explicit giltighet och
 #'   samtycke; dessa fält är typade `NA`. Kandidatnamn exponeras inte.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
+#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -36,7 +40,9 @@
 #' @param data_dir Lokal rotmapp för rådata.
 #' @param update Om `TRUE`, uppdateras den lokala arbetskopian.
 #' @param archive Om `TRUE`, sparas även en daterad snapshot.
-#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param names Språk för kolumnnamn och tekniska kategorier: `"sv"`
+#'   (standard) eller `"en"`. Egentliga namn och källidentifierare bevaras;
+#'   booleska egenskaper är logical `TRUE`/`FALSE` i båda språken.
 #' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
 #'   för alla tillgängliga harmoniserade fält.
 #'
@@ -104,23 +110,23 @@ kandidaturer <- function(
       error = function(e) stop("Val\u00e5r ", ett_ar, ": ", conditionMessage(e),
                                call. = FALSE)
     )
-  }) |> purrr::list_rbind() |> .public_output_names(names)
+  }) |> .public_bind_years() |> .public_output_names(names)
 }
 
 .kandidaturer_ett_ar <- function(ar, val, source, data_dir, update, archive) {
+  source <- .select_public_source(source, ar, "kandidaturer", data_dir,
+    update, archive, val = val)
+  if (source %in% c("canonical", "canonical_auto"))
+    return(.canonical_source(ar, "kandidaturer", val,
+      auto_selected = identical(source, "canonical_auto")))
+  raw_options <- options(swelections.internal_raw_request = TRUE)
+  on.exit(options(raw_options), add = TRUE)
   if (ar == 2006L) {
-    if (source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
     return(.read_candidacies_2006(.sources_2006(source, data_dir, update, archive), if (is.null(val)) c("RD", "RF", "KF") else val))
   }
-  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidaturer", val))
   if (ar %in% c(2010L, 2014L)) return(.read_candidacies_2014(
     .sources_historical(ar, source, data_dir, update, archive),
     if (is.null(val)) c("RD", "RF", "KF") else val))
-  source <- .select_public_source(source, ar, "kandidaturer", data_dir,
-                                  update, archive)
-  if (source %in% c("canonical", "canonical_auto"))
-    return(.canonical_source(ar, "kandidaturer", val,
-        auto_selected = identical(source, "canonical_auto")))
   if (ar == 2018L) {
     file <- .kalla_2018("kandidaturer", source, data_dir, update, archive)
     out <- .read_kandidaturer_2018(file)

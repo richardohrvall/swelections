@@ -73,22 +73,21 @@
 
 .ersattare_ett_ar <- function(ar, val, source, data_dir, update, archive,
                               progress) {
-  if (ar == 2002L) {
-    if (source == "canonical") return(.canonical_source(ar, "ersattare", val))
-    return(.ersattare_2002(.sources_2002(source, data_dir, update, archive), val, progress))
-  }
-  if (ar == 2006L) {
-    if (source == "canonical") return(.canonical_source(ar, "ersattare", val))
-    return(.ersattare_2006(.sources_2006(source, data_dir, update, archive), val, progress))
-  }
-  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "ersattare", val))
-  if (ar %in% c(2010L, 2014L)) return(.ersattare_2014(
-    .sources_historical(ar, source, data_dir, update, archive), val, progress))
   source <- .select_public_source(source, ar, "ersattare", data_dir,
-                                  update, archive)
+    update, archive, val = val)
   if (source %in% c("canonical", "canonical_auto"))
     return(.canonical_source(ar, "ersattare", val,
       auto_selected = identical(source, "canonical_auto")))
+  raw_options <- options(swelections.internal_raw_request = TRUE)
+  on.exit(options(raw_options), add = TRUE)
+  if (ar == 2002L) {
+    return(.ersattare_2002(.sources_2002(source, data_dir, update, archive), val, progress))
+  }
+  if (ar == 2006L) {
+    return(.ersattare_2006(.sources_2006(source, data_dir, update, archive), val, progress))
+  }
+  if (ar %in% c(2010L, 2014L)) return(.ersattare_2014(
+    .sources_historical(ar, source, data_dir, update, archive), val, progress))
   if (ar == 2018L) {
     out <- .xml2018_valda_ersattare(val, source, data_dir, update,
       archive, progress)$ersattare

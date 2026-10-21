@@ -54,19 +54,19 @@ test_that("candidacy year selection preserves order, binding, and source paths",
       parse_kandidaturer_2026(raw)
     }
   )
-  a <- kandidaturer(detaljniva = "full", ar = 2022, val = "RD")
-  b <- kandidaturer(detaljniva = "full", val = "RD")
+  a <- kandidaturer(source = "local", detaljniva = "full", ar = 2022, val = "RD")
+  b <- kandidaturer(source = "local", detaljniva = "full", val = "RD")
   expect_identical(b$valar, rep(2026L, 4))
-  expect_identical(kandidaturer(detaljniva = "full", ar = c(2022, 2026), val = "RD"),
+  expect_identical(kandidaturer(source = "local", detaljniva = "full", ar = c(2022, 2026), val = "RD"),
                    dplyr::bind_rows(a, b))
-  expect_identical(kandidaturer(detaljniva = "full", ar = c(2026, 2022, 2026), val = "RD"),
+  expect_identical(kandidaturer(source = "local", detaljniva = "full", ar = c(2026, 2022, 2026), val = "RD"),
                    dplyr::bind_rows(b, a))
-  expect_identical(kandidaturer(detaljniva = "full", fran = 2022, till = 2026, val = "RD"),
+  expect_identical(kandidaturer(source = "local", detaljniva = "full", fran = 2022, till = 2026, val = "RD"),
                    dplyr::bind_rows(a, b))
-  expect_identical(kandidaturer(detaljniva = "full", fran = 2026, val = "RD"), b)
-  expect_identical(kandidaturer(detaljniva = "full", fran = 2022, till = 2022, val = "RD"), a)
-  expect_error(kandidaturer(detaljniva = "full", ar = 2022, fran = 2022), "alternativa")
-  expect_error(kandidaturer(detaljniva = "full", ar = 2024), "2022.*2026")
+  expect_identical(kandidaturer(source = "local", detaljniva = "full", fran = 2026, val = "RD"), b)
+  expect_identical(kandidaturer(source = "local", detaljniva = "full", fran = 2022, till = 2022, val = "RD"), a)
+  expect_error(kandidaturer(source = "local", detaljniva = "full", ar = 2022, fran = 2022), "alternativa")
+  expect_error(kandidaturer(source = "local", detaljniva = "full", ar = 2024), "2022.*2026")
   expect_identical(paths[[1]][[1]], "parti/kandidaturer.zip")
   expect_identical(paths[[1]][[3]], "val2022")
   expect_identical(paths[[2]][[1]], "parti/kandidaturer.csv")
@@ -83,7 +83,7 @@ test_that("failure in one candidacy year does not return partial data", {
       parse_kandidaturer_2026(fixture_kandidaturer_raw(), 2022L, TRUE)
     }
   )
-  expect_error(kandidaturer(detaljniva = "full", ar = c(2022, 2026)), "2026.*saknad")
+  expect_error(kandidaturer(source = "local", detaljniva = "full", ar = c(2022, 2026)), "2026.*saknad")
 })
 
 test_that("2022 local candidacy source is required and never fetched implicitly", {

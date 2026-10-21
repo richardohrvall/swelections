@@ -77,7 +77,7 @@
  }))
  s<-read('tab-02b_eu_kommun_tab_talut.xls');keep<-!is.na(suppressWarnings(as.integer(s[[3]]))) & !is.na(s[[1]]);s<-s[keep,];j<-match(normal(s[[1]]),units$name);stopifnot(nrow(s)==312L);if(anyNA(j))stop('Unmatched SCB result areas: ',paste(s[[1]][is.na(j)],collapse=', '))
  for(pair in list(c(3,'eligible'),c(7,'cast'),c(11,'invalid'),c(12,'blank'),c(14,'valid')))stopifnot(all(as.integer(s[[as.integer(pair[1])]])==units[[pair[2]]][j]))
- all<-purrr::list_rbind(refs[c('national','county','municipality')]);g<-ifelse(all$geographic_level=='riket','00',ifelse(all$geographic_level=='lan',all$county_code,all$municipality_code))
+ all<-purrr::list_rbind(refs[c('national','county','municipality')]);g<-ifelse(all$geographic_level=='national','00',ifelse(all$geographic_level=='county',all$county_code,all$municipality_code))
  pc<-c('0001','0004','0003','0068','0055','0002','0005','0451');cols<-c(16,18,20,22,24,26,27,28)
  for(i in seq_along(pc)) {ix<-which(all$party_code==pc[i] & !is.na(all$party_code));q<-match(units$code[j],g[ix]);stopifnot(!anyNA(q),all(as.integer(s[[cols[i]]])==all$votes[ix][q]))}
  other<-data.frame(code=g[!all$party_code%in%pc],votes=all$votes[!all$party_code%in%pc]);other<-other|>dplyr::summarise(votes=sum(.data$votes),.by='code');stopifnot(all(as.integer(s[[29]])==other$votes[match(units$code[j],other$code)]))

@@ -426,3 +426,23 @@ test_that("fully counted but contradictory area and district lists fail", {
   expect_error(.personrostomraden_2026(x$kandidaturer, x$kandidater,
     x$rost, x$mandat), "listr")
 })
+
+test_that("area reconciliation reuses mandate lists without validating them early", {
+  x <- personroster_list_fixture()
+  original <- .personroster_mandatlistor_2026
+  calls <- 0L
+  local_mocked_bindings(.personroster_mandatlistor_2026 = function(...) {
+    calls <<- calls + 1L
+    original(...)
+  })
+  out <- .personrostomraden_2026(x$kandidaturer, x$kandidater, x$rost, x$mandat)
+  expect_identical(calls, 1L)
+  expect_identical(out$antal_personroster, c(6L, 0L))
+  calls <- 0L
+  x$rost$antalValdistriktRaknade <- 1L
+  x$mandat$valomrade$valkretsLista[[1]]$rostfordelning$
+    rosterPaverkaMandat$partiRoster[[1]]$listRoster <- "not yet usable"
+  partial <- .personrostomraden_2026(x$kandidaturer, x$kandidater, x$rost, x$mandat)
+  expect_identical(calls, 0L)
+  expect_true(all(is.na(partial$antal_personroster)))
+})

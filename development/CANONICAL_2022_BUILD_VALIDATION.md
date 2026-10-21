@@ -243,7 +243,7 @@ on the original 0–100 scale; it is not a public share.
 ### Local asset inventory
 
 Final prototype directory:
-`C:/git/swelections/.local-data/canonical-build/2022-local-v0.2.0-final`.
+`.local-data/canonical-build/2022-local-v0.2.0-final`.
 It contains exactly 24 Parquet files plus `manifest.json`, no raw source
 files. Parquet size is 51,995,098 bytes; manifest size is 1,149,408 bytes.
 Manifest SHA256 is

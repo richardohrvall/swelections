@@ -1,20 +1,13 @@
 # Unpublished EU build; explicit source="canonical" never changes auto eligibility.
 .eu2004_canonical <- function(table, args) {
-  path <- getOption('swelections.canonical_manifest', NULL)
-  if (!is.null(names(path)) && '2004' %in% names(path)) path <- unname(path[['2004']])
+  path <- .canonical_manifest_path(2004L, "eu", auto_selected = isTRUE(args$.canonical_auto))
   if (!is.character(path) || length(path) != 1L || !file.exists(path))
     stop('EU 2004 canonical data require a configured local build manifest.', call. = FALSE)
   manifest <- .canonical_manifest(path)
   if (!identical(manifest$valserie, 'eu') || as.integer(manifest$valar) != 2004L ||
-      as.integer(manifest$schema_version) != 2L || !identical(manifest$format, 'parquet'))
-    stop('Expected EU 2004 English Parquet schema version 2.', call. = FALSE)
-  fetch <- function(asset) {
-    entry <- manifest$assets[manifest$assets$asset == asset, , drop = FALSE]
-    if (nrow(entry) != 1L) stop('Missing EU canonical asset: ', asset, call. = FALSE)
-    directory <- getOption('swelections.canonical_assets_dir', dirname(path))
-    file <- normalizePath(file.path(directory, entry$file), winslash = '/', mustWork = TRUE)
-    .canonical_asset(manifest, asset, getOption('swelections.canonical_cache_dir', NULL), paste0('file:///', file))
-  }
+      as.integer(manifest$schema_version) != 3L || !identical(manifest$format, 'parquet'))
+    stop('Expected EU 2004 English Parquet schema version 3.', call. = FALSE)
+  fetch <- .canonical_fetcher(manifest, path)
   count <- if (is.null(args$rakning)) 'slutlig' else args$rakning
   if(count != 'slutlig') stop('EU 2004 has no recovered complete preliminary Wednesday snapshot.',call.=FALSE)
   if (table %in% c('results', 'seats')) {

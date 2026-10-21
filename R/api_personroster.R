@@ -87,7 +87,11 @@
 #'   EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
+#'   `auto` prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+#'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+#'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
+#'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
+#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -101,7 +105,9 @@
 #' @param komplettera_nollor Om `TRUE`, komplettera glesa distrikts- och
 #'   listvyer med verifierade nollrader. För standardvyn på personvalsområdesnivå
 #'   utan lista ändras inte resultatet. Standard är `FALSE`.
-#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param names Språk för kolumnnamn och tekniska kategorier: `"sv"`
+#'   (standard) eller `"en"`. Egentliga namn och källidentifierare bevaras;
+#'   booleska egenskaper är logical `TRUE`/`FALSE` i båda språken.
 #' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
 #'   för alla tillgängliga harmoniserade fält.
 #'
@@ -192,18 +198,20 @@ personroster <- function(
     stop("`komplettera_nollor` ska vara TRUE eller FALSE.", call. = FALSE)
   }
   purrr::map(valar, function(ett_ar) {
+    selected_source <- .select_public_source(source, ett_ar, "personroster",
+      data_dir, update, archive, val = val, niva = niva)
+    if (!selected_source %in% c("canonical", "canonical_auto")) {
+      raw_options <- options(swelections.internal_raw_request = TRUE)
+      on.exit(options(raw_options), add = TRUE)
+    }
     tryCatch(
       if (ett_ar == 2002L) {
-        if (source == "canonical") .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor) else
+        if (selected_source %in% c("canonical", "canonical_auto")) .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor, auto_selected = selected_source == "canonical_auto") else
           .personroster_2002(.sources_2002(source, data_dir, update, archive), val, niva, per_lista, komplettera_nollor, progress)
       } else if (ett_ar == 2006L) {
-        if (source == "canonical") .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor) else
+        if (selected_source %in% c("canonical", "canonical_auto")) .canonical_source(ett_ar, "personroster", val, niva, per_lista, komplettera_nollor, auto_selected = selected_source == "canonical_auto") else
           .personroster_2006(.sources_2006(source, data_dir, update, archive), val, niva, per_lista, komplettera_nollor, progress)
-      } else if ({
-        selected_source <- .select_public_source(source, ett_ar,
-          "personroster", data_dir, update, archive)
-        selected_source %in% c("canonical", "canonical_auto")
-      }) {
+      } else if (selected_source %in% c("canonical", "canonical_auto")) {
         canonical_data <- purrr::list_rbind(lapply(val, function(v)
           .canonical_source(ett_ar, "personroster", v, niva, per_lista,
             komplettera_nollor,

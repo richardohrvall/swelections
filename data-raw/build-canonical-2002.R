@@ -12,12 +12,12 @@ sha <- swelections:::.canonical_sha256
 for(file in s$sources$export) swelections:::.xml2002_source(s,file)
 assets <- tables <- gaps <- list()
 save_asset <- function(parts,asset,role,discriminator='.table') {
-  if(is.data.frame(parts)) x <- swelections:::.canonical_names_en(parts) else {
-    layouts <- lapply(parts,function(x) names(swelections:::.canonical_names_en(x)))
-    tables[[length(tables)+1L]] <<- data.frame(asset=asset,table=names(parts),columns=vapply(layouts,paste,'',collapse=','))
+  if(is.data.frame(parts)) x <- swelections:::.canonical_encode(parts) else {
+    layouts <- lapply(parts,function(x) names(swelections:::.canonical_encode(x)))
+    tables[[length(tables)+1L]] <<- data.frame(asset=asset,table=swelections:::.canonical_storage_key(names(parts)),columns=vapply(layouts,paste,'',collapse=','))
     x <- purrr::list_rbind(lapply(names(parts),function(key) {
-      data <- swelections:::.canonical_names_en(parts[[key]])
-      data[[discriminator]] <- rep(key,nrow(data)); data
+      data <- swelections:::.canonical_encode(parts[[key]])
+      data[[discriminator]] <- rep(swelections:::.canonical_storage_key(key),nrow(data)); data
     }))
   }
   x[] <- lapply(x,unname)
@@ -65,7 +65,7 @@ save_asset(seats,'rkl2002-seats-slutlig','seats')
 for(surface in c('candidates','base','elected','substitutes'))
   save_asset(purrr::list_rbind(get(surface)),paste0('rkl2002-',if(surface=='base')'candidate-base'else surface),surface)
 for(file in s$sources$export) swelections:::.xml2002_source(s,file)
-manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',valserie='rkl',valar=2002L,
+manifest <- list(data_version='data-v0.4.0',schema_version=3L,value_schema_version=1L,storage_schema_version=1L,format='parquet',valserie='rkl',valar=2002L,
  release_status='unpublished_local_validation_build',auto_eligible=FALSE,
  built_at_utc=format(Sys.time(),'%Y-%m-%dT%H:%M:%SZ',tz='UTC'),
  build_commit=trimws(system2('git',c('rev-parse','HEAD'),stdout=TRUE)),
@@ -86,5 +86,7 @@ manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',v
   zeros='Explicit observed zeros only; no unsupported missing-candidate zero completion',
   district_preference='Valmyndigheten historical HTML supplements only missing RD district exports 1380/1381/1384; Nr is rank, not list position or identity; no aggregate-other candidates fabricated',
   invalid='Combined OG retained; separate blank/other-invalid categories remain unknown'))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest,file.path(out,'manifest.json'),pretty=TRUE,auto_unbox=TRUE,na='null')
 cat('Finished unpublished 2002 prototype:',out,'\n')

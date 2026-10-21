@@ -91,7 +91,7 @@ test_that("all seven English functions use the shared harmonised readers", {
     expect_identical(result$votes, output$antal_roster)
     expect_identical(nrow(result), nrow(output))
     expect_identical(typeof(result$votes), typeof(output$antal_roster))
-    expect_identical(result$geographic_level, "kommun")
+    expect_identical(result$geographic_level, "municipality")
     expect_identical(result$election_code, "KF")
     expect_false("election_type" %in% names(result))
   }
@@ -125,14 +125,14 @@ test_that("output language option is English-only and an explicit choice wins", 
   on.exit(options(old), add = TRUE)
   expect_identical(results(detail = "full"), output)
   expect_identical(results(names = "en", detail = "full"),
-                   .public_output_names(output, "en"))
+                   .public_output(output, "en"))
   expect_identical(results(names = "sv", detail = "full"), output)
   expect_error(results(names = "de"), "names")
   expect_error(results(names = NA_character_), "names")
   options(swelections.names = "de")
   expect_error(results(), "names")
   expect_identical(results(names = "en", detail = "full"),
-                   .public_output_names(output, "en"))
+                   .public_output(output, "en"))
 })
 
 test_that("English count and level values are strict and systematic", {
@@ -180,7 +180,7 @@ test_that("official election codes and English values use one mapping", {
     code <- fun(election = "RD", detail = "full")
     expect_identical(english, code)
     expect_identical(english$election_code, "RD")
-    expect_identical(english$election_kind, "ordinarie val")
+    expect_identical(english$election_kind, "ordinary")
     expect_false("election_type" %in% names(english))
   }
   expect_true(all(vapply(passed, \(x) identical(x$val, "RD"), logical(1))))
@@ -201,7 +201,7 @@ test_that("actual result fixture is identical across English and Swedish calls",
                     progress = FALSE)
   en <- results(election = "KF", count = "final", level = "municipality",
                 progress = FALSE)
-  expect_identical(en, .public_output_names(sv, "en"))
+  expect_identical(en, .public_output(sv, "en"))
   expect_identical(results(election = "KF", count = "final",
                            level = "municipality", names = "sv",
                            progress = FALSE), sv)

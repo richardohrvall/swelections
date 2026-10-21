@@ -1,8 +1,8 @@
 # 2018 års slutresultat läses från XML, utan beroende av namngivna snapshots.
 .xml2018_valda_ersattare_fil <- function(doc, val, register) {
   root <- xml2::xml_root(doc)
-  omraden <- if (val == "KF") xml2::xml_find_all(doc, "./KOMMUN/KRETS_KOMMUN") else
-    xml2::xml_find_all(doc, if (val == "RD")
+  omraden <- if (val == "KF") .xml2018_find_all(doc, "./KOMMUN/KRETS_KOMMUN") else
+    .xml2018_find_all(doc, if (val == "RD")
       "./NATION/L\u00c4N/KRETS_RIKSDAG" else "./NATION/L\u00c4N/KRETS_LANDSTING")
   valda <- list()
   ersattare <- list()
@@ -15,13 +15,13 @@
       kretskod <- NA_character_
       kretsnamn <- NA_character_
     }
-    for (parti in xml2::xml_find_all(omrade,
+    for (parti in .xml2018_find_all(omrade,
         "./GILTIGA[GRUPP_VALDA]|./\u00d6VRIGA_GILTIGA/GILTIGA[GRUPP_VALDA]")) {
       info <- .xml2018_parti(.xml2018_attr(parti, "PARTI"), val,
         geo$valomradeskod, register, parti, omrade)
-      for (grupp in xml2::xml_find_all(parti, "./GRUPP_VALDA")) {
-        ledamoter <- xml2::xml_find_all(grupp, "./VALD")
-        supp <- xml2::xml_find_all(grupp, "./ERS\u00c4TTARE")
+      for (grupp in .xml2018_find_all(parti, "./GRUPP_VALDA")) {
+        ledamoter <- .xml2018_find_all(grupp, "./VALD")
+        supp <- .xml2018_find_all(grupp, "./ERS\u00c4TTARE")
         gruppnummer <- .xml2018_attr(grupp, "ORDNING")
         ids <- xml2::xml_attr(ledamoter, "KANDNR")
         namn <- xml2::xml_attr(ledamoter, "NAMN")

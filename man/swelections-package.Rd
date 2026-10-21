@@ -11,7 +11,11 @@ The English-first API provides \code{\link[=results]{results()}}, \code{\link[=s
 including \code{\link[=valresultat]{valresultat()}} and \code{\link[=personroster]{personroster()}}, remain fully supported.
 English functions return English column names by default. Use \code{names = "sv"}
 or \code{options(swelections.names = "sv")} for Swedish output column names.
-Language selection changes column names, not data values.
+Language selection changes column names and technical categories. Canonical
+and English categories are English; Swedish output localizes them. Booleans
+remain logical. Proper names and source identifiers are preserved. Referendum
+option names are \code{yes}/\code{no}/\code{blank} in English and \code{Ja}/\code{Nej}/\code{Blank} in Swedish.
+Blank is valid, separate from invalid ballots. See \link{data_sources}.
 Resultatfiler väljs via \code{index.md5}. Optionen
 \code{swelections.resultatsamling_2026} väljer resultatsamling och har för närvarande
 standardvärdet \code{"val2026"}. Test-/utvecklingssamlingen \code{"genrep2026"} kan
@@ -20,10 +24,9 @@ väljas uttryckligen.
 \details{
 En lokal rådatamapp anges med \code{data_dir} eller optionen
 \code{swelections.data_dir}. Explicit \code{data_dir} har företräde.
-Med \code{source = "auto"} används kompletta lokala råfiler först. Om 2018 års
-råfiler saknas används den publicerade kanoniska samlingen när dess version
-uttryckligen är godkänd för automatiskt bruk; annars används fjärrkällan.
-För 2022/2026 används fortsatt den officiella rådatavägen.
+Med \code{source = "auto"} prioriteras godkänd canonical-data för efterfrågad
+valfamilj, valhändelse, år och vy. Utan godkänd täckning används befintlig
+rådataväg. EU-prototyperna är fortsatt endast explicit valbara. Se \link{data_sources}.
 Med \code{source = "local"} krävs en befintlig lokal fil och nätåtkomst används aldrig.
 Med \code{source = "remote"} används fjärrkällan vid vanlig läsning.
 

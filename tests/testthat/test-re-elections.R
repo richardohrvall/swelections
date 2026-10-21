@@ -61,7 +61,7 @@ test_that('all five event selections retain scope, year, metadata and projection
       full<-do.call(f,c(a,list(detail='full',names='en')))
       sv<-do.call(f,c(a,list(detail='standard',names='sv')))
       expect_identical(standard,full[names(standard)])
-      expect_identical(.public_output_names(sv,'en'),standard)
+      expect_identical(.public_output(sv,'en'),standard)
       expect_true(all(standard$event_scope_code==e$scope_code))
       expect_true(all(standard$election_year==e$election_year))
       expect_true(all(standard$original_election_event==e$original_election_event))
@@ -80,7 +80,7 @@ test_that('event ranges select all reruns and do not reinterpret year as parent 
   expect_error(seats(year=2010,election='municipal',election_kind='re_election'),'No matching')
   expect_error(results(year=2011,from=2010,election='municipal',election_kind='re_election'),'alternative')
   expect_error(seats(year=2011,election='municipal',election_kind='re_election',source='canonical'),'No canonical')
-  expect_error(results(year=2011,election='municipal',election_kind='re_election',count='preliminary'),'final sources will not replace')
+  expect_error(results(year=2011,election='municipal',election_kind='re_election',count='preliminary',source='local'),'final sources will not replace')
 })
 
 test_that('post-re-election rejects event-year and incompatible selections', {
@@ -137,7 +137,7 @@ test_that('Örebro composition replaces 17 seats and preserves the other 48', {
   full<-seats(year=2010,election='municipal',after_re_election=TRUE,source='local',detail='full')
   expect_identical(x,full[names(x)])
   sv<-mandat(ar=2010,val='KF',efter_omval=TRUE,source='local')
-  expect_identical(.public_output_names(sv,'en'),x)
+  expect_identical(.public_output(sv,'en'),x)
   expect_equal(sum(mandat(ar=2011,val='KF',valklass='omval',source='local')$antal_mandat),17L)
 })
 

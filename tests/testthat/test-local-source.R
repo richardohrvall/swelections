@@ -55,7 +55,7 @@ test_that("candidate CSV and result index use local archival", {
                                 data_dir = root, archive = TRUE),
                   -dplyr::starts_with("kandidatur_"),
                   -dplyr::starts_with("kall_")),
-    .kort_kommunnamn_2026(fixture_kandidaturer())
+    .public_output(.kort_kommunnamn_2026(fixture_kandidaturer()), "sv")
   )
   expect_true(file.exists(val_archive_path("parti/kandidaturer.csv", 2026, "val2026", root)))
 
@@ -76,7 +76,7 @@ test_that("candidate CSV and result index use local archival", {
   expect_true(file.exists(val_archive_path(index$path, 2026, "test", root)))
 })
 
-test_that("auto and remote retain their previous read and update routing", {
+test_that("auto and remote use remote reads and refresh explicitly requested archives", {
   local_mocked_bindings(
     val_file = function(path, ar, samling, source, data_dir, base_url) {
       list(route = "read", path = path, ar = ar, samling = samling,
@@ -94,7 +94,7 @@ test_that("auto and remote retain their previous read and update routing", {
     for (flags in list(c(TRUE, FALSE), c(FALSE, TRUE), c(TRUE, TRUE))) {
       out <- .resolve_val_file("x", 2026, "test", source, "root", "base", flags[1], flags[2])
       expect_identical(out, list(route = "download", path = "x", ar = 2026, samling = "test",
-                                data_dir = "root", base_url = "base", update = flags[1], archive = flags[2]))
+                                data_dir = "root", base_url = "base", update = TRUE, archive = flags[2]))
     }
   }
 })

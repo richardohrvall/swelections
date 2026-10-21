@@ -1,4 +1,11 @@
-# Lokala och fjärrbaserade rådatafiler ---------------------------------------
+# Local raw archives require an explicit source selection.
+.auto_requires_local <- function(source, label) {
+  if (identical(source, "auto"))
+    stop("No approved canonical or supported remote source for ", label,
+         ". Use `source = \"local\"` with your preserved raw files and `data_dir`.",
+         call. = FALSE)
+  invisible(NULL)
+}
 
 .check_source_update <- function(source, update) {
   if (source == "local" && isTRUE(update)) {
@@ -31,7 +38,7 @@
   if (update || archive) {
     download_val_file(
       path = path, ar = ar, samling = samling, data_dir = data_dir,
-      base_url = base_url, update = update, archive = archive
+      base_url = base_url, update = TRUE, archive = archive
     )
   } else {
     val_file(
@@ -155,55 +162,13 @@ val_file <- function(
 
   source <- match.arg(source)
 
-  if (source == "remote") {
-    return(
-      val_remote_url(
-        path = path,
-        samling = samling,
-        base_url = base_url
-      )
-    )
-  }
+  if (source %in% c("auto", "remote"))
+    return(val_remote_url(path, samling, base_url))
 
-  if (source == "auto" && is.null(val_data_dir(data_dir))) {
-    return(
-      val_remote_url(
-        path = path,
-        samling = samling,
-        base_url = base_url
-      )
-    )
-  }
-
-  local_path <- val_local_path(
-    path = path,
-    ar = ar,
-    samling = samling,
-    data_dir = data_dir
-  )
-
-  if (source == "local") {
-
-    if (!file.exists(local_path)) {
-      stop(
-        "Filen finns inte i det lokala arkivet: ",
-        local_path,
-        call. = FALSE
-      )
-    }
-
-    return(local_path)
-  }
-
-  if (file.exists(local_path)) {
-    local_path
-  } else {
-    val_remote_url(
-      path = path,
-      samling = samling,
-      base_url = base_url
-    )
-  }
+  local_path <- val_local_path(path, ar, samling, data_dir)
+  if (!file.exists(local_path))
+    stop("Filen finns inte i det lokala arkivet: ", local_path, call. = FALSE)
+  local_path
 }
 
 

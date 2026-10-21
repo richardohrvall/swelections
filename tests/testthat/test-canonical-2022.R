@@ -1,12 +1,10 @@
-test_that("2022 remains unpublished and is not selected automatically", {
-  expect_null(.canonical_release(2022L))
-  expect_identical(.select_public_source("auto", 2022L, "valresultat"), "auto")
-  old <- options(swelections.canonical_manifest = NULL)
-  on.exit(options(old), add = TRUE)
-  for (fun in list(results, seats, candidacies, candidates, elected,
-                  substitutes, preference_votes)) {
-    expect_error(fun(year = 2022L, source = "canonical"), "configured local build")
-  }
+test_that("2022 is activated and canonical delivery failures do not select raw", {
+  expect_true(.canonical_release(2022L)$auto_eligible)
+  withr::local_options(swelections.canonical_manifest = NULL)
+  local_mocked_bindings(.canonical_release_manifest = function(...) stop("manifest unavailable fixture"))
+  expect_error(.select_public_source("auto", 2022L, "valresultat"), "manifest unavailable fixture")
+  for (fun in list(results, seats, candidacies, candidates, elected, substitutes, preference_votes))
+    expect_error(fun(year = 2022L, source = "canonical"), "manifest unavailable fixture")
 })
 
 test_that("2022 canonical relations preserve requested election order", {
@@ -61,17 +59,17 @@ test_that("2022 canonical count, language and detail are independent", {
       partikod = "A", antal_roster = 0L, andel_roster = NA_real_,
       valkretskod = NA_character_, valkretsnamn = NA_character_)
     asset <- paste0("rkl2022-results-", count, "-kf")
-    y <- .canonical_names_en(x)
+    y <- .canonical_encode(x)
     columns <- names(y)
-    y$.table <- "kommun"
+    y$.table <- "municipality"
     path <- file.path(root, paste0(asset, ".parquet"))
     nanoparquet::write_parquet(y, path)
     entries[[count]] <- data.frame(asset = asset, file = basename(path),
       bytes = unname(file.info(path)$size), sha256 = .canonical_sha256(path))
-    layouts[[count]] <- data.frame(asset = asset, table = "kommun",
+    layouts[[count]] <- data.frame(asset = asset, table = "municipality",
                                    columns = paste(columns, collapse = ","))
   }
-  manifest <- list(data_version = "data-v0.2.0", schema_version = 2L,
+  manifest <- list(data_version = "data-v0.2.0", schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L,
     format = "parquet", valserie = "rkl", valar = 2022L, sources = list(),
     assets = dplyr::bind_rows(entries), tables = dplyr::bind_rows(layouts))
   path <- file.path(root, "manifest.json")
@@ -89,7 +87,7 @@ test_that("2022 canonical count, language and detail are independent", {
       rakning = if (count == "final") "slutlig" else "preliminar",
       niva = "kommun", source = "canonical")
     expect_identical(standard, full[names(standard)])
-    expect_identical(standard, .public_output_names(sv, "en"))
+    expect_identical(standard, .public_output(sv, "en"))
     expect_identical(standard$votes, 0L)
     expect_identical(standard$vote_share, NA_real_)
     expect_false("constituency_code" %in% names(standard))
@@ -97,7 +95,7 @@ test_that("2022 canonical count, language and detail are independent", {
   }
   manifest$valar <- 2018L
   jsonlite::write_json(manifest, path, auto_unbox = TRUE)
-  expect_error(results(2022, source = "canonical"), "Expected RKL 2022")
+  expect_error(results(2022, source = "canonical"), "requested election family/year/event/schema")
 })
 
 test_that("normalized 2022 base vocabulary round trips without changing values", {
@@ -124,7 +122,7 @@ test_that("2022 stored preference views are selected without changing zeros or N
                     preference_votes = c(5L, 0L, NA_integer_))))
     fetch <- function(name) { expect_identical(name, asset); data }
     for (i in seq_len(nrow(flags))) {
-      got <- .canonical_public_2022(list(tables = layouts, schema_version = 2L),
+      got <- .canonical_public_2022(list(tables = layouts, schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L),
         fetch, "personroster", "KF", level, flags$by_list[[i]], flags$zeros[[i]],
         TRUE, "slutlig")
       expect_identical(got$antal_personroster, c(5L, 0L, NA_integer_))

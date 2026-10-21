@@ -154,6 +154,8 @@
   anmalda_kandidater = "candidates_registered",
   samtycke = "consent",
   forklaring = "candidate_declaration",
+  samtycke_tillampligt = "consent_applicable",
+  forklaring_tillamplig = "candidate_declaration_applicable",
   valsedelsuppgift = "ballot_info",
   antal_valsedlar_lista = "list_ballots_ordered",
   giltig = "valid",

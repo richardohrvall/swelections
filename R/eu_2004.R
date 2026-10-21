@@ -8,6 +8,7 @@
  x
 }
 .eu2004_file <- function(role,source,data_dir) {
+ .auto_requires_local(source, "EU 2004 raw data")
  e<-.eu2004_sources();e<-e[match(role,e$role),]
  if(nrow(e)!=1L||anyNA(e$sha256))stop('Unknown EU 2004 source role.',call.=FALSE)
  if(source=='remote')stop('EU 2004 requires pinned preserved original sources. Use local or a configured canonical build.',call.=FALSE)
@@ -57,8 +58,8 @@
  }
  x
 }
-.eu2004_result_node <- function(node,doc,level,register) {
- x<-.eu2004_retag(.eu2014_result_node(node,doc,level,register))
+.eu2004_result_node <- function(node,doc,level,register, schema = .valresultat_schema()) {
+ x<-.eu2004_retag(.eu2014_result_node(node,doc,level,register,schema))
  # The official final presentation defines this residual as handwritten votes
  # for parties which did not order ballots; no individual designation is given.
  x$partibeteckning[x$ovriga_partier]<-'\u00d6vriga partier'
@@ -67,6 +68,8 @@
 .eu2004_bundle <- function(args) {
  src<-.eu2004_sources();files<-stats::setNames(vapply(src$role,function(r).eu2004_file(r,args$source,args$data_dir),''),src$role)
  key<-paste(files,collapse='|');if(exists(key,.eu2004_cache,inherits=FALSE))return(get(key,.eu2004_cache))
+ # Reuse the immutable empty prototype within this bundle only.
+ schema <- .valresultat_schema()
  doc<-xml2::read_xml(files[['final']],options=c('NONET','NOBLANKS'))
  if(.xml2018_attr(doc,'TID_RAPPORT')!='20040617154308')stop('Unexpected EU 2004 final snapshot.',call.=FALSE)
  kd<-.eu2004_candidacies(files[['candidacies']]);con<-unz(files[['candidacies']],'00E.xml',open='rb');bd<-xml2::read_xml(con);close(con)
@@ -81,7 +84,7 @@
  # Same category adapter, but with explicitly scoped 2004 keys, not 2009 IDs.
  doc<-.eu2004_adapt(doc,kd)
  r<-ctx<-list();i<-0L
- consume<-function(node,level,d=doc){i<<-i+1L;r[[i]]<<-.eu2004_result_node(node,d,level,reg);ctx[[i]]<<-.eu2019_geo(node,level)}
+ consume<-function(node,level,d=doc){i<<-i+1L;r[[i]]<<-.eu2004_result_node(node,d,level,reg,schema);ctx[[i]]<<-.eu2019_geo(node,level)}
  consume(xml2::xml_find_first(doc,'./NATION'),'riket')
  for(n in xml2::xml_find_all(doc,'./NATION/L\u00c4N'))consume(n,'lan')
  for(n in xml2::xml_find_all(doc,'.//KOMMUN'))consume(n,'kommun')

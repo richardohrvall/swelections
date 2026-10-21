@@ -70,7 +70,7 @@ for(level in names(levels)){
   a<-results(2003,election='referendum',level=level,source='local',data_dir=root,names=language,detail=detail)
   b<-results(2003,election='referendum',level=level,source='canonical',names=language,detail=detail)
   stopifnot(identical(a,b))
-  en<-swelections:::.public_output_names(if(language=='sv')a else swelections:::.canonical_names_sv(a),'en')
+  en<-swelections:::.public_output(if(language=='sv')a else swelections:::.canonical_names_sv(a),'en')
   stopifnot(identical(en,raw[names(en)]))
   svlevel<-swelections:::.english_argument_values$level[[level]]
   sv<-valresultat(2003,val='F',niva=svlevel,source='canonical',names=language,detaljniva=detail)

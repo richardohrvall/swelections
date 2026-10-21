@@ -71,8 +71,8 @@
   .valda_fran_raw_2026(mandat_raw, kandidaturdata, kandidater_bas)
 }
 
-.valda_fran_raw_2026 <- function(mandat_raw, kandidaturdata,
-                                 kandidater_bas) {
+.valda_parsad_raw_2026 <- function(mandat_raw, kandidaturdata,
+                                   kandidater_bas) {
   omraden <- .personvalsomraden_mandat_2026(mandat_raw)
   if (!.valda_mandat_komplett_2026(mandat_raw, omraden)) {
     stop("Slutlig invaldsrelation 2026 saknas eller \u00e4r inte verifierbart f\u00e4rdig.",
@@ -81,37 +81,41 @@
 
   valda_data <- parse_valda_ersattare_2026(mandat_raw)$valda
   .valda_validera_nycklar(valda_data, kandidater_bas)
-  valda_bas <- dplyr::semi_join(
-    kandidater_bas, valda_data,
-    by = dplyr::join_by(kandidatnummer, valtyp, partikod)
-  )
 
   summerade <- .personroster_summerade_omrade_2026(omraden)
   indelad <- any(!is.na(omraden$valkretskod))
   population <- kandidaturdata |>
-    dplyr::filter(giltig %in% TRUE) |>
-    dplyr::semi_join(valda_data,
-      by = dplyr::join_by(kandidatnummer, valtyp, partikod)) |>
+    # A mandate file describes one election area, not every candidacy of
+    # a candidate who appears in that file. Keep all local candidacies so
+    # elected candidates can be enriched across areas after all files are read.
+    dplyr::filter(giltig %in% TRUE,
+      valtyp == as_chr_na(mandat_raw$valtyp),
+      valomradeskod == as_chr_na(mandat_raw$valomrade$kod)) |>
     dplyr::distinct(kandidatnummer, valtyp, partikod,
                     valomradeskod, valkretskod) |>
     dplyr::mutate(personvalsomradeskod = if (indelad) valkretskod else
       valomradeskod)
   partier <- .personval_partiroster_2026(omraden)
   if (nrow(dplyr::anti_join(
-      population, partier,
+      dplyr::semi_join(population, valda_data,
+        by = dplyr::join_by(kandidatnummer, valtyp, partikod)), partier,
       by = dplyr::join_by(personvalsomradeskod, partikod)))) {
     stop("Slutligt personr\u00f6stunderlag saknar relevant partirad.", call. = FALSE)
   }
   personrostomraden <- population |>
+    dplyr::left_join(partier,
+      by = dplyr::join_by(personvalsomradeskod, partikod),
+      relationship = "many-to-one") |>
     dplyr::left_join(summerade,
       by = dplyr::join_by(kandidatnummer, partikod, personvalsomradeskod),
       relationship = "many-to-one") |>
     dplyr::mutate(antal_personroster =
-      dplyr::coalesce(antal_personroster_omrade, 0L)) |>
+      dplyr::if_else(is.na(antal_partiroster), NA_integer_,
+        dplyr::coalesce(antal_personroster_omrade, 0L))) |>
     dplyr::select(kandidatnummer, valtyp, partikod, antal_personroster)
 
   personval <- parse_personval_2026(mandat_raw)
-  parsed <- list(list(
+  list(
     status = tibble::tibble(
       valtyp = as_chr_na(mandat_raw$valtyp),
       valomradeskod = as_chr_na(mandat_raw$valomrade$kod),
@@ -120,9 +124,11 @@
     personrostomraden = personrostomraden,
     personval = personval,
     valda = valda_data
-  ))
-  .add_kandidatresultat_fran_parsade_2026(
-    valda_bas, kandidaturdata, as_chr_na(mandat_raw$valtyp), parsed
-  ) |>
-    dplyr::filter(invald %in% TRUE)
+  )
+}
+
+.valda_fran_raw_2026 <- function(mandat_raw, kandidaturdata, kandidater_bas) {
+  parsed <- .valda_parsad_raw_2026(mandat_raw, kandidaturdata, kandidater_bas)
+  .valda_fran_parsade_2022(list(parsed), kandidaturdata, kandidater_bas,
+                          as_chr_na(mandat_raw$valtyp))
 }

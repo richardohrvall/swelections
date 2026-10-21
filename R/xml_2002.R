@@ -1,5 +1,6 @@
 # 2002 final XML adapters. Raw snapshots and election-night sources stay immutable.
 .sources_2002 <- function(source, data_dir, update = FALSE, archive = FALSE) {
+  .auto_requires_local(source, "RKL 2002 raw data")
   if (!source %in% c("auto", "local") || update || archive)
     stop("2002 requires preserved local final sources; remote/update/archive are unsupported.", call. = FALSE)
   root <- val_data_dir(data_dir)

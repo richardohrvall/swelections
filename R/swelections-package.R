@@ -5,7 +5,11 @@
 #' including [valresultat()] and [personroster()], remain fully supported.
 #' English functions return English column names by default. Use `names = "sv"`
 #' or `options(swelections.names = "sv")` for Swedish output column names.
-#' Language selection changes column names, not data values.
+#' Language selection changes column names and technical categories. Canonical
+#' and English categories are English; Swedish output localizes them. Booleans
+#' remain logical. Proper names and source identifiers are preserved. Referendum
+#' option names are `yes`/`no`/`blank` in English and `Ja`/`Nej`/`Blank` in Swedish.
+#' Blank is valid, separate from invalid ballots. See [data_sources].
 #' Resultatfiler väljs via `index.md5`. Optionen
 #' `swelections.resultatsamling_2026` väljer resultatsamling och har för närvarande
 #' standardvärdet `"val2026"`. Test-/utvecklingssamlingen `"genrep2026"` kan
@@ -13,10 +17,9 @@
 #'
 #' En lokal rådatamapp anges med `data_dir` eller optionen
 #' `swelections.data_dir`. Explicit `data_dir` har företräde.
-#' Med `source = "auto"` används kompletta lokala råfiler först. Om 2018 års
-#' råfiler saknas används den publicerade kanoniska samlingen när dess version
-#' uttryckligen är godkänd för automatiskt bruk; annars används fjärrkällan.
-#' För 2022/2026 används fortsatt den officiella rådatavägen.
+#' Med `source = "auto"` prioriteras godkänd canonical-data för efterfrågad
+#' valfamilj, valhändelse, år och vy. Utan godkänd täckning används befintlig
+#' rådataväg. EU-prototyperna är fortsatt endast explicit valbara. Se [data_sources].
 #' Med `source = "local"` krävs en befintlig lokal fil och nätåtkomst används aldrig.
 #' Med `source = "remote"` används fjärrkällan vid vanlig läsning.
 #'

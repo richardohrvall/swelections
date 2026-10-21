@@ -1,3 +1,20 @@
+# swelections 0.4.0 (release candidate)
+
+- Prepare the first combined canonical distribution: 190 Parquet assets and 12
+  product-specific manifests, with central function-specific automatic selection.
+  RKL 2002 excludes candidacies, EU 2009 excludes preference votes, and the 2003
+  referendum exposes voting options through results only. Publication is separate.
+- Standardize English canonical/technical values and logical applicability, with
+  Swedish presentation and unchanged proper names and source identifiers.
+- Include the verified Ragunda 2018 correction and reject unavailable preliminary
+  2018 views rather than returning final results.
+- Add mandate-history intervals and date queries: canonical for 2014/2018,
+  current remote exports for 2022. Members and vacancies use one mandate population.
+- Correct the KF 2026 elected cross-area join and add an index-verified persistent
+  remote raw ZIP cache. A fresh index is required; unindexed CSVs remain fresh.
+- Improve shared raw XML/JSON and canonical selection performance without changing
+  election values, observation keys, row order or supported API semantics.
+
 # Development
 
 - Add EU2014 final results, original mandates/elected/substitutes, documented

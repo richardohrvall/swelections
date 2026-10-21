@@ -19,7 +19,9 @@ and [development/CANONICAL_DATA.md](development/CANONICAL_DATA.md).
 - Preserve `NA`, verified zero and false as distinct states. Do not reconcile
   unexplained official-source discrepancies by overwriting source values.
 - Support English and Swedish interfaces through shared implementation. Canonical
-  column names are English; column-name translation must not translate source values.
+  columns and technical categories are English under the versioned value contract.
+  Swedish presentation localizes technical categories; preserve proper names and
+  literal source identifiers. Use logical flags with separate applicability.
 - `standard` is broad and analysis-friendly. `full` adds source detail. Standard
   must remain a projection of full with identical keys and shared values.
 - Geography must describe its actual role. Distinguish candidacy geography from

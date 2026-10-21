@@ -21,7 +21,7 @@
   }
   if (length(manifest$data_version) != 1L ||
       !grepl("^data-v[0-9]+\\.[0-9]+\\.[0-9]+$", manifest$data_version) ||
-      !as.integer(manifest$schema_version) %in% c(1L, 2L) ||
+      !as.integer(manifest$schema_version) %in% c(1L, 2L, 3L) ||
       anyDuplicated(manifest$assets$asset) ||
       anyDuplicated(manifest$assets$file) ||
       any(!grepl("^[a-z0-9][a-z0-9_.-]*$", manifest$assets$asset)) ||
@@ -41,6 +41,10 @@
        any(!nzchar(manifest$tables$columns)))) {
     stop("Ogiltigt Parquet-manifest.", call. = FALSE)
   }
+  if (as.integer(manifest$schema_version) == 3L &&
+      (!identical(as.integer(manifest$value_schema_version), 1L) ||
+       !identical(as.integer(manifest$storage_schema_version), 1L)))
+    stop("Canonical value/storage contract version is missing or unsupported.", call. = FALSE)
   manifest
 }
 
@@ -91,6 +95,7 @@
 
 .canonical_table <- function(manifest, data, asset, table,
                              discriminator = ".table") {
+  table <- .canonical_storage_key(table)
   entry <- manifest$tables[manifest$tables$asset == asset &
                              manifest$tables$table == table, , drop = FALSE]
   if (nrow(entry) != 1L) stop("Kanonisk tabell saknas: ", asset, "/", table,
@@ -98,7 +103,7 @@
   columns <- strsplit(entry$columns[[1L]], ",", fixed = TRUE)[[1L]]
   out <- data[data[[discriminator]] == table, columns, drop = FALSE]
   out <- tibble::as_tibble(out)
-  if (identical(as.integer(manifest$schema_version), 2L))
+  if (identical(as.integer(manifest$schema_version), 3L))
     out <- .canonical_names_sv(out)
   out
 }
@@ -108,16 +113,14 @@
                                    komplettera_nollor = FALSE,
                                    resultat = TRUE, auto_selected = FALSE) {
   release <- .canonical_release(2018L)
-  path <- if (auto_selected) .canonical_release_manifest(release) else
-    getOption("swelections.canonical_manifest", NULL)
-  if (is.null(path)) path <- .canonical_release_manifest(release)
+  path <- .canonical_manifest_path(2018L, "rkl", auto_selected = auto_selected)
   if (!is.character(path) || length(path) != 1L || !file.exists(path))
     stop("Configure a valid canonical manifest or use the published release.",
          call. = FALSE)
   manifest <- .canonical_manifest(path)
-  if (!identical(as.integer(manifest$schema_version), 2L) ||
+  if (!identical(as.integer(manifest$schema_version), 3L) ||
       !identical(manifest$format, "parquet")) {
-    stop("The canonical source requires the English Parquet schema (version 2).",
+    stop("The canonical source requires the English Parquet schema (version 3).",
          call. = FALSE)
   }
   assets_dir <- if (auto_selected) dirname(path) else
@@ -128,7 +131,7 @@
     local <- file.path(assets_dir, file)
     if (file.exists(local)) {
       paste0("file:///", gsub("\\\\", "/", normalizePath(local)))
-    } else if (!is.null(base_url)) {
+    } else if (!is.null(base_url) && !is.na(base_url)) {
       paste0(sub("/+$", "", base_url), "/", file)
     } else NULL
   }), manifest$assets$asset)
@@ -177,7 +180,7 @@
     if (!all(values %in% c("RD", "RF", "KF"))) stop("Valtyp saknas.", call. = FALSE)
     out <- purrr::list_rbind(lapply(values, function(v)
       .canonical_table(manifest, data, asset, v)))
-    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% niva)
+    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% .canonical_storage_key(niva))
     return(out)
   }
   if (surface %in% c("kandidaturer", "kandidater", "valda", "ersattare")) {
@@ -188,27 +191,13 @@
     if (surface == "kandidater" && (!isTRUE(resultat) || !is.null(val))) {
       kd <- .canonical_names_sv(fetch("rkl2018-candidacies"))
       if (!is.null(val)) kd <- dplyr::filter(kd, .data$valtyp %in% val)
-      base <- .kandidater_bas(kd, 2018L)
-      if (!isTRUE(resultat)) return(base)
-      key <- c("kandidatnummer", "valtyp", "partikod")
-      index <- match(do.call(paste, c(out[key], sep = "\r")),
-                     do.call(paste, c(base[key], sep = "\r")))
-      if (anyNA(index) || anyDuplicated(index))
-        stop("Canonical candidate keys disagree.", call. = FALSE)
-      for (field in names(base)) out[[field]] <- base[[field]][index]
+      return(.canonical_2018_candidate_selection(out, kd, !isTRUE(resultat)))
     }
     if (surface == "valda" && !is.null(val) &&
         all(c("antal_valtyper", "flera_valtyper") %in% names(out))) {
       kd <- dplyr::filter(.canonical_names_sv(fetch("rkl2018-candidacies")),
                           .data$valtyp %in% val)
-      base <- .kandidater_bas(kd, 2018L)
-      key <- c("kandidatnummer", "valtyp", "partikod")
-      index <- match(do.call(paste, c(out[key], sep = "\r")),
-                     do.call(paste, c(base[key], sep = "\r")))
-      if (anyNA(index)) stop("Canonical elected candidate keys disagree.",
-                             call. = FALSE)
-      out$antal_valtyper <- base$antal_valtyper[index]
-      out$flera_valtyper <- base$flera_valtyper[index]
+      out <- .canonical_2018_candidate_selection(out, kd, elected = TRUE)
     }
     return(out)
   }
@@ -239,4 +228,34 @@
     dplyr::arrange(.data$valtyp, .data$valomradeskod,
       .data$personvalsomradeskod, .data$partikod, .data$kandidatnummer,
       dplyr::across(dplyr::any_of(c("valdistriktskod", "listnummer"))))
+}
+
+.canonical_2018_candidate_selection <- function(out, kd, base_only = FALSE,
+                                               elected = FALSE) {
+  if (!"giltig" %in% names(kd)) return(.kandidater_bas(kd, 2018L))
+  valid <- dplyr::filter(kd, .data$giltig %in% TRUE)
+  if (!nrow(valid)) return(.kandidater_bas(valid, 2018L))
+  # Keep the existing source-column validation without regrouping every row.
+  fields <- names(.kandidater_bas(valid[1L, , drop = FALSE], 2018L))
+  key <- c("kandidatnummer", "valtyp", "partikod")
+  encode <- function(x) do.call(paste, c(x[key], sep = "\r"))
+  keys <- dplyr::distinct(valid, dplyr::across(dplyr::all_of(key)))
+  if (base_only) {
+    # Reuse the base column contract and its original candidacy-key order.
+    index <- match(encode(keys), encode(out))
+    if (anyNA(index) || anyDuplicated(index))
+      stop("Canonical candidate keys disagree.", call. = FALSE)
+    out <- out[index, fields, drop = FALSE]
+  }
+  index <- match(encode(out), encode(keys))
+  if (anyNA(index) || (!elected && anyDuplicated(index)))
+    stop(if (elected) "Canonical elected candidate keys disagree." else
+      "Canonical candidate keys disagree.", call. = FALSE)
+  # Other summaries are confined to one election type and already materialised.
+  types <- dplyr::distinct(valid, .data$kandidatnummer, .data$valtyp) |>
+    dplyr::count(.data$kandidatnummer, name = "antal_valtyper")
+  out$antal_valtyper <- types$antal_valtyper[
+    match(out$kandidatnummer, types$kandidatnummer)]
+  out$flera_valtyper <- out$antal_valtyper > 1L
+  out
 }

@@ -27,10 +27,14 @@ EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"
 \code{NULL} ger alla.}
 
 \item{source}{Datakälla: \code{"auto"}, \code{"local"}, \code{"remote"} eller \code{"canonical"}.
+\code{auto} prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+\code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
+den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
 För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
 \code{alkandur_R/L/K.skv}. Källan saknar bland annat explicit giltighet och
 samtycke; dessa fält är typade \code{NA}. Kandidatnamn exponeras inte.
-\code{"canonical"} avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet,
+\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
@@ -45,7 +49,9 @@ Lokal arkivering kräver en redan befintlig lokal fil.}
 \item{fran, till}{Inklusiva gränser bland stödda valår, som alternativ till
 \code{ar}. En utelämnad gräns är öppen.}
 
-\item{names}{\code{"sv"} (standard) eller \code{"en"} för publika kolumnnamn.}
+\item{names}{Språk för kolumnnamn och tekniska kategorier: \code{"sv"}
+(standard) eller \code{"en"}. Egentliga namn och källidentifierare bevaras;
+booleska egenskaper är logical \code{TRUE}/\code{FALSE} i båda språken.}
 
 \item{detaljniva}{\code{"standard"} för centrala analysvariabler eller \code{"full"}
 för alla tillgängliga harmoniserade fält.}

@@ -22,10 +22,6 @@
     if (archive) .arkivera_2018(lokal, rot, spec$path)
     return(lokal)
   }
-  if (source == "auto" && !update && !is.null(lokal) && file.exists(lokal)) {
-    if (archive) .arkivera_2018(lokal, rot, spec$path)
-    return(lokal)
-  }
   if (is.null(spec$url)) {
     stop("2018 \u00e5rs slutliga XML-arkiv kan inte l\u00e4ngre h\u00e4mtas fr\u00e5n den ",
          "officiella statistiksidan. Anv\u00e4nd `source = \"local\"` och ett ",

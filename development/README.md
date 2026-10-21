@@ -5,6 +5,8 @@ Generated reports, raw snapshots, named research crosswalks and workbenches stay
 local and ignored. Run tools from the repository root with the configured R library.
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for dependencies and package checks.
 
+The current release gate is [RELEASE_CANDIDATE_REVIEW.md](RELEASE_CANDIDATE_REVIEW.md): 190 Parquet assets, twelve portable manifests, and a clean-commit rebuild before any publication.
+
 ## Canonical builds
 
 | Tool | Role / inputs |

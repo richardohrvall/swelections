@@ -757,7 +757,7 @@ test_that("local index and ZIP pipeline never uses the network, including archiv
     actual <- valresultat(detaljniva = "full", niva = niva, source = "local", progress = FALSE)
     expect_equal(sum(actual$antal_roster), 10L)
   }
-  expect_identical(valresultat(detaljniva = "full", source = "auto", data_dir = root, progress = FALSE), out)
+  expect_error(valresultat(detaljniva = "full", source = "auto", data_dir = root, progress = FALSE), "Unexpected network access")
   expect_error(valresultat(detaljniva = "full", source = "local", data_dir = tempfile()), "Filen finns inte")
   expect_error(valresultat(detaljniva = "full", source = "local", update = TRUE), 'source = "local".*update = TRUE')
   expect_error(valresultat(detaljniva = "full", source = "local", rakning = "preliminar"), "Saknad prim")

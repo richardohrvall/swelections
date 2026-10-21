@@ -19,7 +19,7 @@ tables <- list()
 save_asset <- function(x, asset, role, table_columns = NULL) {
   if (!is.data.frame(x) || any(vapply(x, is.list, logical(1))))
     stop("Kanonisk tabell maste vara platt: ", asset)
-  x <- swelections:::.canonical_names_en(x)
+  x <- swelections:::.canonical_encode(x)
   path <- file.path(out, paste0(asset, ".parquet"))
   nanoparquet::write_parquet(x, path, compression = "gzip")
   got <- tibble::as_tibble(nanoparquet::read_parquet(path))
@@ -30,10 +30,10 @@ save_asset <- function(x, asset, role, table_columns = NULL) {
     rows = nrow(x), bytes = unname(file.info(path)$size), sha256 = sha(path))
   if (!is.null(table_columns)) {
     table_columns <- lapply(table_columns, function(columns)
-      names(swelections:::.canonical_names_en(
+      names(swelections:::.canonical_encode(
         stats::setNames(as.list(rep(NA, length(columns))), columns))))
     tables[[length(tables) + 1L]] <<- data.frame(
-      asset = asset, table = names(table_columns),
+      asset = asset, table = swelections:::.canonical_storage_key(names(table_columns)),
       columns = vapply(table_columns, paste, collapse = ",", character(1)))
   }
   cat(asset, nrow(x), file.info(path)$size, "bytes\n")
@@ -116,7 +116,9 @@ for (v in c("RD", "RF", "KF")) {
 }
 
 manifest <- source_manifest
-manifest$schema_version <- 2L
+manifest$schema_version <- 3L
+manifest$value_schema_version <- 1L
+manifest$storage_schema_version <- 1L
 manifest$format <- "parquet"
 manifest$public_surfaces <- c("results", "seats", "candidacies", "candidates",
                               "elected", "substitutes", "preference_votes")
@@ -129,16 +131,18 @@ manifest$build_tree_dirty <- length(system2("git", "status --porcelain",
                                           stdout = TRUE)) > 0L
 manifest$assets <- do.call(rbind, assets)
 manifest$tables <- do.call(rbind, tables)
-manifest$build_code_sha256 <- data.frame(
-  file = c("data-raw/build-canonical-2018.R",
-           "data-raw/export-canonical-parquet-2018.R",
-           "R/canonical_backend.R", "R/output_names.R"),
-  sha256 = vapply(c("data-raw/build-canonical-2018.R",
-                    "data-raw/export-canonical-parquet-2018.R",
-                    "R/canonical_backend.R", "R/output_names.R"), sha,
-                  character(1)))
+build_code <- c("data-raw/build-canonical-2018.R",
+  "data-raw/export-canonical-parquet-2018.R", "R/canonical_backend.R",
+  "R/canonical_2022.R", "R/output_names.R", "R/correction_2018.R",
+  "R/read_kandidaturer_2018.R", "R/xml_2018.R", "R/personroster_2018.R",
+  "R/personroster_xml_distrikt_2018.R", "R/kandidatresultat_2018.R",
+  "R/mandat_2018.R", "R/valresultat_2018.R")
+manifest$build_code_sha256 <- data.frame(file = build_code,
+  sha256 = vapply(build_code, sha, character(1)))
 for (field in c("sources", "assets", "tables", "build_code_sha256"))
   rownames(manifest[[field]]) <- NULL
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest, file.path(out, "manifest.json"),
                      auto_unbox = TRUE, pretty = TRUE, na = "null")
 cat("Fardigt:", out, "\n")

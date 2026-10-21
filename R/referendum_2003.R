@@ -114,16 +114,7 @@
   if (source == 'local' && !nzchar(root))
     stop('Specify data_dir for the preserved 2003 referendum archive.', call. = FALSE)
   needs_district <- level %in% c('valdistrikt', 'kommunvalkrets')
-  national_local <- file.path(root, 'final.xml')
-  if (source == 'auto') {
-    suitable <- nzchar(root) && file.exists(national_local)
-    if (suitable && needs_district) {
-      n <- .referendum2003_document(national_local)
-      codes <- xml2::xml_attr(xml2::xml_find_all(n, './/KOMMUN'), 'KOD')
-      suitable <- all(file.exists(file.path(root, 'final-municipal', paste0(codes, '.xml'))))
-    }
-    source <- if (suitable) 'local' else 'remote'
-  }
+  if (source == 'auto') source <- 'remote'
   read <- function(filename, municipality = NULL) {
     file <- .referendum2003_file(source, root, filename)
     if (source == 'remote') on.exit(unlink(file), add = TRUE)
@@ -188,28 +179,30 @@
   for (flag in list(update, archive, progress))
     if (!is.logical(flag) || length(flag) != 1L || is.na(flag)) stop('Expected scalar logical flags.', call. = FALSE)
   if (update || archive) stop('2003 referendum sources are read-only; preserve snapshots separately.', call. = FALSE)
-  data <- if (source == 'canonical') .canonical_referendum2003(level) else
+  selected <- .select_public_source(source, 2003L, "valresultat", data_dir,
+    series = "folkomr", niva = level)
+  if (selected == "canonical") .check_public_args(2003L, "results", source,
+    data_dir, update, archive, valar_resolved = TRUE)
+  data <- if (selected %in% c("canonical", "canonical_auto"))
+    .canonical_referendum2003(level, selected == "canonical_auto") else
     .referendum2003_raw(source, data_dir, level)
   if (anyDuplicated(data[c('kall_enhetskod', 'rostningsalternativkod')]))
     stop('Duplicate referendum result keys.', call. = FALSE)
   if (detail == 'standard') data <- data[, intersect(.referendum2003_standard, names(data)), drop = FALSE]
-  .public_output_names(data, language)
+  .public_output(data, language)
 }
 
-.canonical_referendum2003 <- function(level) {
-  path <- getOption('swelections.canonical_manifest', NULL)
-  if (!is.null(names(path)) && '2003' %in% names(path)) path <- unname(path[['2003']])
+.canonical_referendum2003 <- function(level, auto_selected = FALSE) {
+  path <- .canonical_manifest_path(2003L, "folkomr", auto_selected = auto_selected)
   if (!is.character(path) || length(path) != 1L || !file.exists(path))
     stop('2003 canonical data require an explicitly configured local manifest.', call. = FALSE)
   manifest <- .canonical_manifest(path)
   if (!identical(manifest$valserie, 'folkomr') || !identical(as.integer(manifest$valar), 2003L) ||
-      !identical(as.integer(manifest$schema_version), 2L) || !identical(manifest$format, 'parquet'))
-    stop('Expected final referendum 2003 English Parquet schema version 2.', call. = FALSE)
+      !identical(as.integer(manifest$schema_version), 3L) || !identical(manifest$format, 'parquet'))
+    stop('Expected final referendum 2003 English Parquet schema version 3.', call. = FALSE)
   asset <- 'referendum2003-results-final'
   entry <- manifest$assets[manifest$assets$asset == asset, , drop = FALSE]
   if (nrow(entry) != 1L) stop('Missing referendum results asset.', call. = FALSE)
-  directory <- getOption('swelections.canonical_assets_dir', dirname(path))
-  file <- normalizePath(file.path(directory, entry$file), winslash = '/', mustWork = TRUE)
-  data <- .canonical_asset(manifest, asset, getOption('swelections.canonical_cache_dir', NULL), paste0('file:///', file))
+  data <- .canonical_fetcher(manifest, path)(asset)
   .canonical_table(manifest, data, asset, level)
 }

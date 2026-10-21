@@ -47,22 +47,21 @@
 
 .valda_ett_ar <- function(ar, val, source, data_dir, update, archive,
                           progress) {
-  if (ar == 2002L) {
-    if (source == "canonical") return(.canonical_source(ar, "valda", val))
-    return(.valda_2002(.sources_2002(source, data_dir, update, archive), val, progress))
-  }
-  if (ar == 2006L) {
-    if (source == "canonical") return(.canonical_source(ar, "valda", val))
-    return(.valda_2006(.sources_2006(source, data_dir, update, archive), val, progress))
-  }
-  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "valda", val))
-  if (ar %in% c(2010L, 2014L)) return(.valda_2014(
-    .sources_historical(ar, source, data_dir, update, archive), val, progress))
   source <- .select_public_source(source, ar, "valda", data_dir,
-                                  update, archive)
+    update, archive, val = val)
   if (source %in% c("canonical", "canonical_auto"))
     return(.canonical_source(ar, "valda", val,
       auto_selected = identical(source, "canonical_auto")))
+  raw_options <- options(swelections.internal_raw_request = TRUE)
+  on.exit(options(raw_options), add = TRUE)
+  if (ar == 2002L) {
+    return(.valda_2002(.sources_2002(source, data_dir, update, archive), val, progress))
+  }
+  if (ar == 2006L) {
+    return(.valda_2006(.sources_2006(source, data_dir, update, archive), val, progress))
+  }
+  if (ar %in% c(2010L, 2014L)) return(.valda_2014(
+    .sources_historical(ar, source, data_dir, update, archive), val, progress))
   if (ar == 2018L) {
     kandidaturdata <- kandidaturer(detaljniva = "full", ar = ar, val = val, source = source,
       data_dir = data_dir, update = update, archive = archive)
@@ -94,12 +93,12 @@
     if (ar == 2022L) {
       .valda_parsad_raw_2022(raw, kd, bas)
     } else {
-      .valda_fran_raw_2026(raw, kd, bas)
+      .valda_parsad_raw_2026(raw, kd, bas)
     }
   }, .progress = progress)
-  out <- if (ar == 2022L) {
-    .valda_fran_parsade_2022(parsed, kandidaturdata, kandidater_bas, val)
-  } else purrr::list_rbind(parsed)
+  # Both years use normalized parsed tables. Enrich once across all areas,
+  # preserving the final relation and file order for the elected population.
+  out <- .valda_fran_parsade_2022(parsed, kandidaturdata, kandidater_bas, val)
   if (anyDuplicated(out[c("kandidatnummer", "valtyp", "partikod")])) {
     stop("Samma person valdes i flera slutliga resultatfiler.", call. = FALSE)
   }

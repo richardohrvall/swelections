@@ -2,7 +2,7 @@
 # XML- och kandidaturkoderna för valkretsar har olika bredd; de sista två
 # siffrorna i den officiella valkretskoden är kandidaturfilens delkod.
 .xml2018_personomraden <- function(doc, val) {
-  xml2::xml_find_all(doc, switch(val,
+  .xml2018_find_all(doc, switch(val,
     RD = "./NATION/L\u00c4N/KRETS_RIKSDAG",
     RF = "./NATION/L\u00c4N/KRETS_LANDSTING",
     KF = "./KOMMUN/KRETS_KOMMUN"))
@@ -24,7 +24,7 @@
     return(geo)
   }
   geo <- .xml2018_geo(node, val, "valdistrikt", doc)
-  krets <- xml2::xml_find_first(node, "ancestor::KRETS_KOMMUN[1]")
+  krets <- .xml2018_find_first(node, "ancestor::KRETS_KOMMUN[1]")
   omrades_krets <- if (val == "RF") .xml2018_attr(krets, "KRETS_LANDSTING") else
     if (val == "KF") .xml2018_attr(krets, "KOD") else NA_character_
   if (val == "RD") {
@@ -48,7 +48,7 @@
 .xml2018_person_parti <- function(node, geo, val, register) {
   info <- .xml2018_parti(.xml2018_attr(node, "PARTI"), val,
     geo$valomradeskod, register, node)
-  listor <- xml2::xml_find_all(node, "./VALSEDEL|./PARTISEDEL")
+  listor <- .xml2018_find_all(node, "./VALSEDEL|./PARTISEDEL")
   l_nummer <- xml2::xml_attr(listor, "LISTNUMMER")
   l_roster <- as.integer(xml2::xml_attr(listor, "R\u00d6STER"))
   l_person <- as.integer(xml2::xml_attr(listor, "PERSONKRYSS"))
@@ -70,7 +70,7 @@
                           sum(l_person) != p_person))) {
     stop("Partiets listsummeringar st\u00e4mmer inte i 2018-XML.", call. = FALSE)
   }
-  direct <- xml2::xml_find_all(node, "./PERSONVAL")
+  direct <- .xml2018_find_all(node, "./PERSONVAL")
   d_id <- xml2::xml_attr(direct, "KANDNR")
   d_roster <- as.integer(xml2::xml_attr(direct, "PERSONKRYSS"))
   if (anyNA(d_id) || anyNA(d_roster) || any(d_roster < 0L) ||
@@ -78,10 +78,10 @@
     stop("Partiets kandidatpersonr\u00f6ster st\u00e4mmer inte i 2018-XML.",
          call. = FALSE)
   }
-  l_ids <- lapply(listor, function(l) xml2::xml_attr(
-    xml2::xml_find_all(l, "./PERSONVAL"), "KANDNR"))
-  l_tal <- lapply(listor, function(l) as.integer(xml2::xml_attr(
-    xml2::xml_find_all(l, "./PERSONVAL"), "PERSONKRYSS")))
+  l_nodes <- lapply(listor, function(l) .xml2018_find_all(l, "./PERSONVAL"))
+  l_ids <- lapply(l_nodes, function(nodes) xml2::xml_attr(nodes, "KANDNR"))
+  l_tal <- lapply(l_nodes, function(nodes)
+    as.integer(xml2::xml_attr(nodes, "PERSONKRYSS")))
   for (j in seq_along(listor)) {
     if (anyNA(l_ids[[j]]) || anyNA(l_tal[[j]]) ||
         any(l_tal[[j]] < 0L) || anyDuplicated(l_ids[[j]]) ||
@@ -129,8 +129,8 @@
 }
 
 .xml2018_rd_krets_fran_listor <- function(doc, kandidaturdata) {
-  kommun <- .xml2018_attr(xml2::xml_find_first(doc, "./KOMMUN"), "KOD")
-  listor <- xml2::xml_find_all(doc,
+  kommun <- .xml2018_attr(.xml2018_find_first(doc, "./KOMMUN"), "KOD")
+  listor <- .xml2018_find_all(doc,
     ".//VALDISTRIKT/GILTIGA/VALSEDEL|.//ONSDAGSDISTRIKT/GILTIGA/VALSEDEL|.//VALDISTRIKT/\u00d6VRIGA_GILTIGA/GILTIGA/VALSEDEL|.//ONSDAGSDISTRIKT/\u00d6VRIGA_GILTIGA/GILTIGA/VALSEDEL")
   raw <- tibble::tibble(
     raw = xml2::xml_attr(listor, "LISTNUMMER"),
@@ -192,7 +192,7 @@
     }
     geo$node_id <- as.integer((file_id - 1L) * 10000L + i)
     geos[[i]] <- tibble::as_tibble(geo)
-    ps <- xml2::xml_find_all(node, "./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA")
+    ps <- .xml2018_find_all(node, "./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA")
     for (p in ps) {
       item <- .xml2018_person_parti(p, geo, val, register)
       item$parti$node_id <- geo$node_id
@@ -239,11 +239,12 @@
       }
     }, .progress = progress)
   }) |> unlist(recursive = FALSE)
-  list(geo = purrr::map(filer, "geo") |> purrr::list_rbind(),
+  raw <- list(geo = purrr::map(filer, "geo") |> purrr::list_rbind(),
        parti = purrr::map(filer, "parti") |> purrr::list_rbind(),
        lista = purrr::map(filer, "lista") |> purrr::list_rbind(),
        roster = purrr::map(filer, "roster") |> purrr::list_rbind(),
        listroster = purrr::map(filer, "listroster") |> purrr::list_rbind())
+  .xml2018_ragunda_votes(raw, niva)
 }
 
 .xml2018_person_population <- function(kd, geo) {

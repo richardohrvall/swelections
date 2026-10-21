@@ -20,7 +20,7 @@
  entry <- .eu2019_sources(); entry <- entry[match(role,entry$role),]
  if (anyNA(entry)) stop('Unknown EU 2019 source role.',call.=FALSE)
  root <- val_data_dir(data_dir)
- if (source != 'remote' && !is.null(root)) {
+ if (source == 'local' && !is.null(root)) {
   roots <- unique(c(file.path(root,'eu','2019'),file.path(root,'2019'),root))
   root <- roots[dir.exists(roots)][1L]
   if (!is.na(root)) {
@@ -74,9 +74,9 @@
 
 .eu2019_geo <- function(node,level) {
  attr <- .xml2018_attr
- m <- xml2::xml_find_first(node,'ancestor-or-self::KOMMUN[1]')
- l <- xml2::xml_find_first(node,'ancestor-or-self::L\u00c4N[1]')
- k <- xml2::xml_find_first(node,'ancestor-or-self::KRETS_KOMMUN[1]')
+ m <- .xml2018_find_first(node,'ancestor-or-self::KOMMUN[1]')
+ l <- .xml2018_find_first(node,'ancestor-or-self::L\u00c4N[1]')
+ k <- .xml2018_find_first(node,'ancestor-or-self::KRETS_KOMMUN[1]')
  mk <- attr(m,'KOD'); lk <- attr(l,'KOD');if(is.na(lk)&&!is.na(mk))lk<-substr(mk,1,2)
  kc <- attr(k,'KOD');if(!is.na(kc)&&grepl('00$',kc))kc<-NA_character_
  tibble::tibble(.geo=attr(node,'KOD'),geografiniva=level,
@@ -100,19 +100,19 @@
    partiforkortning=reg$partiforkortning[ix])
 }
 
-.eu2019_result_node <- function(node,doc,level,register,stage) {
- p <- xml2::xml_find_all(node,'./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA')
- other <- xml2::xml_find_first(node,if(stage=='slutlig')'./\u00d6VRIGA_GILTIGA/HANDSKRIVNA'else'./\u00d6VRIGA_GILTIGA')
+.eu2019_result_node <- function(node,doc,level,register,stage, schema = .valresultat_schema()) {
+ p <- .xml2018_find_all(node,'./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA')
+ other <- .xml2018_find_first(node,if(stage=='slutlig')'./\u00d6VRIGA_GILTIGA/HANDSKRIVNA'else'./\u00d6VRIGA_GILTIGA')
  count <- length(p)+as.integer(!inherits(other,'xml_missing'))
- out <- .valresultat_schema()[rep(NA_integer_,count),]
+ out <- schema[rep(NA_integer_,count),]
  out$valtillfalle <- 'EU-val_2019';out$valtyp <- 'E';out$rakningstillfalle<-stage
  out$valdatum <- '2019-05-26';out$valdatum_fg<-'2014-05-25';out$test<-FALSE
  g <- .eu2019_geo(node,level);for(n in intersect(names(g),names(out)))out[[n]]<-g[[n]]
- a <- .xml2018_int; v <- xml2::xml_find_first(node,'./VALDELTAGANDE')
+ a <- .xml2018_int; v <- .xml2018_find_first(node,'./VALDELTAGANDE')
  out$senaste_uppdateringstid <- .xml2018_attr(doc,'TID_RAPPORT')
  out$rapporteringstid <- .xml2018_attr(node,'TID_RAPPORT')
  for(n in c('antal_valdistrikt_raknade','antal_valdistrikt_som_ska_raknas'))
-  out[[n]] <- a(xml2::xml_find_first(doc,'./NATION|./KOMMUN'),if(n=='antal_valdistrikt_raknade')'KLARA_VALDISTRIKT'else'ALLA_VALDISTRIKT')
+  out[[n]] <- a(.xml2018_find_first(doc,'./NATION|./KOMMUN'),if(n=='antal_valdistrikt_raknade')'KLARA_VALDISTRIKT'else'ALLA_VALDISTRIKT')
  out$antal_valdistrikt_raknade_omrade <- a(node,'KLARA_VALDISTRIKT')
  out$antal_valdistrikt_som_ska_raknas_omrade <- a(node,'ALLA_VALDISTRIKT')
  out$giltiga_roster <- a(node,'R\u00d6STER');out$giltiga_roster_fg <- a(node,'R\u00d6STER_FGVAL')
@@ -121,7 +121,7 @@
  out$antal_rostberattigade_fg <- a(v,'R\u00d6STBER\u00c4TTIGADE_KLARA_VALDISTRIKT_FGVAL')
  out$totalt_antal_roster <- a(v,'SUMMA_R\u00d6STER');out$totalt_antal_roster_fg<-a(v,'SUMMA_R\u00d6STER_FGVAL')
  out$valdel_fg <- .xml2018_dbl(v,'PROCENT_FGVAL')
- inv<-xml2::xml_find_all(node,'./OGILTIGA');typ<-xml2::xml_attr(inv,'TEXT')
+ inv<-.xml2018_find_all(node,'./OGILTIGA');typ<-xml2::xml_attr(inv,'TEXT')
  for(pair in list(c('blanka_roster','BLANK'),c('roster_ej_anmalt_deltagande','OGEJ'),c('ovriga_ogiltiga','OG'))) {
   ix<-match(pair[2],typ)
   out[[pair[1]]]<-if(is.na(ix))NA_integer_ else a(inv[[ix]],'R\u00d6STER')
@@ -217,6 +217,8 @@
  zip<-.eu2019_file(role,args$source,args$data_dir)
  key<-paste(normalizePath(zip,winslash='/'),file.info(zip)$mtime,stage)
  if(exists(key,.eu2019_cache,inherits=FALSE))return(get(key,.eu2019_cache))
+ # Reuse the immutable empty prototype within this bundle only.
+ schema <- .valresultat_schema()
  register<-.xml2018_partiregister(.eu2019_file('parties',args$source,args$data_dir))
  prefix<-if(stage=='slutlig')'slutresultat'else'prelresultat'
  members<-sort(utils::unzip(zip,list=TRUE)$Name)
@@ -226,7 +228,7 @@
  r<-ctx<-pv<-ls<-list();index<-0L
  consume<-function(node,level,document) {
   index<<-index+1L
-  r[[index]]<<-.eu2019_result_node(node,document,level,register,stage)
+  r[[index]]<<-.eu2019_result_node(node,document,level,register,stage,schema)
   ctx[[index]]<<-.eu2019_geo(node,level)
   if(stage=='slutlig'&&level%in%c('riket','valdistrikt')) {
    b<-.eu2019_preferences_node(node,register,.xml2018_attr(node,'KOD'))

@@ -127,7 +127,8 @@ test_that("2014 is supported consistently without a new counting-stage value", {
   expect_error(results(2014, count = "election_night"), "count")
   expect_error(seats(2014, count = "preliminary", source = "local"), "final election XML")
   expect_silent(.check_canonical_years("canonical", 2014L))
-  expect_error(.canonical_source(2014L, "valresultat", "RD", "riket"), "configured")
+  local_mocked_bindings(.canonical_release_manifest = function(...) stop("manifest unavailable fixture"))
+  expect_error(.canonical_source(2014L, "valresultat", "RD", "riket"), "manifest unavailable fixture")
 })
 
 test_that("2014 preliminary aggregation sums district totals once per district", {
@@ -288,7 +289,7 @@ test_that("2014 canonical candidate ordering follows the raw population union", 
   file.create(file.path(root, assets$file))
   withr::local_options(swelections.canonical_assets_dir = root)
   local_mocked_bindings(
-    .canonical_manifest = function(...) list(valar = 2014L, schema_version = 2L,
+    .canonical_manifest = function(...) list(valar = 2014L, schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L,
       format = "parquet", valserie = "rkl", assets = assets),
     .canonical_asset = function(manifest, asset, ...) .canonical_names_en(data[[asset]]),
     .canonical_table = function(manifest, x, ...) .canonical_names_sv(x)

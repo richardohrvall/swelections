@@ -14,8 +14,8 @@ parts <- lapply(levels, function(level) results(2003, election = 'referendum', l
   source = 'local', data_dir = args[[1]], names = 'en', detail = 'full'))
 names(parts) <- unname(swelections:::.english_argument_values$level[levels])
 asset <- 'referendum2003-results-final'
-tables <- data.frame(asset = asset, table = names(parts), columns = vapply(parts, function(x) paste(names(x), collapse = ','), ''))
-x <- purrr::list_rbind(lapply(names(parts), function(key) {z <- parts[[key]]; z$.table <- key; z}))
+tables <- data.frame(asset = asset, table = swelections:::.canonical_storage_key(names(parts)), columns = vapply(parts, function(x) paste(names(x), collapse = ','), ''))
+x <- purrr::list_rbind(lapply(names(parts), function(key) {z <- parts[[key]]; z$.table <- swelections:::.canonical_storage_key(key); z}))
 x[] <- lapply(x, unname)
 file <- file.path(out, paste0(asset, '.parquet'))
 nanoparquet::write_parquet(x, file, compression = 'gzip')
@@ -30,7 +30,7 @@ for (i in seq_len(nrow(selected))) {
  stopifnot(file.info(p)$size == selected$size[i], unname(tools::md5sum(p)) == selected$md5[i],
   swelections:::.canonical_sha256(p) == selected$sha256[i])
 }
-manifest <- list(data_version = 'data-v0.0.0', schema_version = 2L, format = 'parquet',
+manifest <- list(data_version = 'data-v0.4.0', schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L, format = 'parquet',
  valserie = 'folkomr', valar = 2003L, release_status = 'unpublished_local_validation_build', auto_eligible = FALSE,
  built_at_utc = format(Sys.time(), '%Y-%m-%dT%H:%M:%SZ', tz = 'UTC'),
  build_commit = trimws(system2('git', c('rev-parse', 'HEAD'), stdout = TRUE)),
@@ -44,5 +44,7 @@ manifest <- list(data_version = 'data-v0.0.0', schema_version = 2L, format = 'pa
   geography = '5976 ordinary districts plus 396 Wednesday units; technical 00 containers are not public constituencies',
   electorate = 'SCB supplies three disjoint citizenship/residence groups for nation/counties only; sums match Valmyndigheten. Finer groups remain missing; Wednesday units have no independent electorate or turnout',
   preliminary = 'Separate preliminary Wednesday snapshot unrecovered; election night is not a complete preliminary stage'))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest, file.path(out, 'manifest.json'), pretty = TRUE, auto_unbox = TRUE, na = 'null')
 cat('PASS unpublished referendum build:', nrow(x), 'rows, 291 source hashes, Parquet round trip\n')

@@ -49,7 +49,7 @@ fixture_valda <- function() {
     kandidatnummer = "1", valtyp = "RD", partikod = "A",
     valomradeskod = "00", valomradesnamn = "Riket",
     valkretskod = "01", valkretsnamn = "Krets 1",
-    invalsordning = 1L, valgrund_id = "P", valgrund_text = "Personroster",
+    invalsordning = 1L, valgrund_id = "P", valgrund_text = "Ledamoten är vald på personröster",
     ersattargrupp = "1"
   )
 }

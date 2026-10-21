@@ -48,9 +48,9 @@ test_that("public candidate years stack without changing the established columns
   local_mocked_bindings(kandidaturer = function(ar, ...) {
     dplyr::mutate(cand, valtillfalle = paste0("Val_", ar))
   })
-  a <- kandidater(detaljniva = "full", ar = 2022, val = "RD", resultat = FALSE)
-  b <- kandidater(detaljniva = "full", ar = 2026, val = "RD", resultat = FALSE)
-  both <- kandidater(detaljniva = "full", ar = c(2022, 2026), val = "RD", resultat = FALSE)
+  a <- kandidater(source = "local", detaljniva = "full", ar = 2022, val = "RD", resultat = FALSE)
+  b <- kandidater(source = "local", detaljniva = "full", ar = 2026, val = "RD", resultat = FALSE)
+  both <- kandidater(source = "local", detaljniva = "full", ar = c(2022, 2026), val = "RD", resultat = FALSE)
   expect_identical(both, dplyr::bind_rows(a, b))
   expect_identical(names(both)[1:2], c("valtillfalle", "valar"))
   expect_type(both$valar, "integer")
@@ -67,7 +67,7 @@ test_that("public candidate years stack without changing the established columns
     dplyr::filter(
       make_kandidater_2026(dplyr::mutate(cand, valtillfalle = "Val_2026")),
       valtyp == "RD"
-    )
+    ) |> .public_output("sv")
   )
   expect_equal(nrow(dplyr::distinct(both, valar, kandidatnummer, valtyp, partikod)),
                nrow(both))

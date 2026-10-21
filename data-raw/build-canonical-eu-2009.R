@@ -9,11 +9,11 @@ if (dir.exists(out) && length(list.files(out, all.files=TRUE, no..=TRUE))) stop(
 dir.create(out, recursive=TRUE, showWarnings=FALSE)
 assets <- tables <- list()
 save_asset <- function(parts, asset) {
-  if (is.data.frame(parts)) x <- swelections:::.canonical_names_en(parts) else {
-    tables[[length(tables)+1L]] <<- data.frame(asset=asset, table=names(parts),
-      columns=vapply(parts, function(d) paste(names(swelections:::.canonical_names_en(d)), collapse=','), ''))
+  if (is.data.frame(parts)) x <- swelections:::.canonical_encode(parts) else {
+    tables[[length(tables)+1L]] <<- data.frame(asset=asset, table=swelections:::.canonical_storage_key(names(parts)),
+      columns=vapply(parts, function(d) paste(names(swelections:::.canonical_encode(d)), collapse=','), ''))
     x <- purrr::list_rbind(lapply(names(parts), function(n) {
-      d <- swelections:::.canonical_names_en(parts[[n]]); d$.table <- rep(n,nrow(d)); d
+      d <- swelections:::.canonical_encode(parts[[n]]); d$.table <- rep(swelections:::.canonical_storage_key(n),nrow(d)); d
     }))
   }
   x[] <- lapply(x, unname)
@@ -59,7 +59,7 @@ for(level in names(short)) {
  save_asset(b,paste0('eu2009-preference-base-',short[[level]]))
 }
 stopifnot(identical(unname(tools::sha256sum(files)),sources$sha256))
-manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',valserie='eu',valar=2009L,
+manifest <- list(data_version='data-v0.4.0',schema_version=3L,value_schema_version=1L,storage_schema_version=1L,format='parquet',valserie='eu',valar=2009L,
  release_status='unpublished_local_validation_build',auto_eligible=FALSE,
  built_at_utc=format(Sys.time(),'%Y-%m-%dT%H:%M:%SZ',tz='UTC'),
  build_commit=trimws(system2('git',c('rev-parse','HEAD'),stdout=TRUE)),
@@ -72,5 +72,7 @@ manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',v
  preference_votes='Main11 parties reconcile. Small-party source-column observations are independent of ballot IDs: national2665, county/municipal2677 versus XML aggregate2655; no inferred Wednesday or constituency allocation.',
  identity='No name-only deduplication or cross-list person linkage. Two Per Johansson ballot positions18/32 are distinct; identical source columns36/47 retained.',
  electorate='Final official district electorate matches XML; Wednesday electorate/turnout remain NA.'))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest,file.path(out,'manifest.json'),pretty=TRUE,auto_unbox=TRUE,na='null')
 cat('PASS EU2009 prototype build:',length(assets),'assets\n')

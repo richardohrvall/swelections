@@ -62,24 +62,29 @@
 #' @param resultat Om `TRUE`, kompletteras kandidaterna med personröster,
 #'   personval och invaldsuppgifter från slutliga resultatfiler.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
+#'   `auto` prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+#'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+#'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
+#'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
 #'   För 2014 ingår valsedelskandidater och identifierade kandidater i
 #'   slutresultatets personröst-, valda- och ersättarstrukturer. Resultatbaserad
 #'   population skapar inte nya offentliga kandidaturposter. Namn är typade
 #'   `NA`; odokumenterade kandidaturattribut för resultat-only kandidater är
 #'   `NA`. Inga senare mandatperiodsfiler används.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2014-/2022-bygge i Parquet.
+#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
-#'   `"auto"` väljer kompletta lokala officiella råfiler först, därefter en
-#'   publicerad kanonisk samling som uttryckligen godkänts för automatiskt
-#'   bruk, annars officiell fjärrkälla. För 2022/2026 används rådatavägen.
+#'   `"auto"` använder godkänd canonical eller stödd officiell fjärrkälla.
+#'   Om båda saknas krävs ett uttryckligt `source = "local"` för eget arkiv.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
 #'   Lokal arkivering kräver en redan befintlig lokal fil.
 #' @param data_dir Lokal rotmapp för rådata.
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator vid läsning av resultatfiler.
-#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param names Språk för kolumnnamn och tekniska kategorier: `"sv"`
+#'   (standard) eller `"en"`. Egentliga namn och källidentifierare bevaras;
+#'   booleska egenskaper är logical `TRUE`/`FALSE` i båda språken.
 #' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
 #'   för alla tillgängliga harmoniserade fält.
 #'
@@ -156,23 +161,21 @@ kandidater <- function(
 
 .kandidater_ett_ar <- function(ar, val, resultat, source, data_dir, update,
                                archive, progress) {
-  if (ar == 2002L) {
-    if (source == "canonical") return(.canonical_source(ar, "kandidater", val, resultat = resultat))
-    return(.kandidater_2002(.sources_2002(source, data_dir, update, archive), val, resultat, progress))
-  }
-  if (ar == 2006L) {
-    if (source == "canonical") return(.canonical_source(ar, "kandidater", val, resultat = resultat))
-    return(.kandidater_2006(.sources_2006(source, data_dir, update, archive), val, resultat, progress))
-  }
-  if (ar %in% c(2010L, 2014L) && source == "canonical") return(.canonical_source(ar, "kandidater", val,
-    resultat = resultat))
-  if (ar %in% c(2010L, 2014L)) return(.kandidater_2014(
-    .sources_historical(ar, source, data_dir, update, archive), val, resultat, progress))
   source <- .select_public_source(source, ar, "kandidater", data_dir,
-                                  update, archive, include_results = resultat)
+    update, archive, val = val, include_results = resultat)
   if (source %in% c("canonical", "canonical_auto"))
     return(.canonical_source(ar, "kandidater", val, resultat = resultat,
       auto_selected = identical(source, "canonical_auto")))
+  raw_options <- options(swelections.internal_raw_request = TRUE)
+  on.exit(options(raw_options), add = TRUE)
+  if (ar == 2002L) {
+    return(.kandidater_2002(.sources_2002(source, data_dir, update, archive), val, resultat, progress))
+  }
+  if (ar == 2006L) {
+    return(.kandidater_2006(.sources_2006(source, data_dir, update, archive), val, resultat, progress))
+  }
+  if (ar %in% c(2010L, 2014L)) return(.kandidater_2014(
+    .sources_historical(ar, source, data_dir, update, archive), val, resultat, progress))
   kandidaturdata <- kandidaturer(detaljniva = "full",
     ar = ar,
     val = val,

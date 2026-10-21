@@ -1,3 +1,19 @@
+# Current value/storage contract (unpublished)
+
+All current products are rebuilt for `data-v0.4.0`, column/schema version 3,
+value contract 1 and storage contract 1. See [VALUE_CONTRACT.md](VALUE_CONTRACT.md).
+English technical categories and logical/applicability pairs are stored in
+canonical files; Swedish presentation localizes categories only. Internal
+`.component` and `.table` keys are English. Proper names, source identifiers
+and all election quantities retain their source meaning.
+
+The existing `data-v0.1.0` publication is immutable historical material. The
+current registry does not select its manifest or URL. The replacement 2018
+generation includes the reviewed Ragunda correction and requires a local
+current-contract manifest until publication is approved. Automatic eligibility
+flags have not changed. Historical build/release descriptions below document
+the earlier generations; they do not override this current contract.
+
 # Canonical data distribution: RKL 2018 and 2022
 
 ## RKL 2022: unpublished local build
@@ -151,32 +167,31 @@ invalid asset. Explicit `"local"` and `"remote"` always use official raw data.
 
 ## Automatic source selection
 
-The central registry in `R/canonical_distribution.R` names each approved
-year, series, data version, schema version, release URL and `auto_eligible`
-flag. Its initial row explicitly enables 2018 / `data-v0.1.0`; no 2022 or
-2026 row exists. A calendar-year threshold is never used. For each requested
-year and public table, `source = "auto"` follows this order:
+The shared registry in `R/canonical_distribution.R` records family, event kind,
+year, schema, canonical reader, approval and published location. It registers
+supported prototypes as explicit-only entries. Only published RKL 2018 is
+currently auto-eligible; EU 2004/2009/2014/2019/2024 remain unapproved for auto.
+No calendar-year threshold or automatic developer-directory discovery is used.
 
-1. If all raw files required by that table exist with nonzero size in the
-   configured local archive, use `local`. The parser still validates their
-   contents; a malformed local source errors rather than silently falling
-   back. Results and seats require the 2018 result ZIP and party register;
-   candidacies require the candidacy file; result-enriched candidate, elected,
-   substitute and preference-vote tables require all three. Candidates with
-   `include_results = FALSE` require only candidacies.
-2. Otherwise, if the registry marks coverage eligible **and** the versioned
-   published release manifest can be retrieved and validated (or was already
-   retrieved into the release cache), use `canonical` when optional
-   `nanoparquet` is installed. A local build selected with
-   `swelections.canonical_manifest` does not by itself qualify for auto.
-3. Otherwise use `remote`, the official raw source. Some 2018 raw URLs are no
-   longer available, so this route may give the existing informative error.
+For each requested event/year/function/count/geographic view, `source = "auto"`
+uses approved canonical coverage first, before configured raw archives. Manifest
+asset/table layouts determine view coverage. Without approved coverage, the
+existing raw resolution is retained, including preserved-local requirements for
+historical readers. Selected canonical failures stop rather than silently switch
+source; a missing `nanoparquet` reader gives installation guidance.
 
-`update = TRUE` or `archive = TRUE` retains the existing raw-data path and
-does not select canonical. Explicit `source` always overrides `auto`. Each
-year in a multi-year call is resolved separately. A later 2022 release needs
-its own reviewed registry row; the current 2026 election remains on the raw
-path until explicitly approved.
+Explicit `local`, `remote` and `canonical` keep their meanings and override auto.
+To force a user archive when canonical exists, specify `source = "local"` as well
+as `data_dir`. `update`/`archive` with `auto` retains the raw-operation meaning.
+Canonical does not accept those flags or a raw `data_dir`.
+
+Configured manifests can be a single path or named by `series:ordinary:year`,
+`series:year`, or legacy year. A prototype path alone does not approve auto use.
+Approval and source location can later be added to the registry without changing
+the common routing policy. A new source format still needs its own validated
+reader. Ordinary election coverage does not enable re-election or mandate-history
+canonical sources. See installed `?data_sources` and
+[SOURCE_SELECTION_DESIGN.md](SOURCE_SELECTION_DESIGN.md) for the full policy.
 
 ## Build and provenance
 
@@ -263,3 +278,12 @@ eligibility is enabled. Build with `data-raw/build-canonical-eu-2004.R`; validat
 with `data-raw/validate-eu-2004.R`. See
 [completeness](COMPLETENESS_EU_2004.md) and
 [validation](VALIDATION_EU_2004.md) for source populations and exact commands.
+
+## Reviewed RKL 2018 correction prototype
+
+See [the scoped 2018 corrections](CANONICAL_2018_CORRECTIONS.md) for the
+final-only count-stage guard, corrected original Ragunda SD holder and five
+source-supported Stugubyn preference votes. Original published assets stay
+immutable. The reviewed working-tree build uses a separate output directory
+and records its actual dirty state. A clean-commit rebuild and a new data-release
+version are required before publication; no EU eligibility changes are implied.

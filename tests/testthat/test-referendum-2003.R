@@ -32,13 +32,14 @@ test_that('Wednesday vote observations never invent electorate or turnout', {
 })
 
 test_that('referendum API shares projection and English/Swedish values', {
- local_mocked_bindings(.referendum2003_raw = function(...) referendum_output())
+ local_mocked_bindings(.referendum2003_raw = function(...) referendum_output(),
+   .canonical_release_manifest = function(...) stop("manifest unavailable fixture"))
  full <- results(2003,election='referendum',source='local',detail='full')
  standard <- results(2003,election='F',source='local')
  expect_identical(standard,full[names(standard)])
  expect_gt(ncol(full),ncol(standard))
  sv <- valresultat(2003,val='F',source='local',detaljniva='full')
- expect_identical(.public_output_names(sv,'en'),full)
+ expect_identical(.public_output(sv,'en'),full)
  expect_identical(results(2003,election='referendum',source='local',names='sv'),
   valresultat(2003,val='F',source='local'))
  expect_identical(results(election='referendum',year='all',source='local'),standard)

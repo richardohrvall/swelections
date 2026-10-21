@@ -61,8 +61,8 @@ test_that("2006 source positions, zeros and qualification remain explicit", {
 
 test_that("2006 cannot claim cross-area person aggregation", {
   local_mocked_bindings(.sources_2006=function(...) NULL, .personroster_2006=function(...) tibble::tibble(valar=2006L))
-  expect_error(preference_votes(2006,election='municipal',level='municipality'), 'unsupported person linkage')
-  expect_error(preference_votes(2006,election='regional',level='region'), 'unsupported person linkage')
+  expect_error(preference_votes(source = "local", 2006,election='municipal',level='municipality'), 'unsupported person linkage')
+  expect_error(preference_votes(source = "local", 2006,election='regional',level='region'), 'unsupported person linkage')
 })
 
 test_that("2006 is registered for all supported observation families", {

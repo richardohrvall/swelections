@@ -25,13 +25,13 @@ sources <- data.frame(file = normalizePath(source_files, winslash = "/"),
   sha256 = vapply(source_files, sha, ""))
 assets <- tables <- list()
 save_asset <- function(parts, asset, role, discriminator = ".table") {
-  if (is.data.frame(parts)) x <- swelections:::.canonical_names_en(parts) else {
-    layouts <- lapply(parts, function(x) names(swelections:::.canonical_names_en(x)))
-    tables[[length(tables) + 1L]] <<- data.frame(asset = asset, table = names(parts),
+  if (is.data.frame(parts)) x <- swelections:::.canonical_encode(parts) else {
+    layouts <- lapply(parts, function(x) names(swelections:::.canonical_encode(x)))
+    tables[[length(tables) + 1L]] <<- data.frame(asset = asset, table = swelections:::.canonical_storage_key(names(parts)),
       columns = vapply(layouts, paste, "", collapse = ","))
     x <- purrr::list_rbind(lapply(names(parts), function(key) {
-      data <- swelections:::.canonical_names_en(parts[[key]])
-      data[[discriminator]] <- rep(key, nrow(data)); data
+      data <- swelections:::.canonical_encode(parts[[key]])
+      data[[discriminator]] <- rep(swelections:::.canonical_storage_key(key), nrow(data)); data
     }))
   }
   if (any(vapply(x, is.list, logical(1)))) stop("List column: ", asset)
@@ -111,7 +111,7 @@ for (surface in c("candidacies", "candidates", "elected", "substitutes", "popula
 }
 if (!identical(vapply(source_files, sha, ""), sources$sha256 |> stats::setNames(source_files)))
   stop("Original sources changed during build.")
-manifest <- list(data_version = "data-v0.0.0", schema_version = 2L, format = "parquet",
+manifest <- list(data_version = "data-v0.4.0", schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L, format = "parquet",
   valserie = "rkl", valar = 2010L, release_status = "unpublished_local_validation_build", auto_eligible = FALSE,
   built_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   build_commit = trimws(system2("git", c("rev-parse", "HEAD"), stdout = TRUE)),
@@ -126,5 +126,7 @@ manifest <- list(data_version = "data-v0.0.0", schema_version = 2L, format = "pa
       raw_rf_id = "451964", raw_rd_ballot_id = "497359",
       rd_context = "RD / party 0003 / constituency 03 / list 03600 / position 22",
       evidence = "SOURCE_ID_RECONCILIATION_2010.md; no other identity harmonisation enabled")))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest, file.path(out, "manifest.json"), pretty = TRUE, auto_unbox = TRUE, na = "null")
 cat("Finished unpublished 2010 build:", out, "\n")

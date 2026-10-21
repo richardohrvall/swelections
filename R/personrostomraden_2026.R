@@ -250,19 +250,16 @@
       ))
 
       if (isTRUE(available)) {
-        rader <- lapply(noder, function(p) {
-          x <- .personrost_rader(p$summeradePersonroster, "kandidatnummer")
-          if (is.null(x) || !length(x)) {
-            return(tibble::tibble(
-              kandidatnummer = character(), antal_personroster_summerat = integer()
-            ))
-          }
-          tibble::tibble(
-            kandidatnummer = names(x),
-            antal_personroster_summerat = unname(x)
-          )
-        }) |>
-          purrr::list_rbind()
+        # Collect typed candidate vectors before constructing one group table.
+        votes <- lapply(noder, function(p) {
+          .personrost_rader(p$summeradePersonroster, "kandidatnummer")
+        })
+        values <- unlist(votes, use.names = FALSE)
+        ids <- unlist(lapply(votes, names), use.names = FALSE)
+        rader <- tibble::tibble(
+          kandidatnummer = if (length(ids)) ids else character(),
+          antal_personroster_summerat = if (length(values)) values else integer()
+        )
         if (nrow(rader)) {
           rader <- dplyr::summarise(
             rader,
@@ -344,13 +341,21 @@
   underlag <- .personrostomradesunderlag_2026(
     rost_raw, valomradeskod, omraden
   )
-  avstamda <- .personrostomraden_avstamda_2026(rost_raw, omraden)
+  mandatlistor <- NULL
+  get_mandatlistor <- function() {
+    if (is.null(mandatlistor)) {
+      mandatlistor <<- .personroster_mandatlistor_2026(omraden)
+    }
+    mandatlistor
+  }
+  avstamda <- .personrostomraden_avstamda_2026(
+    rost_raw, omraden, mandatlistor = get_mandatlistor())
   summerade_omrade <- .personroster_summerade_omrade_2026(omraden)
   listsummerade <- tibble::tibble(
     personvalsomradeskod = character(), partikod = character(),
     kandidatnummer = character(), antal_personroster_listor = integer())
   if (any(avstamda)) {
-    listsummerade <- .personroster_mandatlistor_2026(omraden)$roster |>
+    listsummerade <- get_mandatlistor()$roster |>
       dplyr::summarise(
         antal_personroster_listor = as.integer(sum(antal_personroster_lista)),
         .by = c(personvalsomradeskod, partikod, kandidatnummer)

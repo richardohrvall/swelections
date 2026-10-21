@@ -21,7 +21,7 @@ test_that('EU public dispatch is shared across all seven interfaces and years', 
  for(i in seq_along(en)) {
    a <- do.call(get(en[i]),list(year=2024,election='european',source='local',detail='full'))
    b <- do.call(get(sv[i]),list(ar=2024,val='E',source='local',detaljniva='full'))
-   expect_identical(a,.public_output_names(b,'en'))
+   expect_identical(a,.public_output(b,'en'))
    st <- do.call(get(en[i]),list(year=2024,election='E',source='local'))
    expect_identical(st,a[names(st)])
    expect_identical(do.call(get(en[i]),list(year='all',election='E',source='local',detail='full')),dplyr::bind_rows(dplyr::mutate(a,election_year=2004L),dplyr::mutate(a,election_year=2009L),dplyr::mutate(a,election_year=2014L),dplyr::mutate(a,election_year=2019L),a))

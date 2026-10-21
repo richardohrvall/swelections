@@ -17,13 +17,13 @@ ballot <- file.path(s$root, "valresultat", "xml.zip")
 ballot_before <- sha(ballot)
 assets <- tables <- list()
 save_asset <- function(parts, asset, role, discriminator = ".table") {
-  if (is.data.frame(parts)) x <- swelections:::.canonical_names_en(parts) else {
-    layouts <- lapply(parts, function(x) names(swelections:::.canonical_names_en(x)))
-    tables[[length(tables) + 1L]] <<- data.frame(asset = asset, table = names(parts),
+  if (is.data.frame(parts)) x <- swelections:::.canonical_encode(parts) else {
+    layouts <- lapply(parts, function(x) names(swelections:::.canonical_encode(x)))
+    tables[[length(tables) + 1L]] <<- data.frame(asset = asset, table = swelections:::.canonical_storage_key(names(parts)),
       columns = vapply(layouts, paste, "", collapse = ","))
     x <- purrr::list_rbind(lapply(names(parts), function(key) {
-      data <- swelections:::.canonical_names_en(parts[[key]])
-      data[[discriminator]] <- rep(key, nrow(data)); data
+      data <- swelections:::.canonical_encode(parts[[key]])
+      data[[discriminator]] <- rep(swelections:::.canonical_storage_key(key), nrow(data)); data
     }))
   }
   x[] <- lapply(x, unname)
@@ -73,7 +73,7 @@ for (i in seq_len(nrow(sources))) swelections:::.xml2006_source(s, sources$file[
 if (nrow(s$municipal_sources) != 579L) stop("Complete 579-file municipality preservation required.")
 for (file in s$municipal_sources$file) swelections:::.xml2006_source(s, paste0("official-final/", file))
 stopifnot(identical(sha(ballot), ballot_before))
-manifest <- list(data_version = "data-v0.0.0", schema_version = 2L, format = "parquet",
+manifest <- list(data_version = "data-v0.4.0", schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L, format = "parquet",
   valserie = "rkl", valar = 2006L, release_status = "unpublished_local_validation_build", auto_eligible = FALSE,
   built_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   build_commit = trimws(system2("git", c("rev-parse", "HEAD"), stdout = TRUE)),
@@ -90,5 +90,7 @@ manifest <- list(data_version = "data-v0.0.0", schema_version = 2L, format = "pa
     discrepancies = c("RD detailed candidate totals exceed independent official area statistics by 4089 in five constituencies",
       "KF detailed totals 1554153 versus separate Valmyndigheten statistics 1554115: 38 votes; neither source is overwritten",
       "RF SCB wide table has 102 exact duplicate rows; raw table retained unchanged")))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest, file.path(out, "manifest.json"), pretty = TRUE, auto_unbox = TRUE, na = "null")
 cat("Finished unpublished 2006 build:", out, "\n")

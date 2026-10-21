@@ -79,7 +79,7 @@
  j<-match(paste(raw[[8]],sprintf('%05d',as.integer(raw[[6]]))),paste(kd$candidate_number,kd$list_number))
  stopifnot(!anyNA(j),!anyDuplicated(j),nrow(raw)==nrow(kd),
   identical(as.integer(raw[[7]]),kd$ballot_order[j]),identical(as.integer(raw[[10]]),kd$age_on_election_day[j]),
-  identical(raw[[11]],kd$sex[j]),identical(raw[[12]],kd$ballot_info[j]),
+  identical(unname(c(M='male',K='female',Man='male',Kvinna='female')[raw[[11]]]),kd$sex[j]),identical(raw[[12]],kd$ballot_info[j]),
   all(is.na(kd$name)),all(is.na(kd$valid)),all(is.na(kd$consent)))
  cat('PASS all376candidacy keys/positions/age/sex/ballot text and source missingness\n')
  invisible(TRUE)

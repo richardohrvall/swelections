@@ -58,7 +58,7 @@ Use new output directories rather than replacing preserved validation references
 
 Canonical data versions are separate from package versions. Follow the pinned
 source selection and manifest procedure in [CANONICAL_DATA.md](development/CANONICAL_DATA.md).
-Only published releases explicitly eligible for automatic use may be selected by
+Only canonical coverage explicitly approved in the registry may be selected by
 `auto`; a local canonical cache is still canonical, not a local raw archive.
 
 Do not use mandate-period membership to redefine the fixed election result.

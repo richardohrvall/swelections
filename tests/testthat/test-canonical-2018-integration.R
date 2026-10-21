@@ -346,7 +346,7 @@ test_that("public 2018 APIs preserve raw-built values in both name languages", {
   }
 })
 
-test_that("auto uses the published release path, not a local build override", {
+test_that("auto uses registered published coverage before local raw files", {
   build <- swelections_test_env("CANONICAL_DIR")
   skip_if(!nzchar(build), "Canonical integration needs local release assets")
   skip_if_not_installed("nanoparquet")
@@ -356,7 +356,7 @@ test_that("auto uses the published release path, not a local build override", {
   cache <- tempfile("canonical-auto-cache-")
   on.exit(unlink(cache, recursive = TRUE), add = TRUE)
   old <- options(swelections.data_dir = root,
-                 swelections.canonical_manifest = "unpublished-local-build.json",
+                 swelections.canonical_manifest = NULL,
                  swelections.canonical_cache_dir = cache)
   on.exit(options(old), add = TRUE)
   local_mocked_bindings(.canonical_release_manifest = function(release,
@@ -376,7 +376,7 @@ test_that("auto uses the published release path, not a local build override", {
                                              election = "parliamentary"))
   )
   for (entry in calls) {
-    options(swelections.canonical_manifest = "unpublished-local-build.json")
+    options(swelections.canonical_manifest = NULL)
     actual <- do.call(entry$fun, c(entry$args, list(source = "auto")))
     options(swelections.canonical_manifest = file.path(build, "manifest.json"))
     expected <- do.call(entry$fun, c(entry$args, list(source = "canonical")))

@@ -22,7 +22,11 @@
 #'   EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med `val = "E"`.
 #'   `NULL` ger alla.
 #' @param source Datakälla: `"auto"`, `"local"`, `"remote"` eller `"canonical"`.
-#'   `"canonical"` avser den separat versionerade 2018-samlingen eller ett uttryckligen konfigurerat 2022-bygge i Parquet,
+#'   `auto` prioriterar godkänd canonical-täckning för valfamilj, valhändelse,
+#'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
+#'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
+#'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
+#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.
@@ -31,7 +35,9 @@
 #' @param update Om `TRUE`, uppdateras lokala arbetskopior.
 #' @param archive Om `TRUE`, sparas även daterade snapshots.
 #' @param progress Visa progressindikator.
-#' @param names `"sv"` (standard) eller `"en"` för publika kolumnnamn.
+#' @param names Språk för kolumnnamn och tekniska kategorier: `"sv"`
+#'   (standard) eller `"en"`. Egentliga namn och källidentifierare bevaras;
+#'   booleska egenskaper är logical `TRUE`/`FALSE` i båda språken.
 #' @param detaljniva `"standard"` för centrala analysvariabler eller `"full"`
 #'   för alla tillgängliga harmoniserade fält.
 #' @param fran,till Inklusiva årsgränser bland stödda år, som alternativ till

@@ -3,10 +3,10 @@
 # currently published, redacted kandidaturer.skv; the local named research
 # snapshot is deliberately not a build input.
 # Canonical staging uses the complete raw readers, before public detail/geography projection.
-# Usage: Rscript data-raw/build-canonical-2018.R RAW_ROOT OFFICIAL_CANDIDATE_FILE
+# Usage: Rscript data-raw/build-canonical-2018.R RAW_ROOT OFFICIAL_CANDIDATE_FILE [STAGE_DIR]
 # RAW_ROOT has 2018/valresultat/{slutresultat.zip,deltagande_partier.skv}.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2L) stop("Ange RAW_ROOT och OFFICIAL_CANDIDATE_FILE.")
+if (!length(args) %in% c(2L, 3L)) stop("Ange RAW_ROOT, OFFICIAL_CANDIDATE_FILE och valfri STAGE_DIR.")
 root <- normalizePath(args[[1]], mustWork = TRUE)
 candidate <- normalizePath(args[[2]], mustWork = TRUE)
 pkgload::load_all(".", quiet = TRUE)
@@ -41,7 +41,8 @@ dest <- c(file.path(stage, "2018", "valresultat", "slutresultat.zip"),
           file.path(stage, "2018", "kandidater", "kandidaturer.skv"))
 if (!all(file.copy(copies, dest))) stop("Kunde inte förbereda temporär byggrot.")
 
-outdir <- file.path(".local-data", "canonical-build", "data-v0.1.0")
+outdir <- if (length(args) == 3L) args[[3L]] else
+  file.path(".local-data", "canonical-build", "data-v0.1.0")
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
 values <- c("RD", "RF", "KF")
 levels <- list(
@@ -179,6 +180,7 @@ manifest <- list(
   ),
   public_surfaces = c("valresultat", "mandat", "kandidaturer", "kandidater",
                       "valda", "ersattare", "personroster"),
+  corrections = list(ragunda_2018 = swelections:::.xml2018_ragunda_provenance()),
   assets = do.call(rbind, entries),
   sources = data.frame(
     source = c("slutresultat.zip", "deltagande_partier.skv",

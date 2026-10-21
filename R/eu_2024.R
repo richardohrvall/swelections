@@ -25,7 +25,7 @@
     }
     file
   }
-  if (source != 'remote' && length(local)) return(verify(local[[1]]))
+  if (source == 'local' && length(local)) return(verify(local[[1]]))
   if (source == 'local') stop('Missing EU 2024 source: ', name, call. = FALSE)
   url <- if (kind == 'candidacies')
     'https://data.val.se/filer/euval2024/parti/kandidaturer.zip' else
@@ -335,8 +335,18 @@
     if (!is.null(args[[flag]])) .check_flag(args[[flag]], flag)
   if (isTRUE(args$update) || isTRUE(args$archive)) stop('EU snapshots are read-only; preserve updates separately.', call. = FALSE)
   if (!is.null(args$rakning) && (length(args$rakning) != 1L || !args$rakning %in% c('slutlig', 'preliminar'))) stop('Unknown EU count stage.', call. = FALSE)
-  return(purrr::list_rbind(lapply(years, function(y) {
-    if (args$source == 'canonical') return(if (y == 2004L) .eu2004_canonical(table, args) else if (y == 2009L) .eu2009_canonical(table, args) else if (y == 2014L) .eu2014_canonical(table, args) else if (y == 2019L) .eu2019_canonical(table, args) else .eu2024_canonical(table, args))
+  return(.public_bind_years(lapply(years, function(y) {
+    selected <- .select_public_source(args$source, y, table, args$data_dir,
+      series = "eu", niva = args$niva,
+      rakning = if (is.null(args$rakning)) "slutlig" else args$rakning,
+      include_results = !identical(args$resultat, FALSE))
+    if (selected %in% c("canonical", "canonical_auto")) {
+      .check_public_args(y, table, if (selected == "canonical") "canonical" else "auto",
+        args$data_dir, FALSE, FALSE, valar_resolved = TRUE)
+      args$.canonical_auto <- identical(selected, "canonical_auto")
+      entry <- .canonical_release(y, "eu")
+      return(get(entry$reader, mode = "function")(table, args))
+    }
     if (y == 2004L) .eu2004_read(table, args) else if (y == 2009L) .eu2009_read(table, args) else if (y == 2014L) .eu2014_read(table, args) else if (y == 2019L) .eu2019_read(table, args) else .eu2024_read(table, args)
   })))
 }

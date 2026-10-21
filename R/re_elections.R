@@ -309,7 +309,8 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   if(table=="seats" && !"antal_tomma_stolar" %in% names(raw)) raw$antal_tomma_stolar <- rep(NA_integer_,nrow(raw))
   out <- .public_output_names(.public_detail(raw,table,detail,e$election_code),language)
   if(table=="seats") .re_verify_allocation(.public_output_names(.public_detail(raw,table,"standard",e$election_code),"en"),e)
-  .re_provenance(out,e,file,language)
+  out <- .re_provenance(out,e,file,language)
+  .public_output(if(language == "sv") out else .canonical_names_sv(out), language)
 }
 
 .re_provenance <- function(out,e,file,language) {
@@ -343,6 +344,7 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   }
   if(nrow(re)) {
     src<-match.arg(source,c('auto','local','remote','canonical'))
+    .auto_requires_local(src, 're-election results')
     if(src %in% c('remote','canonical'))stop('Re-election ',src,' source is not available; use preserved local sources. No canonical re-election release exists.',call.=FALSE)
     if(update||archive)stop('Preserved re-election sources are immutable; update/archive are not supported.',call.=FALSE)
     if(!identical(count,'final'))stop('Re-election preliminary readers are not yet verified; final sources will not replace them.',call.=FALSE)
@@ -439,7 +441,7 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
         if(anyNA(match(cmp$party_abbreviation,names(old_by))) || any(old_by[cmp$party_abbreviation]!=cmp$previous_seats))
           stop('Original constituency allocation disagrees with the official re-election comparison.',call.=FALSE)
         kept<-parts[parts$municipal_constituency_code!=e$scope_code,]
-        kept$geographic_level<-'kommun'
+        kept$geographic_level<-'municipality'
         if(sum(kept$seats)+sum(replacement$seats)!=sum(original$seats[affected]))
           stop('Replacement does not preserve the verified council size.',call.=FALSE)
         replacement<-dplyr::bind_rows(kept,replacement)
@@ -458,6 +460,7 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
     out[[length(out)+1L]]<-original
   }
   out<-dplyr::bind_rows(out)
+  out <- .values_present(out, language)
   if(language=='sv')out<-.canonical_names_sv(out)
   out
 }
@@ -471,7 +474,7 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   if(anyNA(k))stop('Ordinary event metadata missing from registry.',call.=FALSE)
   columns<-c(election_event='valtillfalle',election_date='valdatum',election_kind='valklass',mandate_period='mandatperiod')
   for(n in names(columns))x[[if(language=='sv')columns[[n]]else n]]<-registry[[n]][k]
-  x
+  .public_output(if(language == "sv") x else .canonical_names_sv(x), language)
 }
 
 .swedish_election_kind <- function(x) {

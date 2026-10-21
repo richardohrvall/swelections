@@ -25,13 +25,13 @@
   }) |> purrr::list_rbind()
   nodpath <- xml2::xml_path(noder)
   nodid <- geos$node_id
-  ps <- xml2::xml_find_all(noder,
+  ps <- .xml2018_find_all(noder,
     "./GILTIGA|./\u00d6VRIGA_GILTIGA/GILTIGA", flatten = TRUE)
   ppath <- xml2::xml_path(ps)
-  pnode <- match(xml2::xml_path(xml2::xml_find_first(ps,
+  pnode <- match(xml2::xml_path(.xml2018_find_first(ps,
     "ancestor::VALDISTRIKT[1]|ancestor::ONSDAGSDISTRIKT[1]")), nodpath)
   if (anyNA(pnode)) stop("Partirad saknar valdistrikt 2018.", call. = FALSE)
-  p_list <- xml2::xml_find_first(ps, "./VALSEDEL|./PARTISEDEL")
+  p_list <- .xml2018_find_first(ps, "./VALSEDEL|./PARTISEDEL")
   firstlist <- xml2::xml_attr(p_list, "LISTNUMMER")
   pkod <- ifelse(!is.na(firstlist) & grepl("^[0-9]{4}-", firstlist),
                  substr(firstlist, 1L, 4L), NA_character_)
@@ -46,9 +46,9 @@
     stop("Ogiltiga partir\u00f6ster i 2018 \u00e5rs distrikt.", call. = FALSE)
   if (anyDuplicated(paste(nodid[pnode], pkod)))
     stop("Dubbla partirader i 2018 \u00e5rs distrikt.", call. = FALSE)
-  lnodes <- xml2::xml_find_all(ps, "./VALSEDEL|./PARTISEDEL",
+  lnodes <- .xml2018_find_all(ps, "./VALSEDEL|./PARTISEDEL",
                                flatten = TRUE)
-  lparti <- match(xml2::xml_path(xml2::xml_find_first(lnodes, "..")), ppath)
+  lparti <- match(xml2::xml_path(.xml2018_find_first(lnodes, "..")), ppath)
   lraw <- xml2::xml_attr(lnodes, "LISTNUMMER")
   l_rost <- as.integer(xml2::xml_attr(lnodes, "R\u00d6STER"))
   l_person <- as.integer(xml2::xml_attr(lnodes, "PERSONKRYSS"))
@@ -73,8 +73,8 @@
     stop("Listornas personr\u00f6ster st\u00e4mmer inte med partiraden 2018.",
          call. = FALSE)
   }
-  vnodes <- xml2::xml_find_all(ps, "./PERSONVAL", flatten = TRUE)
-  vparti <- match(xml2::xml_path(xml2::xml_find_first(vnodes, "..")), ppath)
+  vnodes <- .xml2018_find_all(ps, "./PERSONVAL", flatten = TRUE)
+  vparti <- match(xml2::xml_path(.xml2018_find_first(vnodes, "..")), ppath)
   vid <- xml2::xml_attr(vnodes, "KANDNR")
   vtal <- as.integer(xml2::xml_attr(vnodes, "PERSONKRYSS"))
   if (anyNA(vparti) || anyNA(vid) || anyNA(vtal) || any(vtal < 0L) ||
@@ -83,8 +83,8 @@
     stop("Distriktets kandidatpersonr\u00f6ster st\u00e4mmer inte 2018.",
          call. = FALSE)
   }
-  lvnodes <- xml2::xml_find_all(lnodes, "./PERSONVAL", flatten = TRUE)
-  lvlista <- match(xml2::xml_path(xml2::xml_find_first(lvnodes, "..")),
+  lvnodes <- .xml2018_find_all(lnodes, "./PERSONVAL", flatten = TRUE)
+  lvlista <- match(xml2::xml_path(.xml2018_find_first(lvnodes, "..")),
                    xml2::xml_path(lnodes))
   lvid <- xml2::xml_attr(lvnodes, "KANDNR")
   lvtal <- as.integer(xml2::xml_attr(lvnodes, "PERSONKRYSS"))

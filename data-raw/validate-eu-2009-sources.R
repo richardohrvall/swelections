@@ -63,8 +63,8 @@
  stopifnot(nrow(kd)==500L,length(v)==500L,!anyNA(j),!anyDuplicated(j))
  stopifnot(identical(kd$candidate_number,paste0('2009:E:ballot:',ln[j],':',pos[j])))
  stopifnot(identical(kd$ballot_info,xml_attr(v,'KANDIDATUPPGIFT')[j]),identical(kd$name,trimws(sub(',.*$','',xml_attr(v,'KANDIDATUPPGIFT')[j]))))
- stopifnot(identical(kd$age_on_election_day,as.integer(xml_attr(v,'ÅLDER'))[j]),identical(kd$sex,xml_attr(v,'KÖN')[j]))
- stopifnot(identical(kd$ballot_status,xml_attr(l,'STATUS')[j]),identical(kd$candidates_registered,xml_attr(l,'KANDIDATANMÄLAN')[j]=='Ja'),all(is.na(kd$valid)))
+ stopifnot(identical(kd$age_on_election_day,as.integer(xml_attr(v,'ÅLDER'))[j]),identical(kd$sex,unname(c(M='male',K='female',Man='male',Kvinna='female')[xml_attr(v,'KÖN')[j]])))
+ stopifnot(identical(kd$ballot_status,unname(c(Definitiv='final',Utkast='draft',S='S',B='B')[xml_attr(l,'STATUS')[j]])),identical(kd$candidates_registered,xml_attr(l,'KANDIDATANMÄLAN')[j]=='Ja'),all(is.na(kd$valid)))
  cat('PASS all500 original ballot/list positions, descriptions, names, ages, sex, status and registration flags\n')
  # The final elected roster is matched by party + name + age and original order/basis.
  ep<-xml_find_all(pd,'./NATION/GILTIGA[GRUPP_VALDA]');expected<-rels<-list();i<-0L
@@ -88,7 +88,7 @@
  # SCB district table has 290 pooled postal units, not 396 XML Wednesday units.
  scb<-readxl::read_excel(file.path(control_dir,'scb-district.xls'),col_names=FALSE,.name_repair='minimal')[-1,]
  names(scb)<-c('county','county_name','municipality','municipality_name','code','name','eligible','foreign','cast','invalid','blank','valid','M','C','FP','KD','MP','S','V','PP','other')
- dx<-refs$district;g<-ifelse(dx$district_type=='uppsamlingsdistrikt',paste0(dx$municipality_code,'9800'),dx$district_code)
+ dx<-refs$district;g<-ifelse(dx$district_type=='collection',paste0(dx$municipality_code,'9800'),dx$district_code)
  a<-unique(data.frame(code=g,raw=dx$district_code,valid=dx$valid_votes,invalid=dx$invalid_votes,cast=dx$total_votes,eligible=dx$eligible_voters))
  a<-a|>dplyr::summarise(valid=sum(.data$valid),invalid=sum(.data$invalid),cast=sum(.data$cast),eligible=sum(.data$eligible,na.rm=TRUE),.by='code')
  j<-match(as.character(scb$code),a$code);stopifnot(nrow(scb)==5954L,!anyNA(j))

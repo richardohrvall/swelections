@@ -7,7 +7,7 @@ options(swelections.canonical_manifest=file.path(out,'manifest.json'),
  swelections.canonical_cache_dir=file.path(out,'validation-cache'))
 sha<-swelections:::.canonical_sha256
 manifest<-jsonlite::read_json(file.path(out,'manifest.json'),simplifyVector=TRUE)
-stopifnot(manifest$valar==2024L,manifest$valserie=='eu',manifest$schema_version==2L,nrow(manifest$assets)==15L)
+stopifnot(manifest$valar==2024L,manifest$valserie=='eu',manifest$schema_version==3L,nrow(manifest$assets)==15L)
 for(i in seq_len(nrow(manifest$assets))){a<-manifest$assets[i,];f<-file.path(out,a$file);stopifnot(file.info(f)$size==a$bytes,sha(f)==a$sha256)}
 files<-c(swelections:::.eu2024_file('results','local',root,'slutlig'),
  swelections:::.eu2024_file('results','local',root,'preliminar'),
@@ -42,9 +42,9 @@ compare<-function(fun,extra=list()){
  full<-do.call(get(fun),c(common,list(source='local',names='en',detail='full')))
  for(lang in c('en','sv'))for(detail in c('standard','full')){
    raw<-do.call(get(fun),c(common,list(source='local',names=lang,detail=detail)))
-   canonical<-do.call(get(fun),c(common,list(source='canonical',names=lang,detail=detail)))
+   canonical<-do.call(get(fun),c(common[setdiff(names(common),'data_dir')],list(source='canonical',names=lang,detail=detail)))
    if(!identical(raw,canonical))stop('Canonical/raw difference: ',fun,' ',paste(extra,collapse='/'),' ',lang,' ',detail)
-   translated<-if(lang=='en')raw else swelections:::.public_output_names(raw,'en')
+   translated<-if(lang=='en')raw else swelections:::.public_output(raw,'en')
    stopifnot(identical(translated,full[names(translated)]),nrow(translated)==nrow(full))
  }
  cat('PASS API',fun,paste(extra,collapse='/'),nrow(full),'\n');flush.console()

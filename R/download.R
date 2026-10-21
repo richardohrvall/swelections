@@ -1,5 +1,19 @@
-# Download to a temporary sibling so failed attempts cannot expose partial data.
+# Indexed official result files use a fresh request-scoped index and a raw-byte cache.
 .download_file <- function(url, destfile, expected_bytes = NULL,
+                           attempts = 3L, timeout = 180L,
+                           .download = utils::download.file, .sleep = Sys.sleep) {
+  transport <- function(url, destfile, expected_bytes = NULL) {
+    .download_file_uncached(url, destfile, expected_bytes, attempts, timeout,
+                            .download, .sleep)
+  }
+  spec <- .remote_raw_url(url)
+  if (!is.null(spec) && (spec$path == "index.md5" || grepl("[.]zip$", spec$path)))
+    return(.remote_raw_download(spec, destfile, expected_bytes, transport))
+  transport(url, destfile, expected_bytes)
+}
+
+# Download to a temporary sibling so failed attempts cannot expose partial data.
+.download_file_uncached <- function(url, destfile, expected_bytes = NULL,
                            attempts = 3L, timeout = 180L,
                            .download = utils::download.file,
                            .sleep = Sys.sleep) {

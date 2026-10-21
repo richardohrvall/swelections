@@ -45,7 +45,7 @@ test_that('2014 English and Swedish wrappers share detail and output-name handli
   b<-do.call(get(sv[i],envir=asNamespace('swelections')),list(ar=2014,val='E',source='local',names=lang,detaljniva=detail))
   expect_identical(a,b)
  }
- a<-results(2014,election='E',detail='standard');b<-results(2014,election='E',detail='full')
+ a<-results(2014,election='E',source='local',detail='standard');b<-results(2014,election='E',source='local',detail='full')
  expect_false('source_votes_without_party_designation'%in%names(a))
  expect_identical(b$source_votes_without_party_designation,10L)
  expect_identical(a,b[names(a)])

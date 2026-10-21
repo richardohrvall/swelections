@@ -119,7 +119,7 @@ test_that("configured 2010 candidate assets use the requested year prefix", {
   writeLines("fixture", file.path(root, paste0(asset, ".parquet")))
   data <- fixture_kandidaturer() |> dplyr::mutate(valar = 2010L)
   local_mocked_bindings(.canonical_manifest = function(...) list(valar = 2010L,
-    schema_version = 2L, format = "parquet", valserie = "rkl",
+    schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L, format = "parquet", valserie = "rkl",
     assets = data.frame(asset = asset, file = paste0(asset, ".parquet"))),
     .canonical_asset = function(manifest, requested, ...) {
       expect_identical(requested, asset)

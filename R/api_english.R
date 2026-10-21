@@ -29,6 +29,8 @@
 }
 
 .english_call <- function(fun, args, year, year_missing, names, detail, table) {
+  finish_remote <- .remote_raw_begin()
+  on.exit(finish_remote(), add = TRUE)
   language <- .english_output_language(names)
   detail <- .check_detail(detail)
   args["val"] <- list(.english_argument_value(args$val, "election", nullable = TRUE))
@@ -38,7 +40,7 @@
   }
   if (identical(args$val, "E")) {
     data <- .eu2024_dispatch(args, year, year_missing, table)
-    return(.public_output_names(.public_detail(data, table, detail, "E"), language))
+    return(.public_output(.public_detail(data, table, detail, "E"), language))
   }
   broader_preference <- identical(table, "preference_votes") &&
     !is.null(args$niva) &&
@@ -63,7 +65,7 @@
   elections <- if (is.null(args$val)) c("RD", "RF", "KF") else args$val
   if (table == "seats" && !is.null(args$niva))
     elections <- unique(.mandat_par_2026(args$val, args$niva)$valtyp)
-  .public_output_names(.public_detail(data, table, detail, elections), language)
+  .public_output(.public_detail(data, table, detail, elections), language)
 }
 
 #' Election results
@@ -78,8 +80,9 @@
 #' See the repository's 2006 implementation documentation for source limitations.
 #'
 #' Read official voting results at one geographic level and one count stage.
-#' The English interface calls [valresultat()] and translates column names
-#' only; source values and data values are unchanged.
+#' The English interface uses English column names and technical categories.
+#' Swedish output localizes those categories. Proper names and literal source
+#' identifiers are preserved; Boolean properties remain logical. See [data_sources].
 #'
 #' @section Re-elections:
 #' A re-election is a separate election event within the original continuing
@@ -149,15 +152,17 @@
 #'   the election. Supported combinations depend on election and year;
 #'   unsupported combinations give an error.
 #' @param source `"auto"`, `"local"`, `"remote"` or `"canonical"`.
-#'   For 2018, `"auto"` prefers a complete configured local raw set, then an
-#'   explicitly auto-eligible published canonical release, then the official
-#'   remote raw source. Other years retain the official raw-data route.
-#'   Explicit `"canonical"` resolves the published 2018 English-schema Parquet
-#'   release. Unpublished 2014/2022 builds require an explicitly configured manifest;
-#'   they are not selected by `"auto"`. A local build may be selected through
-#'   `options(swelections.canonical_manifest = "path/to/manifest.json")`.
-#'   A named character vector of manifest paths keyed by year supports requests
-#'   spanning published 2018 and configured 2022 data.
+#'   `auto` prefers approved canonical coverage for the requested election family,
+#'   event, year and view, even when local raw files exist. Without that coverage,
+#'   it uses a supported remote route, never the user's local raw files.
+#'   If neither is available, select `source = "local"` explicitly for a saved
+#'   archive. Explicit `remote` uses Valmyndigheten
+#'   where supported; `local` requires the user's saved raw archive and never
+#'   uses the network. `canonical` requires canonical data without raw fallback.
+#'   Use `source = "local"` to select `data_dir` instead of canonical under `auto`.
+#'   Private prototypes cannot extend automatic permission. Configured manifests may be
+#'   a single path or named paths keyed by `series:ordinary:year` (e.g.
+#'   `eu:ordinary:2014`), `series:year`, or legacy year keys. See [data_sources].
 #'   Canonical Parquet reading requires optional package `nanoparquet`.
 #'   The 2014 raw route requires a preserved local archive: final XML under
 #'   `2014/valresultat/slutresultat_20141001`, election-night XML under
@@ -190,7 +195,10 @@
 #'   Full output preserves the original parent fields as
 #'   `source_electoral_area_*`.
 #' @param names Output column language: `"en"` or `"sv"`. `NULL` uses
-#'   `getOption("swelections.names", "en")`. This changes column names only.
+#'   `getOption("swelections.names", "en")`. This controls column names and
+#'   technical categories. Proper names/source identifiers remain unchanged.
+#'   Booleans are logical in both languages. Consent/declaration in full output
+#'   have separate `*_applicable` flags; not applicable is not false.
 #' @return A tibble with the same rows, values and types as [valresultat()].
 #' @examples
 #' \dontrun{

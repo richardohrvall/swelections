@@ -4,10 +4,11 @@
                                per_lista = FALSE, komplettera_nollor = FALSE,
                                resultat = TRUE, auto_selected = FALSE,
                                rakning = "slutlig") {
-  configured <- getOption("swelections.canonical_manifest", NULL)
-  if (!is.null(names(configured)) && as.character(ar) %in% names(configured)) {
-    configured <- unname(configured[[as.character(ar)]])
-  }
+  if (ar == 2018L && surface %in% c("valresultat", "mandat") &&
+      !identical(rakning, "slutlig"))
+    stop("2018 st\u00f6der endast slutlig r\u00e4kning i det officiella XML-underlaget.",
+         call. = FALSE)
+  configured <- .canonical_manifest_path(ar, "rkl", auto_selected = auto_selected)
   if (ar == 2002L) return(.canonical_2002_source(configured, surface, val, niva, per_lista, komplettera_nollor, resultat, rakning))
   if (ar == 2006L) return(.canonical_2006_source(configured, surface, val, niva, per_lista, komplettera_nollor, resultat, rakning))
   if (ar %in% c(2010L, 2014L)) return(.canonical_2014_source(configured, surface, val,
@@ -26,21 +27,11 @@
   manifest <- .canonical_manifest(configured)
   if (!identical(as.integer(manifest$valar), 2022L) ||
       !identical(manifest$valserie, "rkl") ||
-      !identical(as.integer(manifest$schema_version), 2L) ||
+      !identical(as.integer(manifest$schema_version), 3L) ||
       !identical(manifest$format, "parquet")) {
-    stop("Expected RKL 2022 English Parquet schema version 2.", call. = FALSE)
+    stop("Expected RKL 2022 English Parquet schema version 3.", call. = FALSE)
   }
-  dir <- getOption("swelections.canonical_assets_dir", dirname(configured))
-  base <- getOption("swelections.canonical_base_url", NULL)
-  urls <- stats::setNames(lapply(manifest$assets$file, function(file) {
-    local <- file.path(dir, file)
-    if (file.exists(local)) {
-      paste0("file:///", gsub("\\\\", "/", normalizePath(local)))
-    } else if (!is.null(base)) paste0(sub("/+$", "", base), "/", file)
-    else NULL
-  }), manifest$assets$asset)
-  fetch <- function(asset) .canonical_asset(manifest, asset,
-    getOption("swelections.canonical_cache_dir", NULL), urls[[asset]])
+  fetch <- .canonical_fetcher(manifest, configured)
   .canonical_public_2022(manifest, fetch, surface, val, niva, per_lista,
                          komplettera_nollor, resultat, rakning)
 }
@@ -58,7 +49,7 @@
     values <- if (is.null(val)) c("RD", "RF", "KF") else val
     out <- purrr::list_rbind(lapply(values, function(v)
       .canonical_table(manifest, x, asset, v)))
-    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% niva)
+    if (!is.null(niva)) out <- dplyr::filter(out, .data$geografiniva %in% .canonical_storage_key(niva))
     return(out)
   }
   if (surface %in% c("kandidaturer", "kandidater", "valda", "ersattare")) {
@@ -138,6 +129,7 @@
                                   dplyr::across(dplyr::all_of(key)))
   out <- lapply(unique(parts$metadata$.source_area), function(area) {
     get <- function(component) {
+      component <- .canonical_storage_key(component)
       data <- partitioned[[component]][[area]]
       if (is.null(data)) data <- parts[[component]][0L, , drop = FALSE]
       data$.source_area <- NULL

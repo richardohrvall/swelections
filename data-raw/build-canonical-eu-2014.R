@@ -9,11 +9,11 @@ if (dir.exists(out) && length(list.files(out, all.files=TRUE, no..=TRUE))) stop(
 dir.create(out, recursive=TRUE, showWarnings=FALSE)
 assets <- tables <- list()
 save_asset <- function(parts, asset) {
-  if (is.data.frame(parts)) x <- swelections:::.canonical_names_en(parts) else {
-    tables[[length(tables)+1L]] <<- data.frame(asset=asset, table=names(parts),
-      columns=vapply(parts, function(d) paste(names(swelections:::.canonical_names_en(d)), collapse=','), ''))
+  if (is.data.frame(parts)) x <- swelections:::.canonical_encode(parts) else {
+    tables[[length(tables)+1L]] <<- data.frame(asset=asset, table=swelections:::.canonical_storage_key(names(parts)),
+      columns=vapply(parts, function(d) paste(names(swelections:::.canonical_encode(d)), collapse=','), ''))
     x <- purrr::list_rbind(lapply(names(parts), function(n) {
-      d <- swelections:::.canonical_names_en(parts[[n]]); d$.table <- rep(n,nrow(d)); d
+      d <- swelections:::.canonical_encode(parts[[n]]); d$.table <- rep(swelections:::.canonical_storage_key(n),nrow(d)); d
     }))
   }
   x[] <- lapply(x, unname)
@@ -57,7 +57,7 @@ for(level in names(short)) {
  save_asset(b,paste0('eu2014-preference-base-',short[[level]]))
 }
 stopifnot(identical(unname(tools::sha256sum(files)),sources$sha256))
-manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',valserie='eu',valar=2014L,
+manifest <- list(data_version='data-v0.4.0',schema_version=3L,value_schema_version=1L,storage_schema_version=1L,format='parquet',valserie='eu',valar=2014L,
  release_status='unpublished_local_validation_build',auto_eligible=FALSE,
  built_at_utc=format(Sys.time(),'%Y-%m-%dT%H:%M:%SZ',tz='UTC'),
  build_commit=trimws(system2('git',c('rev-parse','HEAD'),stdout=TRUE)),
@@ -69,5 +69,7 @@ manifest <- list(data_version='data-v0.0.0',schema_version=2L,format='parquet',v
  candidacies='376 documented ballot records, source validity/consent unavailable; public names NA. Source IDs are not asserted longitudinal person IDs.',
  identity='No candidate-ID harmonisation; joins use candidate plus official list code.',
  electorate='Original official district electorate matches final XML; Wednesday electorate/turnout NA.'))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest,file.path(out,'manifest.json'),pretty=TRUE,auto_unbox=TRUE,na='null')
 cat('PASS EU2014 prototype build:',length(assets),'assets\n')

@@ -46,7 +46,7 @@
 }
 
 .check_canonical_years <- function(source, years) {
-  if (identical(source, "canonical") && any(!years %in% c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L))) {
+  if (identical(source, "canonical") && any(!years %in% .canonical_release_registry()$year[.canonical_release_registry()$series == "rkl"])) {
     stop("`source = 'canonical'` supports 2018 and configured 2002/2006/2010/2014/2022 builds.", call. = FALSE)
   }
   invisible(years)

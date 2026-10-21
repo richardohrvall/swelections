@@ -47,12 +47,19 @@
             "valdistriktskod", "valdistriktstyp", "valomradeskod", "kretskod",
             "kommunvalkretsKod", "kommunvalkretsNamn", "statusJamforelse",
             "partibeteckning", "partiforkortning", "partikod", "fargkod", "deltaMandatfordelning")
-  for (namn in names(obj)) {
+  # Classify field names together; every non-NULL value is still checked below.
+  fields <- names(obj)
+  text_fields <- fields %in% text
+  integer_fields <- grepl(
+    "^(antal|totaltAntalRoster|forandringAntal|forandringTotaltAntalRoster|ordningsnummer)", fields)
+  double_fields <- grepl(
+    "^(andel|valdeltagande|forandringAndel|forandringValdeltagande|valomradessparrProcent|valkretssparrProcent)", fields)
+  for (i in seq_along(fields)) {
+    namn <- fields[[i]]
     x <- obj[[namn]]
     if (is.null(x)) next
-    typ <- if (namn %in% text) "character" else if (namn == "test") "logical" else
-      if (grepl("^(antal|totaltAntalRoster|forandringAntal|forandringTotaltAntalRoster|ordningsnummer)", namn)) "integer" else
-        if (grepl("^(andel|valdeltagande|forandringAndel|forandringValdeltagande|valomradessparrProcent|valkretssparrProcent)", namn)) "double" else NULL
+    typ <- if (text_fields[[i]]) "character" else if (namn == "test") "logical" else
+      if (integer_fields[[i]]) "integer" else if (double_fields[[i]]) "double" else NULL
     if (is.null(typ)) next
     ok <- length(x) == 1L && switch(typ,
       character = is.character(x), logical = is.logical(x),

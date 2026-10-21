@@ -1,6 +1,7 @@
 # 2014 adapters read preserved sources without altering the snapshots. Shared
 # XML normalisers remain responsible for the harmonised data types.
 .sources_2014 <- function(source, data_dir, update = FALSE, archive = FALSE) {
+  .auto_requires_local(source, "RKL 2014 raw data")
   .check_source_update(source, update)
   if (source == "remote" || update || archive)
     stop("2014 requires preserved local sources; update/archive are not supported.",

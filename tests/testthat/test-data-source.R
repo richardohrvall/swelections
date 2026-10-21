@@ -39,8 +39,6 @@ test_that("ordinary local reads never fall back to remote sources", {
   writeLines("synthetic fixture", path)
   expect_identical(val_file("fixture.txt", 2026, "test", "local", root),
                    val_local_path("fixture.txt", 2026, "test", root))
-  expect_identical(val_file("fixture.txt", 2026, "test", "auto", root),
-                   val_local_path("fixture.txt", 2026, "test", root))
   expect_error(val_file("missing.txt", 2026, "test", "local", root), "Filen finns inte")
 })
 

@@ -66,8 +66,8 @@ test_that('2002 preference records preserve observations without person-name lin
 
 test_that('2002 cannot claim person-linked broader aggregation or ballot completeness', {
   local_mocked_bindings(.sources_2002=function(...) NULL,.personroster_2002=function(...) tibble::tibble(valar=2002L))
-  expect_error(preference_votes(2002,election='municipal',level='municipality'),'unsupported person linkage')
-  expect_error(preference_votes(2002,election='regional',level='region'),'unsupported person linkage')
+  expect_error(preference_votes(source = "local", 2002,election='municipal',level='municipality'),'unsupported person linkage')
+  expect_error(preference_votes(source = "local", 2002,election='regional',level='region'),'unsupported person linkage')
   expect_false(2002L %in% .stodd_valar('kandidaturer','RD'))
   for(f in c('valresultat','mandat','kandidater','valda','ersattare','personroster'))
     for(v in c('RD','RF','KF')) expect_true(2002L %in% .stodd_valar(f,v))

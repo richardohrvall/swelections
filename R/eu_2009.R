@@ -15,6 +15,7 @@
  'https://historik.val.se/val/ep2009/handskrivna/handskrivna.skv'))
 
 .eu2009_file <- function(role, source, data_dir) {
+ .auto_requires_local(source, "EU 2009 raw data")
  entry <- .eu2009_sources(); entry <- entry[match(role,entry$role),]
  if(anyNA(entry)) stop('Unknown EU 2009 source role.',call.=FALSE)
  if(source=='remote') stop('EU 2009 requires the pinned preserved original sources; current redacted/truncated files are not equivalent. Use local or a configured canonical build.',call.=FALSE)
@@ -131,6 +132,8 @@
 .eu2009_bundle <- function(args) {
  files<-stats::setNames(vapply(.eu2009_sources()$role,function(r).eu2009_file(r,args$source,args$data_dir),''),.eu2009_sources()$role)
  key<-paste(files,collapse='|');if(exists(key,.eu2009_cache,inherits=FALSE))return(get(key,.eu2009_cache))
+ # Reuse the immutable empty prototype within this bundle only.
+ schema <- .valresultat_schema()
  kd<-.eu2009_candidacies(files[['candidacies']]);bd<-xml2::read_xml(files[['candidacies']])
  con<-unz(files[['final']],'slutresultat_00E.xml',open='rb');doc<-xml2::read_xml(con);close(con)
  reg<-.eu2009_register(doc,bd)
@@ -141,7 +144,7 @@
  if(length(members)!=290L)stop('Incomplete EU 2009 municipal XML archive.',call.=FALSE)
  r<-ctx<-pv<-ls<-list();i<-0L
  consume<-function(node,level,d){
-  i<<-i+1L;r[[i]]<<-.eu2009_retag(.eu2014_result_node(node,d,level,reg));ctx[[i]]<<-.eu2019_geo(node,level)
+  i<<-i+1L;r[[i]]<<-.eu2009_retag(.eu2014_result_node(node,d,level,reg,schema));ctx[[i]]<<-.eu2019_geo(node,level)
   if(level%in%c('riket','valdistrikt')){p<-.eu2019_preferences_node(node,reg,.xml2018_attr(node,'KOD'));pv[[i]]<<-p$votes;ls[[i]]<<-p$lists}
  }
  consume(xml2::xml_find_first(doc,'./NATION'),'riket',doc)

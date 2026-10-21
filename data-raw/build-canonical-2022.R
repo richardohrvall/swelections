@@ -52,13 +52,15 @@ reuse <- function(asset, role, layouts = NULL) {
   file <- file.path(out, paste0(asset, ".parquet"))
   if (!nzchar(resume) || !file.exists(file)) return(FALSE)
   x <- tibble::as_tibble(nanoparquet::read_parquet(file))
+  current <- swelections:::.canonical_encode(swelections:::.canonical_names_sv(x))
+  if (!identical(x, current)) stop("Resume asset uses an older value/storage contract; use an empty output directory: ", asset)
   assets[[length(assets) + 1L]] <<- data.frame(asset = asset, file = basename(file),
     role = role, rows = nrow(x), bytes = unname(file.info(file)$size), sha256 = sha(file))
   if (!is.null(layouts)) {
     if (identical(layouts, "seat-layout"))
       layouts <- stats::setNames(rep(list(setdiff(names(x), ".table")), 3L), c("RD", "RF", "KF"))
     tables[[length(tables) + 1L]] <<- data.frame(asset = asset,
-      table = names(layouts), columns = vapply(layouts, paste, collapse = ",", ""))
+      table = swelections:::.canonical_storage_key(names(layouts)), columns = vapply(layouts, paste, collapse = ",", ""))
   }
   cat("Reusing previously round-trip validated", asset, "\n")
   TRUE
@@ -66,14 +68,14 @@ reuse <- function(asset, role, layouts = NULL) {
 save_asset <- function(parts, asset, role, discriminator = ".table") {
   # Single data frames have no discriminator; component/level layouts are explicit.
   if (is.data.frame(parts)) {
-    x <- swelections:::.canonical_names_en(parts)
+    x <- swelections:::.canonical_encode(parts)
   } else {
-    layouts <- lapply(parts, function(x) names(swelections:::.canonical_names_en(x)))
+    layouts <- lapply(parts, function(x) names(swelections:::.canonical_encode(x)))
     tables[[length(tables) + 1L]] <<- data.frame(asset = asset,
-      table = names(parts), columns = vapply(layouts, paste, collapse = ",", ""))
+      table = swelections:::.canonical_storage_key(names(parts)), columns = vapply(layouts, paste, collapse = ",", ""))
     x <- purrr::list_rbind(lapply(names(parts), function(key) {
-      data <- swelections:::.canonical_names_en(parts[[key]])
-      data[[discriminator]] <- rep(key, nrow(data))
+      data <- swelections:::.canonical_encode(parts[[key]])
+      data[[discriminator]] <- rep(swelections:::.canonical_storage_key(key), nrow(data))
       data
     }))
   }
@@ -96,7 +98,7 @@ for (count in c("preliminar", "slutlig")) {
   for (v in names(levels)) {
     asset <- paste0("rkl2022-results-", count, "-", tolower(v))
     layouts <- stats::setNames(lapply(levels[[v]], function(level)
-      names(swelections:::.canonical_names_en(stats::setNames(
+      names(swelections:::.canonical_encode(stats::setNames(
         as.list(rep(NA, length(swelections:::.valresultat_public_columns_2026(level)))),
         swelections:::.valresultat_public_columns_2026(level))))), levels[[v]])
     if (reuse(asset, "results", layouts)) next
@@ -162,7 +164,7 @@ for (v in names(levels)) {
     })
     parts <- stats::setNames(lapply(names(per_file[[1]]), function(component)
       purrr::list_rbind(lapply(per_file, `[[`, component))), names(per_file[[1]]))
-    base_layout <- lapply(parts, function(x) names(swelections:::.canonical_names_en(x)))
+    base_layout <- lapply(parts, function(x) names(swelections:::.canonical_encode(x)))
     if (!reuse(base_asset, "preference-votes-base", base_layout))
       save_asset(parts, base_asset, "preference-votes-base", ".component")
     # Independent analysis-facing assets match the established 2018 product.
@@ -191,7 +193,7 @@ for (v in names(levels)) {
       view
     })
     names(views) <- paste(flags$by_list, flags$zeros, sep = "__")
-    view_layout <- lapply(views, function(x) names(swelections:::.canonical_names_en(x)))
+    view_layout <- lapply(views, function(x) names(swelections:::.canonical_encode(x)))
     if (!reuse(view_asset, "preference_votes", view_layout))
       save_asset(views, view_asset, "preference_votes", ".person_view")
     rm(per_file, parts); gc()
@@ -201,7 +203,7 @@ for (v in names(levels)) {
 before <- provenance$original_source_sha256
 for (file in names(before)) if (!identical(sha(file), before[[file]]))
   stop("Original source changed during build: ", file)
-manifest <- list(data_version = "data-v0.2.0", schema_version = 2L,
+manifest <- list(data_version = "data-v0.4.0", schema_version = 3L, value_schema_version = 1L, storage_schema_version = 1L,
   format = "parquet", valserie = "rkl", valar = 2022L,
   built_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   build_commit = trimws(system2("git", c("rev-parse", "HEAD"), stdout = TRUE)),
@@ -225,6 +227,8 @@ manifest <- list(data_version = "data-v0.2.0", schema_version = 2L,
     sha256 = vapply(c(list.files("R", full.names = TRUE),
       "data-raw/build-canonical-2022.R", "data-raw/prepare-canonical-2022.R"), sha, "")),
   assets = purrr::list_rbind(assets), tables = purrr::list_rbind(tables))
+source("data-raw/canonical-build-contract.R")
+manifest <- canonical_build_contract(manifest)
 jsonlite::write_json(manifest, file.path(out, "manifest.json"),
   pretty = TRUE, auto_unbox = TRUE, na = "null")
 cat("Finished unpublished local build:", out, "\nRaw comparison archive:", stage, "\n")
