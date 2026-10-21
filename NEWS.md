@@ -1,4 +1,4 @@
-# swelections 0.4.0 (release candidate)
+# swelections 0.4.0
 
 - Prepare the first combined canonical distribution: 190 Parquet assets and 12
   product-specific manifests, with central function-specific automatic selection.
@@ -14,8 +14,6 @@
   remote raw ZIP cache. A fresh index is required; unindexed CSVs remain fresh.
 - Improve shared raw XML/JSON and canonical selection performance without changing
   election values, observation keys, row order or supported API semantics.
-
-# Development
 
 - Add EU2014 final results, original mandates/elected/substitutes, documented
   candidacies and all reported candidate preferences. Retain the ten unidentified
