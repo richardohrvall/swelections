@@ -19,9 +19,9 @@ represented as covered by the package's own licence.
 
 ## Historical index
 
-`index.md5` is a preserved genrep2026 checksum inventory: its paths contain
+The [archived index.md5](https://github.com/richardohrvall/swelections/blob/v0.4.0/references/index.md5) is a preserved genrep2026 checksum inventory: its paths contain
 `Genrep_2026`, not the current live collection. Its retrieval date is not established.
-Do not use it as the current acquisition index. The live index is
+It is retained in the frozen tag/local archive, not in the active tracked references. No maintained runtime/build/test script reads that file. Do not use it as the current acquisition index. The live index is
 [val2026/index.md5](https://resultat.val.se/resultatfiler/val2026/index.md5).
 
 ## Local PDF capture

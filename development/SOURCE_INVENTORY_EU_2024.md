@@ -1,5 +1,10 @@
 # Source inventory: European Parliament election 2024
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Assessment date: 2026-10-15. **Inventory only: no production implementation,
 API changes or canonical build.** The election occasion is 9 June 2024.
 

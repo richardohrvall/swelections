@@ -1,148 +1,106 @@
-# Development, validation and source documentation
+# Development and maintenance
 
-This directory contains public R reproducibility tools and methodological evidence.
-Generated reports, raw snapshots, named research crosswalks and workbenches stay
-local and ignored. Run tools from the repository root with the configured R library.
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for dependencies and package checks.
+The [frozen v0.4.0 record](releases/v0.4.0.md) gives the published commit,
+190 Parquet assets, twelve manifests, coverage and final verification. The
+[published inventory](releases/data-v0.4.0-files.csv) records the exact public
+file sizes, hashes and URLs. Raw sources, caches and generated outputs stay
+outside Git. No Python executable is required.
 
-The current release gate is [RELEASE_CANDIDATE_REVIEW.md](RELEASE_CANDIDATE_REVIEW.md): 190 Parquet assets, twelve portable manifests, and a clean-commit rebuild before any publication.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for R dependencies and package checks.
+Run tools from the repository root with an explicitly configured library/input
+archive. Historical snapshots are not interchangeable with current remote files.
 
-## Canonical builds
+## Permanent contracts
 
-| Tool | Role / inputs |
-|---|---|
-| `data-raw/build-canonical-2002.R` | Hash-verified original-election XML registry and new unpublished output directory |
-| `data-raw/build-canonical-2006.R` | Preserved archive root and new unpublished output directory |
-| `data-raw/build-canonical-2010.R` | Raw archive root and new output directory |
-| `data-raw/build-canonical-2014.R` | Raw archive root and new output directory |
-| `data-raw/build-canonical-2018.R` | Raw archive and pinned official candidate file; full-schema staging |
-| `data-raw/export-canonical-parquet-2018.R` | 2018 stage and new Parquet output directory |
-| `data-raw/build-canonical-2022.R` | Preserved 2022 source root and new output directory |
-| `data-raw/prepare-canonical-2022.R` | Pinned staging and documented Norrbotten reconstruction |
-| `data-raw/build-party-identifiers-2014.R` | Scoped party metadata, not imported votes or candidate identities |
-| `data-raw/build_kommunnamn.R` | Internal lookup from the tracked municipality CSV |
+- [Canonical operation, source selection, build and release procedure](CANONICAL_DATA.md).
+- [English canonical/value and storage contract](VALUE_CONTRACT.md).
+- [Official-result authority and independent reconciliation](SOURCE_POLICY.md).
+- [Preference-vote evidence, missingness and observation identity](PREFERENCE_VOTE_COMPLETENESS.md).
+- [Mandate-history population, dates, sources and verified corrections](MANDATE_HISTORY.md).
+- [Current-index verified remote raw cache](REMOTE_RAW_CACHE.md).
+- [R-only 2022 preparation and deterministic ZIP/JSON rules](R_ONLY_WORKFLOW.md).
+- [Approved scoped 2010 identity rules](SOURCE_ID_RECONCILIATION_2010.md).
+- [Ragunda 2018 fixed-result correction](CANONICAL_2018_CORRECTIONS.md).
+- [2026 RF official source correction](RF_2026_SOURCE_CORRECTION.md).
+- [Source format references](../references/README.md).
 
-Follow [CANONICAL_DATA.md](CANONICAL_DATA.md) for exact build/distribution commands,
-manifest validation and publication boundaries. Keep data products outside Git.
-The [2018 schema](CANONICAL_SCHEMA_2018_ENGLISH.md) is version-specific.
-The [R-only preparation contract](R_ONLY_WORKFLOW.md) records reproducible ZIP/JSON
-selection and serialization, including differences from the retired implementation.
+## Source and validation records
 
-## Acquisition and source tools
+Dated source inventories and validation reports retain their original evidence.
+Their old prototype/commit status is not the current release status.
 
-- `data-raw/preserve-final-2002.R`: sequential, cached preservation of final XML;
-  original Orsa is pinned separately from its 2003 rerun. No preliminary search.
-- [2002 implementation](IMPLEMENTATION_2002.md), [source inventory](SOURCE_INVENTORY_2002.md)
-  and [validation](VALIDATION_2002.md): source-observation keys, incomplete ballot
-  coverage and unrecovered preliminary collections are explicit limitations.
-- `validate_canonical_2002.R`, `data-raw/validate-sources-2002.R` and
-  `data-raw/validate-scb-2002.R`: public equivalence and separate XML/SCB controls.
-- `data-raw/validate-aggregates-2002.R`: independent district/municipality/national
-  final XML controls, including the 2002 collection-node placements.
+| Election | Source record | Implementation / completeness / validation |
+| --- | --- | --- |
+| RKL 2002 | [inventory](SOURCE_INVENTORY_2002.md) | [implementation](IMPLEMENTATION_2002.md), [completeness](COMPLETENESS_2002.md), [validation](VALIDATION_2002.md), [final reconciliation](FINAL_RESULT_RECONCILIATION_2002.md), [official supplement](SUPPLEMENT_2002.md) |
+| Referendum 2003 | [inventory](SOURCE_INVENTORY_2003.md) | [validation, schema and completeness](VALIDATION_2003.md) |
+| RKL 2006 | [inventory](SOURCE_INVENTORY_2006.md) | [implementation](IMPLEMENTATION_2006.md), [validation](VALIDATION_2006.md) |
+| RKL 2010 | [pinned inventory](2010_SOURCE_INVENTORY.json) | [source/implementation validation](IMPLEMENTATION_2010_VALIDATION.md), [preliminary preservation](PRELIMINARY_2010_SOURCE_RETRIEVAL.md) |
+| RKL 2014 | [source/implementation validation](IMPLEMENTATION_2014_VALIDATION.md) | [source/implementation validation](IMPLEMENTATION_2014_VALIDATION.md) |
+| RKL 2018 | [format reference](../references/README.md) | [fixed-result correction](CANONICAL_2018_CORRECTIONS.md), [mandate-history sources](MANDATE_HISTORY.md), [value/storage contract](VALUE_CONTRACT.md) |
+| RKL 2022 | [build and independent source evidence](CANONICAL_2022_BUILD_VALIDATION.md) | [build and independent source evidence](CANONICAL_2022_BUILD_VALIDATION.md) |
+| EU 2004 | [inventory](SOURCE_INVENTORY_EU_2004.md) | [completeness](COMPLETENESS_EU_2004.md), [validation](VALIDATION_EU_2004.md) |
+| EU 2009 | [inventory](SOURCE_INVENTORY_EU_2009.md) | [completeness/open preference questions](COMPLETENESS_EU_2009.md), [validation](VALIDATION_EU_2009.md) |
+| EU 2014 | [inventory](SOURCE_INVENTORY_EU_2014.md) | [completeness](COMPLETENESS_EU_2014.md), [validation](VALIDATION_EU_2014.md) |
+| EU 2019 | [inventory](SOURCE_INVENTORY_EU_2019.md) | [completeness](COMPLETENESS_EU_2019.md), [validation](VALIDATION_EU_2019.md) |
+| EU 2024 | [inventory](SOURCE_INVENTORY_EU_2024.md) | [validation/completeness](VALIDATION_EU_2024.md), [candidate snapshot exception](EU_2024_CANDIDACY_SNAPSHOT_RECONCILIATION.md) |
+| Re-elections | [inventory](SOURCE_INVENTORY_OMVAL.md) | [implementation](IMPLEMENTATION_OMVAL.md), [validation](VALIDATION_OMVAL.md) |
 
-- `data-raw/preserve-final-2006.R`: sequential preservation of the official
-  RD/RF municipality XML, with per-file URL, retrieval time, size and hashes.
-- [2006 implementation](IMPLEMENTATION_2006.md), [validation](VALIDATION_2006.md) and [source inventory](SOURCE_INVENTORY_2006.md):
-  conservative source-observation identity and documented source limitations.
-- `validate_canonical_2006.R` and `data-raw/validate-scb-2006.R`: public/raw
-  equivalence and independent municipality/party/mandate validation in R.
+[Historical validation and retained performance findings](HISTORICAL_VALIDATION_NOTES.md)
+consolidate retired genrep reports, the corrected 2026 elected-geography join and
+paired performance evidence. The 2006/EU 2019 inventories retain GIS/district-mapping
+source links for future geography work; no GIS implementation is implied.
 
-- `preserve_preliminary_2010_conservative.R`: sequential, resumable acquisition;
-  immutable cached responses, provenance and rate-limit backoff. The `--verify-cache`
-  mode checks existing preservation without HTTP requests.
-- `source_tools.R`: shared independent R I/O, hash and parsing utilities.
-- `build_party_identifiers_2010.R`: geographically scoped official party metadata.
-- `install-dependencies.R`: optional partial development-library setup.
-- `check.R`: documentation generation followed by package tests; it can modify manuals.
+## Builders and acquisition
 
-Successful retrievals and generated outputs belong in ignored directories. Use a
-new destination for outputs; do not overwrite preserved sources or reference builds.
+[CANONICAL_DATA.md](CANONICAL_DATA.md) lists the complete build sequence. Keep
+all `data-raw/build-canonical-*.R` builders, `canonical-build-contract.R`,
+`prepare-canonical-2022.R`, `export-canonical-parquet-2018.R` and the release
+preparer/metadata validator. History uses the two combined 2014/2018 manifests.
 
-## Validation tools
+- `data-raw/preserve-final-2002.R` and `data-raw/preserve-final-2006.R` preserve
+  official sources sequentially with provenance, without replacing original files.
+- `preserve_preliminary_2010_conservative.R` is resumable and rate-limit-aware;
+  `--verify-cache` checks preserved bytes without HTTP requests.
+- `source_tools.R` is shared independent I/O/hash/parsing support.
+- `build_party_identifiers_2010.R` and `data-raw/build-party-identifiers-2014.R`
+  produce scoped metadata, never imported election votes or person identities.
+- `data-raw/build_kommunnamn.R` and tracked `data-raw/kommunnamn.csv` reproduce
+  the installed municipality lookup in `R/sysdata.rda`.
 
-| Tool | Purpose |
-|---|---|
-| `validate_canonical_2010.R`, `validate_canonical_2014.R`, `validate_canonical_2022.R` | Public canonical/raw comparison, schemas, detail and language projections |
-| `validate_sources_2010.R` | Independent final XML/SKV/Excel checks; requires pinned `2010_SOURCE_INVENTORY.json` |
-| `export_source_validation_2010.R` | Package outputs supplied to the independent source validator |
-| `export_mandate_validation_2010.R` | Excel validation export, never a canonical input |
-| `validate_preliminary_2010_preserved.R` | Independent preserved HTML/XML reconstruction and published totals |
-| `validate_preliminary_2010_integration.R` | Collections, blank cells, aggregates and canonical integration |
-| `validate_official_totals_2014.R` | Independent SKV/HTML totals |
-| `validate_excel_2014.R` | Independent OOXML/SKV cross-check |
-| `validate_mixed_2014.R` | Mixed requests, ordering and subset equivalence |
-| `diagnose_sources_2014.R` | Source audit using package reader helpers; not wholly independent parsing |
-| `audit_canonical_2022_aggregates.R` | Arithmetic checks on assets already compared with raw APIs |
-| `diagnose_2022_rd_person_votes.R` | Independent raw trace of the preserved RD area/district discrepancy |
-| `compare_r_only_assets.R` | Pinned 24-asset 2022 reproducibility comparison |
-| `validate_r_only_2022.R` | Detailed reference/current staging byte, JSON and provenance comparison |
-| `test_r_only_preparation.R` | Deterministic ZIP/JSON preparation regressions |
-| `test_source_retrieval.R` | Deterministic retrieval/backoff/cache tests without live requests |
-| `run_2022_sweep.R`, `run_mandat_2022_sweep.R` | Opt-in current official result/mandate sweeps, distinct from pinned-build validation |
-| `validate_tomma_stolar_2026.R` | Opt-in official explicit unfilled-seat checks |
+## Maintained validation tools
 
-Scripts document positional arguments in their headers. Several preserved-source
-validators use a pinned archive layout: consult their header/body before execution.
-Network sweeps must be selected explicitly. Changing live snapshots cannot replace
-hash-pinned historical build evidence. Independent source validators use separate
-R parsing logic; canonical/raw comparisons additionally test the public API path.
+| Tools | Role |
+| --- | --- |
+| `validate_canonical_2002.R`, `validate_canonical_2006.R`, `validate_canonical_2010.R`, `validate_canonical_2014.R`, `validate_canonical_2022.R` | Public raw/canonical equivalence and supported schema/language/detail/geography variants |
+| `data-raw/validate-canonical-2003.R`, `data-raw/validate-eu-2004.R`, `data-raw/validate-eu-2009.R`, `data-raw/validate-eu-2014.R`, `data-raw/validate-eu-2019.R`, `data-raw/validate-eu-2024.R` | Referendum/EU API equivalence and separate source controls |
+| `data-raw/validate-eu-2004-sources.R`, `data-raw/validate-eu-2009-sources.R`, `data-raw/validate-eu-2014-sources.R`, `data-raw/validate-eu-2019-sources.R` | Independent parsing; do not replace it with production normalization |
+| `data-raw/validate-sources-2002.R`, `data-raw/validate-aggregates-2002.R`, `data-raw/validate-complement-2002.R`, `data-raw/validate-preference-web-2002.R`, `data-raw/validate-supplement-2002.R` | XML, supplementary district data, recovered web observations and official supplement |
+| `data-raw/validate-scb-2002.R`, `data-raw/validate-scb-2006.R` | Independent SCB controls; local Stata inputs remain outside Git |
+| `validate_sources_2010.R`, `export_source_validation_2010.R`, `export_mandate_validation_2010.R` | Independent XML/SKV/Excel reconciliation; the validator requires tracked `2010_SOURCE_INVENTORY.json` |
+| `validate_preliminary_2010_preserved.R`, `validate_preliminary_2010_integration.R` | Independent reported-state reconstruction, blanks, official totals and integration |
+| `validate_official_totals_2014.R`, `validate_excel_2014.R`, `validate_mixed_2014.R`, `diagnose_sources_2014.R` | Independent controls and ordering/subset checks; the diagnosis also uses package helpers |
+| `audit_canonical_2022_aggregates.R`, `diagnose_2022_rd_person_votes.R`, `compare_r_only_assets.R` | Arithmetic, retained source discrepancy and fixed 24-asset reference comparison |
+| `test_r_only_preparation.R`, `test_source_retrieval.R` | Deterministic ZIP/JSON and retrieval/backoff/cache regressions |
+| `validate_r_only_2022.R` | Historical preparation-migration comparison; requires the preserved old staging reference, not ordinary release inputs |
+| `validate-re-elections.R` | Independent omval controls; requires tracked `SOURCE_INVENTORY_OMVAL_FILES.csv` |
+| `run_2022_sweep.R`, `run_mandat_2022_sweep.R`, `validate_tomma_stolar_2026.R` | Explicit opt-in official remote sweeps, distinct from pinned-source reproducibility |
+| `data-raw/validate-electorate-2003.R` | Independent SCB composition checks plus a legacy prototype regression; its old physical-layout assertions are schema-specific |
 
-Examples with configured library and explicit inputs:
+Scripts describe their positional inputs in their headers. Source archives may
+have a pinned layout; configure them deliberately. The electorate prototype
+regression above is not a general schema-3 release validator. Source checks are
+kept separate from production normalization where possible. Generated exports,
+reports and cached responses belong in ignored output directories.
 
-```sh
-Rscript development/test_r_only_preparation.R
-Rscript development/test_source_retrieval.R
-Rscript development/validate_canonical_2010.R ARCHIVE_ROOT ASSET_DIR all
-Rscript development/validate_canonical_2014.R ARCHIVE_ROOT ASSET_DIR all
-Rscript development/validate_canonical_2022.R ASSET_DIR REPORT_JSON
-Rscript development/validate_sources_2010.R SOURCE_ROOT OUTPUT_JSON REPORT_JSON
-```
+`install-dependencies.R` is an optional partial setup helper. `check.R` regenerates
+manuals before testing, so it can modify files; see CONTRIBUTING for a read-only
+test/check workflow. Live integrations are opt-in, never a silent source fallback.
 
-Use paths under an ignored output directory for report arguments. Do not add broad
-CSV/ZIP ignore rules: intentional fixtures, source inventories and lookups are public.
+## Retired v0.4.0 preparation
 
-## Source and methodological records
-
-- [2010 source/implementation validation](IMPLEMENTATION_2010_VALIDATION.md) and
-  [pinned inventory](2010_SOURCE_INVENTORY.json).
-- [2010 preliminary retrieval](PRELIMINARY_2010_SOURCE_RETRIEVAL.md) and
-  [integration](PRELIMINARY_2010_INTEGRATION.md): preserve unreported and partial pages.
-- [Approved 2010 identity rules](SOURCE_ID_RECONCILIATION_2010.md): unresolved cases
-  remain unresolved; detailed proposed linkages are local research material.
-- [2014 validation](IMPLEMENTATION_2014_VALIDATION.md): SCB/population and snapshot differences.
-- [2022 build/validation](CANONICAL_2022_BUILD_VALIDATION.md): source versions,
-  Norrbotten reconstruction and the retained 15-vote RD discrepancy.
-- [2026 RF correction](RF_2026_SOURCE_CORRECTION.md): corrected official source and provenance.
-- [Preference-vote completeness](PREFERENCE_VOTE_COMPLETENESS.md): current evidence principles.
-- [Consolidated historical checks](HISTORICAL_VALIDATION_NOTES.md): durable findings
-  extracted from retired plans and genrep integrations, not current release status.
-- [Source references](../references/README.md): authoritative technical documentation.
-
-Historical checkpoint numbers and clean/dirty status are evidence of those builds,
-not claims about present source availability. The retained documentation does not
-activate new identity rules or reconcile official source inconsistencies.
-
-- [EU 2024 source inventory](SOURCE_INVENTORY_EU_2024.md),
-  [approved candidacy snapshot exception](EU_2024_CANDIDACY_SNAPSHOT_RECONCILIATION.md)
-  and [implementation/validation](VALIDATION_EU_2024.md).
-
-- [EU 2019 source inventory](SOURCE_INVENTORY_EU_2019.md),
-  [explicit completeness and schema decisions](COMPLETENESS_EU_2019.md), and
-  [independent XML/SCB/Excel and canonical validation](VALIDATION_EU_2019.md).
-  The unpublished build uses original 20-seat final relations, complete
-  preliminary XML and the reconciled electorate snapshot.
-
-- [EU 2014 coverage](COMPLETENESS_EU_2014.md), [validation](VALIDATION_EU_2014.md) and [source inventory](SOURCE_INVENTORY_EU_2014.md).
-
-EU2009: [source inventory](SOURCE_INVENTORY_EU_2009.md),
-[completeness](COMPLETENESS_EU_2009.md), [validation](VALIDATION_EU_2009.md).
-The source keys describe ballot positions or independent preference columns,
-not asserted physical-person identities.
-
-## EU 2004
-
-- [Source policy](SOURCE_POLICY.md): legally established results and independent source reconciliation.
-- [Source inventory](SOURCE_INVENTORY_EU_2004.md), [completeness](COMPLETENESS_EU_2004.md) and [validation](VALIDATION_EU_2004.md).
-- `data-raw/build-canonical-eu-2004.R`: pinned preserved sources to an unpublished Parquet prototype.
-- `data-raw/validate-eu-2004.R` and `data-raw/validate-eu-2004-sources.R`: public API equivalence and separate XML/text/SCB/SND checks.
-- `data-raw/eu2004-validation-sources.csv`: protocol/SCB acquisition provenance; raw sources remain local.
+Readiness decisions, old asset-count comparisons, the categorical migration audit
+and long performance iterations are preserved in the frozen tag, not maintained
+as current specifications. The [release record](releases/v0.4.0.md) links that
+history and the two retired schema-2 migration/incremental tools. Their local
+copies and evidence remain ignored. No original sources or published assets are
+deleted by this documentation cleanup.

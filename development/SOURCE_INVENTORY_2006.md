@@ -1,5 +1,10 @@
 # 2006 source inventory and implementation assessment
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Reviewed 2026-10-11, against repository commit `5d86cb67454107049bfe526a41ddc25f30cfe9bc`.
 This is a source review, not a canonical build or an approval of a candidate population.
 

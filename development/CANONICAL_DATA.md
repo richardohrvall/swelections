@@ -1,289 +1,160 @@
-# Current value/storage contract (unpublished)
+# Canonical data: operation and reproducible builds
 
-All current products are rebuilt for `data-v0.4.0`, column/schema version 3,
-value contract 1 and storage contract 1. See [VALUE_CONTRACT.md](VALUE_CONTRACT.md).
-English technical categories and logical/applicability pairs are stored in
-canonical files; Swedish presentation localizes categories only. Internal
-`.component` and `.table` keys are English. Proper names, source identifiers
-and all election quantities retain their source meaning.
+The published [v0.4.0 record](releases/v0.4.0.md) identifies the frozen production
+commit, twelve products, 190 Parquet assets, twelve manifests, approved functions
+and final checks. Its [file inventory](releases/data-v0.4.0-files.csv) contains the
+actual published sizes, SHA256 values and URLs. Package and data versions are
+separate; old releases are immutable. Do not overwrite their files or tags.
 
-The existing `data-v0.1.0` publication is immutable historical material. The
-current registry does not select its manifest or URL. The replacement 2018
-generation includes the reviewed Ragunda correction and requires a local
-current-contract manifest until publication is approved. Automatic eligibility
-flags have not changed. Historical build/release descriptions below document
-the earlier generations; they do not override this current contract.
+Current data use schema 3 and [value/storage contracts 1/1](VALUE_CONTRACT.md).
+Canonical columns and technical values are English; Swedish output localizes
+column names and technical categories. Proper names and literal source IDs are
+preserved. `standard` remains a projection of `full`. See the source-specific
+reports indexed in [development/README.md](README.md) for exact populations.
 
-# Canonical data distribution: RKL 2018 and 2022
+## Source selection
 
-## RKL 2022: unpublished local build
+The central registration in `R/canonical_distribution.R` records family, event
+kind, year, data/schema versions, manifest location and approved auto functions.
+It is the approval authority; a manifest describes actual coverage, not permission
+to activate new functions. English and Swedish wrappers use the same decision.
 
-The next collection is a local `data-v0.2.0` build, using English Parquet
-schema version 2. It has **not** been published or enabled for automatic
-selection. The published 2018 assets are unchanged. An explicit 2022 request
-uses `options(swelections.canonical_manifest = ".../manifest.json")`;
-named manifest paths keyed by year support mixed 2018/2022 requests.
+1. `auto` checks product approval and its explicit function allowlist.
+2. For an allowed function it checks the requested manifest view, geography and
+   counting stage, then uses canonical. Invalid selected canonical data fail;
+   they do not silently switch to raw data.
+3. Without approved canonical coverage, only an existing supported remote route
+   can be used automatically. No user raw archive is discovered or selected.
+4. If neither route exists, the request fails. Where supported, the message
+   explains how to supply raw files explicitly with `source = "local"`.
 
-Build with:
+`source = "canonical"` explicitly requests actual manifest coverage.
+`source = "remote"` explicitly requests supported current Valmyndigheten sources,
+even when canonical exists. `source = "local"` reads the user's own saved source
+files in a supported layout; it does not access the network. `data_dir` and raw-root
+options do not make `auto` local. Calls formerly relying on that behavior must
+select `local` explicitly. Explicit raw `update`/`archive` requests retain their
+supported raw semantics and cannot be combined with canonical selection.
 
-```sh
-Rscript data-raw/build-canonical-2022.R SOURCE_ROOT OUTPUT_DIR
+RKL 2002 candidacies and EU 2009 preference votes are not auto-approved. A full
+private prototype does not expand the central list. Unavailable views/stages are
+not filled from other counts: in particular, preliminary 2018 results/mandates
+are rejected instead of returning final results. Newer supported elections
+without canonical retain their remote path. Re-election raw reads remain explicit
+local requests; their event/composition model is unchanged.
+
+## Configuration and caching
+
+Normal historical calls need no developer archive. `nanoparquet` must be installed
+to read canonical data. For explicit testing of a build or mirror:
+
+```r
+options(swelections.canonical_manifest = "my_build/manifest.json")
+results(2018, "municipal", source = "canonical")
+results(2018, "municipal", source = "local", data_dir = "my_raw_archive")
 ```
 
-`SOURCE_ROOT` is the preserved `rkl/2022` collection. The script pins the
-reviewed official index and the verified historical candidate CSV (MD5
-`639daa9630a1f2554f1c6839473448ee`). It hashes all preserved result JSON,
-RSA signature files and candidate snapshots, and checks the originals again
-after building. Signatures are recorded as signatures, not interpreted as
-textual SHA256 checksums. Four corrected final KF ZIPs (0136, 1439, 1860,
-2506) are downloaded separately and verified against the pinned official
-index. Raw files are never overwritten.
+Manifest overrides can be named by `series:ordinary:year`, `series:year`, or legacy
+year keys. `swelections.canonical_assets_dir` and `swelections.canonical_base_url`
+control explicit asset locations; `swelections.canonical_cache_dir` controls the
+canonical cache. Manifest keys include the family/event/year/version namespace.
+Asset bytes are checked against the manifest. A local canonical cache is still
+canonical, not a user's raw `local` archive. Raw-only arguments are rejected for
+explicit canonical requests.
 
-Preparation is implemented in `data-raw/prepare-canonical-2022.R`; no Python
-executable is required. Build-time R dependencies include `pkgload`,
-`nanoparquet`, `digest` and `zip`, in addition to package dependencies.
-Derived ZIP members use a fixed UTC timestamp, including the candidate CSV.
-See `R_ONLY_WORKFLOW.md` for the preparation contract and byte-level audit.
+The [remote raw cache](REMOTE_RAW_CACHE.md) is separate. It stores downloaded
+indexed ZIP bytes, requires a fresh current official MD5 index and checks cached
+bytes before reuse. There is no stale-index fallback or persistent parsed/API
+result cache. Unindexed candidate/member CSVs are fetched fresh.
 
-RF 25 uses the preserved October 2022 result snapshot. The documented
-14 November correction `50975 -> 488` is applied only to typed candidate-ID
-fields for SD/Bo Larsson: two mandate-file fields and 95 district-file fields.
-The manifest records original hashes, changed JSON paths, derived hashes,
-decision `201-11278-2022` and its official protocol URL. Original elected
-and substitute relations are retained; later mandate-period replacements
-are not imported. Counts, names, order and other source values are unchanged
-by this reconstruction.
+## Preserved inputs and build chain
 
-An external temporary raw comparison archive contains explicitly derived
-ZIP containers. Its index checksums describe those containers, not the
-original official ZIPs. Neither this archive nor original raw files form
-part of the canonical asset distribution.
+Use new output directories and immutable pinned sources with URL/retrieval/size/
+checksum provenance. SCB/SND serve independent validation or source-supported,
+reconciled supplementation; see [SOURCE_POLICY.md](SOURCE_POLICY.md). Do not infer
+identity, unsupported zeros or final values for missing preliminary data.
 
-The 24 Parquet assets are:
+From the repository root with the documented R dependencies:
 
-- `rkl2022-results-{preliminar,slutlig}-{rd,rf,kf}.parquet` (six files);
-- `rkl2022-seats-{preliminar,slutlig}.parquet` (two files);
-- `rkl2022-candidacies.parquet`;
-- `rkl2022-candidates.parquet`;
-- `rkl2022-elected.parquet`;
-- `rkl2022-substitutes.parquet`;
-- `rkl2022-preference-votes-{area,district}-{rd,rf,kf}.parquet`
-  (six analysis assets: all four area views and the two sparse district views);
-- `rkl2022-preference-votes-base-{area,district}-{rd,rf,kf}.parquet`
-  (six files).
+```sh
+Rscript data-raw/build-canonical-2002.R RAW_ROOT OUTPUT_2002
+Rscript data-raw/build-canonical-2006.R RAW_ROOT OUTPUT_2006
+Rscript data-raw/build-canonical-2010.R RAW_ROOT OUTPUT_2010
+Rscript data-raw/build-canonical-2014.R RAW_ROOT OUTPUT_2014_RESULTS
+Rscript data-raw/build-canonical-2018.R RAW_ROOT PINNED_CANDIDATE_FILE OUTPUT_2018_STAGE
+Rscript data-raw/export-canonical-parquet-2018.R OUTPUT_2018_STAGE OUTPUT_2018_RESULTS
+Rscript data-raw/build-canonical-2022.R SOURCE_ROOT_2022 OUTPUT_2022
+Rscript data-raw/build-canonical-2003.R REFERENDUM_SOURCE_DIRECTORY OUTPUT_REFERENDUM
+Rscript data-raw/build-canonical-eu-2004.R RAW_ROOT OUTPUT_EU2004
+Rscript data-raw/build-canonical-eu-2009.R RAW_ROOT OUTPUT_EU2009
+Rscript data-raw/build-canonical-eu-2014.R RAW_ROOT OUTPUT_EU2014
+Rscript data-raw/build-canonical-eu-2019.R RAW_ROOT OUTPUT_EU2019
+Rscript data-raw/build-canonical-eu-2024.R RAW_ROOT OUTPUT_EU2024
+Rscript data-raw/build-canonical-mandate-history.R 2014 OUTPUT_2014_RESULTS/manifest.json RAW_ROOT OUTPUT_2014
+Rscript data-raw/build-canonical-mandate-history.R 2018 OUTPUT_2018_RESULTS/manifest.json RAW_ROOT OUTPUT_2018
+```
 
-Result, seat and preference-vote analysis assets record per-table layouts. Normalized preference-vote
-bases record per-component layouts and source-area partition keys. The same
-verified 2022 presentation/aggregation implementation serves raw and
-canonical requests, including list views and optional verified-zero
-completion. Completed panels are reconstructed on demand rather than
-stored as millions of duplicate rows. Technical base fields use the same
-English vocabulary for shared concepts; the source percentage used for
-validation is explicitly named `source_preference_vote_percent` and remains
-on its raw 0–100 scale. Public shares remain proportions.
+Source-root layouts and required auxiliary snapshots differ by builder; use its
+header and the year-specific source/validation document. The 2018 full-schema RDS
+stage is intentional and is not itself distributed. The fixed result and later
+membership sources remain separate; two history assets augment the 2014/2018
+products. The ongoing 2022–2026 history is remote, not a canonical build product.
 
-All seven public functions retain their existing 2022 geographic matrix.
-Results cover district plus parliamentary constituency/national (RD),
-regional constituency/region (RF), municipal constituency/municipality (KF),
-for preliminary and final counting. Seats cover the corresponding
-non-district levels. Candidate-related and preference-vote data describe
-final election results. Broader RF region/KF municipality preference-vote
-aggregation and both detail/name settings are handled by the shared public
-layer. No new unsupported geographical levels are inferred.
+2022 preparation is sourced by its builder. It selects the pinned historical
+candidate CSV (MD5 `639daa9630a1f2554f1c6839473448ee`), verifies official correction
+ZIPs for KF 0136/1439/1860/2506 and preserves original source bytes. RF Norrbotten's
+original-election reconstruction changes only the approved typed `50975 -> 488`
+fields for SD/Bo Larsson: two mandate and 95 district fields, with decision
+`201-11278-2022` retained. See [R_ONLY_WORKFLOW.md](R_ONLY_WORKFLOW.md) and
+[the independent build/source evidence](CANONICAL_2022_BUILD_VALIDATION.md).
+No Python executable is required. RSA signature files are provenance, not textual
+SHA256 checksums. Derived staging ZIP checksums are distinct from original hashes.
 
-Validate with `development/validate_canonical_2022.R OUTPUT_DIR`. The sweep
-uses public raw and canonical APIs, all supported levels/count stages,
-both languages/detail settings, all list/zero preference-vote variants,
-broader aggregation, keys, missingness, source/asset hashes and the
-Norrbotten election-time identities. A local dirty build is only a reviewed
-prototype: a future release requires a new clean-commit build, validation
-and explicit publication approval. No 2022 release or registry entry is
-created by these scripts.
+## Validation and distribution
 
-The 2018 canonical collection is an independent Parquet data product. It uses
-English public column names from `R/output_names.R`, with schema version 2
-and data version `data-v0.1.0`. These versions are separate from the R package
-version. The 2018 collection is published as `data-v0.1.0`; the 2022
-`data-v0.2.0` collection above is an unpublished local build.
+Validate raw and canonical outputs through the maintained year-specific API
+validators plus independent source parsers listed in [the tool index](README.md).
+Check all supported counts/geographies, names/detail settings, keys, missingness,
+relationships, source hashes, manifest layouts and Parquet round trips. Normalized
+preference bases can reconstruct list/zero views on demand; physical base rows
+are not all candidate observations. Validation must retain that distinction.
 
-## Asset inventory
+For a release, start from a reviewed clean commit. Every build must report its
+actual commit/code hashes and `build_tree_dirty = false`; stop on unexpected data
+or byte differences. Check the full suite, R CMD check and source integrity.
+Build time, commit and corresponding JSON provenance/checksums may change on a
+fresh build; they are not permission to accept changed election data.
 
-All filenames have the `.parquet` extension. The manifest records each file's
-row count, byte size, SHA256 checksum, role and original table layout.
+Prepare a CSV with a `manifest` column containing the twelve final product build
+manifests (including the combined history products), then run:
 
-| Asset | Rows |
-| --- | ---: |
-| `rkl2018-results-rd` | 108,948 |
-| `rkl2018-results-rf` | 87,759 |
-| `rkl2018-results-kf` | 84,972 |
-| `rkl2018-seats` | 4,374 |
-| `rkl2018-candidacies` | 184,197 |
-| `rkl2018-candidates` | 72,255 |
-| `rkl2018-elected` | 14,723 |
-| `rkl2018-substitutes` | 76,297 |
-| `rkl2018-preference-votes-base-area-rd` | 34,253 |
-| `rkl2018-preference-votes-area-rd` | 122,876 |
-| `rkl2018-preference-votes-base-district-rd` | 951,606 |
-| `rkl2018-preference-votes-district-rd` | 685,502 |
-| `rkl2018-preference-votes-base-area-rf` | 52,968 |
-| `rkl2018-preference-votes-area-rf` | 202,174 |
-| `rkl2018-preference-votes-base-district-rf` | 1,143,157 |
-| `rkl2018-preference-votes-district-rf` | 905,633 |
-| `rkl2018-preference-votes-base-area-kf` | 129,275 |
-| `rkl2018-preference-votes-area-kf` | 262,335 |
-| `rkl2018-preference-votes-base-district-kf` | 1,224,345 |
-| `rkl2018-preference-votes-district-kf` | 1,006,364 |
+```sh
+Rscript data-raw/prepare-canonical-release.R MANIFESTS.csv EMPTY_DISTRIBUTION
+Rscript data-raw/validate-canonical-release-metadata.R ORIGINAL_STAGE PORTABLE_STAGE MANIFESTS.csv
+```
 
-Results are partitioned by election code. Seat allocations and candidate
-tables each have one asset. Preference-vote data have a public sparse view
-and five small normalized components (`geo`, `parti`, `lista`, `roster`,
-`listroster`) per election and level. Completed district panels are
-reconstructed from those bases, avoiding millions of prewritten zero rows.
-The technical `.component` values remain source-oriented Swedish labels;
-their data values have not been translated. The English names of shared
-columns are identical in bases and public analysis tables.
+The second command compares preserved original/nonportable and portable staging
+receipts when validating the metadata transformation. Preparation never changes
+Parquet bytes; source path conversion is portable provenance only. Raw/build
+manifests remain preserved. Public manifest fields do not require users to have
+our raw archive layout. Absolute-path detection and unchanged operational fields
+have separate regression coverage.
 
-## Explicit package backend
+The preparer is explicitly scoped to data-v0.4.0's twelve products and approved
+counts. It filters EU 2009's full fourteen-asset build to eight publishable assets;
+the six preference bases must not be uploaded. A future product/version change
+needs review of the registry, preparer and tests, not manual additions to an
+upload directory. All release filenames must be globally unique.
 
-The distribution is a GitHub Release with tag `data-v0.1.0` in
-`richardohrvall/swelections`. `manifest.json` and the 20 Parquet files above
-are release assets, **not Git files**. The manifest is the canonical entry
-point at
-`https://github.com/richardohrvall/swelections/releases/download/data-v0.1.0/manifest.json`.
-It records every asset filename, byte size and SHA256 digest. The package
-downloads and validates the manifest, then downloads only needed assets and
-validates their sizes and SHA256 digests before use. The manifest and assets
-are cached under the separate canonical data version and checksums. A cached
-Parquet asset remains `source = "canonical"`, never raw `"local"`.
+The preparation output `upload-inventory.csv` is the proposed upload payload.
+After publication, verify every actual public file against it and preserve a
+versioned final inventory. Test normal auto calls in a new R session/library/
+workspace/cache against the real URLs, including exclusions, history routing and
+explicit raw selection. Publishing assets, tag/release creation and activation
+are separately reviewed operations; a successful build does not authorize them.
 
-Explicit `source = "canonical"` resolves that release by default. For a
-local build or mirror, set `swelections.canonical_manifest` to its manifest;
-assets are then looked up beside it. `swelections.canonical_assets_dir` and
-`swelections.canonical_base_url` may override the asset location for explicit
-canonical requests. `swelections.canonical_cache_dir` changes the cache root.
-`nanoparquet` remains optional. Canonical mode rejects raw `data_dir`,
-`update` and `archive` and never falls back to raw files on a missing or
-invalid asset. Explicit `"local"` and `"remote"` always use official raw data.
-
-## Automatic source selection
-
-The shared registry in `R/canonical_distribution.R` records family, event kind,
-year, schema, canonical reader, approval and published location. It registers
-supported prototypes as explicit-only entries. Only published RKL 2018 is
-currently auto-eligible; EU 2004/2009/2014/2019/2024 remain unapproved for auto.
-No calendar-year threshold or automatic developer-directory discovery is used.
-
-For each requested event/year/function/count/geographic view, `source = "auto"`
-uses approved canonical coverage first, before configured raw archives. Manifest
-asset/table layouts determine view coverage. Without approved coverage, the
-existing raw resolution is retained, including preserved-local requirements for
-historical readers. Selected canonical failures stop rather than silently switch
-source; a missing `nanoparquet` reader gives installation guidance.
-
-Explicit `local`, `remote` and `canonical` keep their meanings and override auto.
-To force a user archive when canonical exists, specify `source = "local"` as well
-as `data_dir`. `update`/`archive` with `auto` retains the raw-operation meaning.
-Canonical does not accept those flags or a raw `data_dir`.
-
-Configured manifests can be a single path or named by `series:ordinary:year`,
-`series:year`, or legacy year. A prototype path alone does not approve auto use.
-Approval and source location can later be added to the registry without changing
-the common routing policy. A new source format still needs its own validated
-reader. Ordinary election coverage does not enable re-election or mandate-history
-canonical sources. See installed `?data_sources` and
-[SOURCE_SELECTION_DESIGN.md](SOURCE_SELECTION_DESIGN.md) for the full policy.
-
-## Build and provenance
-
-`data-raw/build-canonical-2018.R` rebuilds RDS intermediates from the
-verified official 2018 result ZIP, participating-party file and currently
-published redacted candidacy file. They are technical build inputs, not
-distribution assets. `data-raw/export-canonical-parquet-2018.R` writes
-the 20 English-schema Parquet files and `manifest.json`. The named local
-research snapshot is not a build input and candidate names are never
-released in this collection.
-
-The manifest contains the independent data and schema versions, UTC build
-time, package version, build Git SHA, clean/dirty tree flag, build-code
-checksums, source identities and MD5/SHA256 values, and per-asset sizes and
-SHA256 checksums. Assets are gzip-compressed Parquet, usable from R, Python,
-DuckDB, Polars and other Parquet readers. No CSV, DTA or public RDS duplicate
-is built. The local build artifacts are Git-ignored.
-
-## Validation and release boundary
-
-The exporter round-trips every Parquet file and validates values, order,
-types and missingness. Integration tests verify manifest checksums,
-English column names, normalized components and equivalence to raw-built
-2018 intermediates. A separate opt-in test can reparse the official raw
-archive and compare public outputs. The public `source = "canonical"` route
-must agree for both `names = "en"` and `names = "sv"`.
-
-No `data-v0.1.0` Git tag, GitHub release or asset publication is created by
-this work. The release procedure is:
-
-1. Commit and review the package code, schema, tests and this document while
-   leaving generated assets outside Git.
-2. From that clean commit, rebuild the raw RDS intermediates and export the
-   20 Parquet assets and manifest. Confirm the manifest's build Git SHA equals
-   the reviewed commit and `build_tree_dirty` is `false`.
-3. Validate the schema, source hashes, every asset's size and SHA256, the
-   direct raw/public API equivalence sweep, the full tests and `R CMD check`.
-4. Create the `data-v0.1.0` tag/release from the reviewed code commit and
-   upload `manifest.json` plus exactly the 20 listed Parquet files. Do not
-   replace published assets in place; a change requires a new data version.
-5. Test explicit canonical and `auto` with no local raw archive against the
-   published release, then record the release URL and checksums.
-
-## European Parliament 2019 local prototype
-
-The 2019 build follows the existing EU asset inventory (15 Parquet files) and
-English schema version 2. Run `data-raw/build-canonical-eu-2019.R` with a preserved
-raw archive and an empty output directory. The manifest pins six official source
-inputs, includes sizes/hashes/acquisition metadata, and records the build SHA and
-clean/dirty state. It remains unpublished and ineligible for automatic canonical
-selection. Explicit canonical reads require a configured local build manifest.
-
-Final and preliminary party detail intentionally differ: the complete preliminary
-XML identifies ten parties and an other-party aggregate. Final handwritten-party
-votes replace the matching XML residual and are never mixed into preliminary
-results. Original 20-seat relationships exclude subsequent Brexit changes.
-See [COMPLETENESS_EU_2019.md](COMPLETENESS_EU_2019.md) for exact populations,
-source selection, missing source attributes and independent R validation commands.
-
-## EU 2014 unpublished prototype
-
-Use the pinned original final XML with geographic names; the current ZIP has redacted place names. The R-only builder is data-raw/build-canonical-eu-2014.R and the public/source validation entry point is data-raw/validate-eu-2014.R. Fourteen English Parquet assets are expected: final results/seats, candidacies/candidates/elected/substitutes, candidate base, six preference bases, and exact source designations. No release or auto eligibility is enabled. Full-only source_votes_without_party_designation identifies the ten valid Vårdsberg votes without assigning them to a party. See development/COMPLETENESS_EU_2014.md and development/VALIDATION_EU_2014.md.
-
-## EU 2009
-
-All seven English/Swedish interfaces support the fixed final2009 EU result from
-pinned preserved originals. See [completeness](COMPLETENESS_EU_2009.md) and
-[validation](VALIDATION_EU_2009.md). The unpublished local prototype has14 English
-schema2 Parquet assets: `eu2009-results-final`, `eu2009-seats-final`,
-`eu2009-candidacies`, `eu2009-candidates`, `eu2009-elected`, `eu2009-substitutes`,
-`eu2009-candidate-base`, `eu2009-source-designations`, and
-`eu2009-preference-base-{area,national,county,municipality,municipal-constituency,district}`,
-all with `.parquet` suffix. The manifest records source and asset SHA256/size,
-original/archive URL, source-selection semantics, Git SHA and actual dirty status.
-No2009 release is published or auto-eligible. No complete preliminary Wednesday
-result is inferred from the election-night archive.
-
-## EU 2004 unpublished prototype
-
-The existing EU schema-version2 structure is reused:14 Parquet assets for final
-results/seats, candidacies/candidates/elected/substitutes, candidate base,
-source designations, and six normalized preference bases. No release or automatic
-eligibility is enabled. Build with `data-raw/build-canonical-eu-2004.R`; validate
-with `data-raw/validate-eu-2004.R`. See
-[completeness](COMPLETENESS_EU_2004.md) and
-[validation](VALIDATION_EU_2004.md) for source populations and exact commands.
-
-## Reviewed RKL 2018 correction prototype
-
-See [the scoped 2018 corrections](CANONICAL_2018_CORRECTIONS.md) for the
-final-only count-stage guard, corrected original Ragunda SD holder and five
-source-supported Stugubyn preference votes. Original published assets stay
-immutable. The reviewed working-tree build uses a separate output directory
-and records its actual dirty state. A clean-commit rebuild and a new data-release
-version are required before publication; no EU eligibility changes are implied.
+The old data-v0.1.0 2018 distribution remains frozen. v0.4.0 selects the corrected
+Ragunda generation at its own URLs/cache namespace; no permanent old-format
+read-time upgrade or modification of old release files is used. Reproduce a frozen
+release from its tag and pinned sources. Later maintenance commits can have new
+code fingerprints without changing that historical build record.

@@ -1,5 +1,12 @@
 # EU 2009 completeness
 
+Published data-v0.4.0 contains eight assets for results, seats, candidacies,
+candidates, elected and substitutes. **Canonical preference_votes is not
+published or auto-approved.** The preference coverage statements below concern
+preserved sources and explicit local/private-prototype analysis, not permission
+to query preferences from the public canonical product. See the
+[release record](releases/v0.4.0.md).
+
 This statement concerns the fixed 7 June 2009 election result, not the later
 increase from 18 to 20 seats on 1 December 2011. Valmyndigheten is the primary
 result source; SCB is an independent validation source.
@@ -25,7 +32,7 @@ result source; SCB is an independent validation source.
 
 ## National preference-vote total reconciliation
 
-The current implementation reports **1,874,130 as the main-party component**,
+The preserved-source analysis reports **1,874,130 as the main-party component**,
 not the total for all parties. The preserved final Valmyndigheten XML and
 SCB historical table report the following national totals:
 
@@ -41,7 +48,7 @@ small-party discrepancy: national candidate columns sum to **2,665**, whereas
 the official small-party aggregate is **2,655**. No source establishes its
 cause. Candidate values are preserved without correction or deduplication.
 Consequently, summing the national candidate rows returned by
-`preference_votes()` gives **1,876,795**, not the official aggregate total.
+`preference_votes(..., source = "local")` or a private full prototype gives **1,876,795**, not the official aggregate total.
 No allocation or change to candidate-level values is made to force agreement.
 
 ## Identity and observation keys
@@ -53,7 +60,7 @@ Neither denotes an official candidate/person ID or a longitudinal person key.
 `candidates()` contains the500 documented ballot positions, not488 verified
 physical persons. Unlinked small-party preference totals in that view are NA,
 not zero. Those preference observations remain available through
-`preference_votes()` under their source-column keys, with unknown list/position.
+`preference_votes(..., source = "local")` under their source-column keys, with unknown list/position; not through published canonical preferences.
 
 ArbetarInitiativet ballot04536 position18 is Per Johansson, tågförare, Stockholm,
 age48; position32 is Per Johansson, sjuksköterska, Sundsvall, age38. These are
@@ -103,3 +110,25 @@ The XML also preserves29 RD reporting groups. These are not EU mandate
 constituencies and are not exposed as an additional EU constituency API level;
 the raw source remains preserved. This does not remove any ordinary/Wednesday
 unit or change the supported geographic totals.
+
+## Withheld preference bases and open source questions
+
+- Geographic allocation: for the other 100 columns, 114 municipality-minus-
+  ordinary-district votes split into 23 geographically unambiguous votes in
+  21 single-Wednesday-unit municipalities and 91 votes in 30 multi-unit
+  municipalities. Neither proposed derived allocation has been implemented.
+- Candidate allocation: the official aggregate implies 34 votes jointly for
+  list 04536 positions 18 and 32, after the other 100 columns total 2,621.
+  Columns 36/47 each report 22 nationally, 28 over counties/municipalities
+  and 32 over ordinary districts. No individual allocation is established.
+- Candidacy linkage: 102 source columns lack verified list/position links to
+  the 114 small-party ballot positions. The ballot observations themselves
+  are retained; matching identical names is not sufficient.
+
+These are external source questions, not fourteen erroneous assets. The six
+unpublished files are `eu2009-preference-base-{national,county,municipality,
+municipal-constituency,district,area}.parquet`. No pseudo-candidate, residual
+geographic row or corrected 22+22 allocation has been introduced. The eight
+published files are listed in the [actual inventory](releases/data-v0.4.0-files.csv).
+All other-party aggregate votes and the official total 1,876,785 remain
+documented; the preserved candidate-column sum is not presented as that total.

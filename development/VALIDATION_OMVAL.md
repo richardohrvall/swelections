@@ -1,5 +1,10 @@
 # Re-election validation and review report
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Implementation date: 17 October 2026. No commit, push, tag or release was made.
 No original source or existing canonical asset was rebuilt or edited.
 

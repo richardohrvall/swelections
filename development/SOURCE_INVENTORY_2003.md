@@ -1,5 +1,10 @@
 # Source inventory: 2003 euro referendum
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Assessment date: 14 October 2026. Scope: the referendum held on **14 September 2003**, not the Orsa municipal re-election in March 2003. This is an inventory and independent source assessment, not an implementation specification approved for production.
 
 ## Conclusion

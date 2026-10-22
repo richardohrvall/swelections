@@ -1,7 +1,7 @@
 # Mandate-period history
 
-Implementation and validation: 19 October 2026. No release, commit or push.
-The source assessment is in [MANDATE_HISTORY_FEASIBILITY.md](MANDATE_HISTORY_FEASIBILITY.md).
+Implemented in the published v0.4.0 release. The dated validation observations below describe preserved snapshots, not live guarantees.
+The verified source-role and Ragunda/Överkalix/Kiruna evidence is consolidated below.
 
 ## Public functions
 
@@ -132,7 +132,7 @@ Current source contract (21 October 2026): auto selects complete canonical
 history for 2014/2018 and current remote history for 2022. The latter combines
 fresh official membership CSVs with the validated fixed original result.
 Local membership files require explicit local selection. See
-[MANDATE_HISTORY_SOURCE_SELECTION.md](MANDATE_HISTORY_SOURCE_SELECTION.md).
+[the published release record](releases/v0.4.0.md).
 
 
 ## Real-source validation
@@ -187,3 +187,139 @@ intended installed package contents were changed.
 - A missing or inconsistent required source causes an error, not fabricated
   dates, fabricated people, or an apparently complete snapshot.
 - No longitudinal physical-person identifier is inferred from names or IDs.
+
+## Preserved sources and coverage
+
+| Period | Preserved member/control inputs | Snapshot / role |
+| --- | --- | --- |
+| 2014–2018 | `nuvarande_ledamoter.skv`, `avgangna_ledamoter.skv`, `tommastolar.skv` under `rkl/2014/kandidater/` | 2018-11-07; current chair anchor, succession/departures, independent vacancies |
+| 2018–2022 | `ledamoter_med_historik_20221031.skv`, `nuvarande_ledamoter_20221031.skv`, `avgangna_ledamoter_20221031.skv`, `tommastolar_20221031.skv` under `rkl/2018/kandidater/` | 2022-10-31; primary history and three controls |
+| 2022–2026 | `ledamoter_med_historik.csv`, `nuvarande_ledamoter.csv`, `avgangna_ledamoter.csv`, `tomma_stolar.csv` | Fresh official remote sources; actual source headers determine coverage |
+
+The `_20221031` suffix is a preserved local snapshot label, not a claim about
+the official original filename. Original final allocations/elected records are
+required independently of every member source, including unfilled allocations.
+The 2014 canonical interval coverage is 2014-09-14 through 2018-11-07; the
+2018 coverage is 2018-09-09 through 2022-10-31. These source conventions do not
+extend a legal mandate period. Select the original year explicitly around a
+transition if that is the intended query.
+
+Remote CSVs are fetched sequentially from
+[the official 2022 export directory](https://resultat.val.se/filer/val2022/info/).
+A newer departure/vacancy export does not extend an older history/current-member
+coverage boundary. The reader rejects inconsistent snapshots and later dates;
+it never silently falls back to a local archive. Canonical 2014/2018 and remote
+2022 retain the same source-specific interval semantics.
+
+## Verified source reconciliation
+
+### Ragunda 2018: corrected election result
+
+Relevant preserved sources are `rkl/2018/valresultat/slutresultat.zip`
+(`slutresultat_2303K.xml`), the December 2018 `kandidaturer.skv` snapshot,
+and all six member/history/departure/relation/vacancy SKV files dated
+20221031 under `rkl/2018/kandidater/`. Candidate 534885 is absent from the
+preserved candidacy snapshot and early final XML, but appears in the later
+history, current-member and expanded member/substitute files. No departure
+or successor event for that candidate occurs in the departure file.
+
+The official explanation is
+[Valprövningsnämnden 877-2018, decided 12 December 2018](https://www.riksdagen.se/sv/dokument-och-lagar/dokument/valprovningsnamndens-beslut/mandatfordelning-inom-parti-bifall-forordnande_h6d34c8b78/).
+It establishes a timely candidacy consent, five wrongly disregarded personal
+votes, and orders a new SD candidate allocation treating Häggkvist as eligible.
+The old two-person/three-seat result therefore precedes an election-result
+correction. This is not a re-election or evidence of a routine mid-term vacancy.
+
+The [official final presentation](https://historik.val.se/val/val2018/slutresultat/K/kommun/23/03/valda.html)
+has update timestamp `2019-01-17 13:38:11`; names and its protocol link are now
+redacted. The 2022 history/current files explicitly place candidate 534885 on
+SD chair 3 from `2018-09-09`, without an end date. The history/current files
+give list `0110-17638`, position 3; the expanded file confirms the candidate and
+chair. No Ragunda vacancy
+is reported in the end-of-period vacancy file.
+
+**Conclusion:** the corrected electoral composition has Häggkvist occupying
+chair 3, with the source's election-day start convention. The old XML vacancy
+must not be carried forward as an actual continuing empty chair. The precise
+date of the implementing county decision and any period of actual non-service
+before correction remain unverified. Obtain the county's revised Ragunda SD
+allocation protocol following decision 877-2018 to date that administrative
+transition. The linked `slutresultat/protokoll/protokoll_2303K.pdf` could not be
+retrieved (HTTP 503/cache failure); that failure is not evidence of absence.
+Do not substitute the appeal decision date or web update timestamp for the
+missing implementing-decision date.
+
+Approved implementation interpretation: `start_date = 2018-09-09`, directly
+reported in the history/current files, describes the corrected original
+electoral composition. The separate `correction_date = 2018-12-12` dates the
+appeal decision. The unverified county implementation date is provenance only;
+it does not make the corrected electoral start unknown or create a vacancy.
+An actual re-election instead has its own polling-event start, while remaining
+in the original mandate period. The existing RF Norrbotten 2022 ID correction
+likewise leaves the original electoral start unchanged and retains its
+14 November correction provenance in the canonical build manifest. The 2026
+RF counting/election-basis correction is outside these three history periods;
+it is not a new appointment or a new election event.
+
+### Överkalix 2022: two later vacancies, no source conflict
+
+The original preserved
+`Val_20220911_slutlig_mandatfordelning_2513_KF.json` elects SD candidate 4759
+(Tord Roland Andersson) to chair 2 and 4760 (Ethel Elise Landström) to chair 3.
+Their ballot names in the same source are Roland Andersson and Ethel Landström;
+the matching uses the candidate numbers, not a name inference. The corresponding
+vote JSON supports their result records. Both appear as occupied chairs in
+the 12 October 2022 current/history snapshots and the 13 November 2022 expanded
+relation snapshot, with no listed substitutes for these chairs.
+
+The [municipal protocol of 1 December 2025, section 67](https://www.overkalix.se/media/vcpfcde3/kf-2025-12-01-61-74.pdf)
+records both council resignations. Section 74 concerns Andersson's separate
+municipal-executive substitute role and must not be used as the council-seat
+transition date. The [23 February 2026 protocol, section 6](https://www.overkalix.se/media/iylbfxz1/kf-2026-02-23-1-10.pdf)
+and its [agenda/registration list](https://www.overkalix.se/media/yikdzwe5/kallelse-samt-kungorelse-till-kommunfullmaktiges-sammantrade-20260223-samt-bilaga-1.pdf)
+identify resignation/recount-request records dated 26 November 2025, municipal
+cases 2025-000791 and 2025-000792, and county closure decisions 18915-2025-4
+and 18914-2025-4 received on 16 December 2025.
+
+The current history/departure exports both give `2025-12-15` departures and no
+successor IDs. The current-member export has candidate-less chairs 2 and 3
+starting on that same date; the expanded relation file labels both
+`Kunde inte utses`. The final row of `tomma_stolar.csv` confirms two empty SD
+chairs in Överkalix.
+
+**Conclusion:** the source-defined intervals are occupied from the original
+election until `2025-12-15`, then vacant through the inspected final snapshots.
+Both vacancies are real later vacancies, not initial vacancies. The vacancy
+count conflict was solely the audit's discarded final record. The council
+resignations were already documented earlier; `2025-12-15` is the export's
+administrative transition, not proof that the people actually served until
+that day. If exact legal resignation effectiveness is required, inspect the
+original resignation documents and the two identified county decisions.
+
+### Kiruna 2022: occupied chair; history record was not missing
+
+The original preserved
+`Val_20220911_slutlig_mandatfordelning_2584_KF.json` elects candidate 54150,
+Nils Per Olof Nutti (ballot/result name Per Olof Nutti), for party 1073,
+chair 2, on personal votes. Its original substitute order is 54152 then 54153.
+The corresponding vote JSON, both 12 October 2022 current/history files, and
+the 13 November 2022 expanded relation snapshot confirm this candidate/seat.
+
+The full October 2026 history and current-member exports retain candidate
+54150 on the same chair, with blank original entry date and no departure date.
+The 14 October expanded relation export also retains him, now with substitutes
+54152 then 54154. That change is in the substitute relations, not evidence of
+a change of the chair's holder; its intervening appointment date is not
+established by these endpoint snapshots. No departure row for Nutti was found.
+
+Independent municipal corroboration includes the
+[24 October 2022 attendance/member list](https://kiruna.se/download/18.4e03e69b18418a04c9f7ca5/1667555242597/Kommunfullm%C3%A4ktiges%20protokoll%202022-10-24.pdf),
+the [11 March 2024 protocol](https://kiruna.se/download/18.17baa4b618e0dbf1076a773/1710745583920/Protokoll%20kommunfullm%C3%A4ktige%202024-03-11.pdf),
+and the [29 September 2025 member list](https://kiruna.se/download/18.25216a2b19a0f615ad938b0/1761749794335/Protokoll%20kommunfullm%C3%A4ktige%202025-09-29.pdf).
+These corroborate the ID-based source chain; they are not name-based ID mappings.
+
+**Conclusion:** occupied by candidate 54150 from the derived original-election
+start `2022-09-11`, with no reported holder transition through the inspected
+2026 snapshots. No vacancy interval or unknown chair is supported. The prior
+missing-row conclusion was entirely an audit parsing error. Temporary meeting
+substitution, if any, is not a departure from the electoral chair.

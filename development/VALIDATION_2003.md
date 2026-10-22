@@ -1,5 +1,10 @@
 # 2003 referendum implementation and validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Only the final 14 September 2003 euro referendum is implemented. Valmyndigheten
 XML is authoritative; no SCB/SND observations replace its complete final counts.
 No preliminary reconstruction, party interpretation, candidate identity change,

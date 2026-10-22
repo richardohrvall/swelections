@@ -1,5 +1,10 @@
 # EU 2019 validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Validation uses the pinned official original XML and complementary official
 handwritten-party and final-compatible electorate files. Sources remain unchanged.
 No election-night recovery or mandate-period reconstruction is included.

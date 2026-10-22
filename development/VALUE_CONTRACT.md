@@ -1,17 +1,17 @@
 # Canonical and public value contract
 
-Status: implemented for local validation, 2026-10-21. No release, commit or push.
+Published in data-v0.4.0. The [frozen release record](releases/v0.4.0.md) identifies its clean build and verified distribution.
 
 ## Versions and scope
 
 All twelve current products use `data_version = data-v0.4.0`,
 `schema_version = 3`, `value_schema_version = 1` and
-`storage_schema_version = 1`. The 194 Parquet assets cover RKL 2002, 2006,
+`storage_schema_version = 1`. The 190 published Parquet assets, including two mandate-history assets, cover RKL 2002, 2006,
 2010, 2014, 2018 and 2022, referendum 2003 and EU 2004, 2009, 2014, 2019, 2024.
 Only results are relevant to the referendum. Unsupported views/stages are not
 created by this normalization.
 
-The earlier [categorical audit](CATEGORICAL_VALUE_AUDIT.md) is the baseline.
+The [archived categorical audit](https://github.com/richardohrvall/swelections/blob/v0.4.0/development/CATEGORICAL_VALUE_AUDIT.md) records the preimplementation baseline; the approved contract is stated here.
 The explicit subsequent decisions are: normalize all current generations,
 normalize internal storage keys, use `yes`/`no`/`blank` for referendum option
 names, and use the broad aggregate label `Handwritten votes`.
@@ -31,8 +31,8 @@ change. Names-only internal helpers remain available for column mapping.
 | `district_type` | `ordinary`, `collection`, `wednesday` | `valdistrikt`, `uppsamlingsdistrikt`, `onsdagsdistrikt` |
 | `sex` | `male`, `female` | `man`, `kvinna` |
 | `ballot_status` | `final`, `draft`, literal source codes `S`/`B` | `definitiv`, `utkast`, `S`/`B` |
-| `comparison_status` | Eight distinct English categories from the audit | Eight corresponding Swedish categories |
-| `election_basis` | Six distinct English categories from the audit | The six Swedish source descriptions |
+| `comparison_status` | Eight separate categories listed below | Eight corresponding Swedish categories |
+| `election_basis` | Six separate categories listed below | The six Swedish source descriptions |
 | `election_kind` | `ordinary`, `re_election` | `ordinarie`, `omval` |
 | `voting_option_name` | `yes`, `no`, `blank` | `Ja`, `Nej`, `Blank` |
 | History `status` | `occupied`, `vacant` | `besatt`, `vakant` |
@@ -110,49 +110,59 @@ source-oriented internal contract until final presentation/export.
 
 ## Rebuild and provenance
 
-Every maintained builder writes the same contract through the shared R helper
-`data-raw/canonical-build-contract.R`. `standardize-canonical-values.R` provides
-a separate deterministic re-encoding route for already validated canonical
-prototypes. It verifies all input checksums and records the input manifest and
-asset checksums, prior build provenance and original source inventory. It does
-not pretend to reparse raw data. Independent raw/canonical validation is run
-separately.
+Maintained raw-source builders write schema 3 and value/storage contract 1/1
+through `data-raw/canonical-build-contract.R`. Build manifests retain code and
+source hashes, the actual commit and truthful dirty status. Distribution copies
+only make provenance labels portable; they do not alter Parquet bytes or the
+operational manifest fields. See [CANONICAL_DATA.md](CANONICAL_DATA.md).
 
-The current re-encoding uses the reviewed Ragunda-corrected 2018 prototype.
-Candidate 534885 is included with the established correction provenance;
-no other election relationship is recalculated. New assets have new checksums
-and manifests. Old reference and published files are preserved.
+The one-time schema-2 re-encoding tool is preserved at the
+[frozen v0.4.0 tag](https://github.com/richardohrvall/swelections/blob/v0.4.0/data-raw/standardize-canonical-values.R).
+It checked original asset hashes, preserved rows and literal source values,
+recorded original/derived provenance and checked Parquet round trips. Production
+release assets were then independently rebuilt from raw sources at the clean
+release commit. This migration is not a required step in a new raw-source build.
 
-## 2018 publication transition
+The old data-v0.1.0 2018 files remain immutable. The active registry selects
+data-v0.4.0, with the approved Ragunda correction and a separate version/cache
+namespace. There is no normal-read conversion of older canonical formats.
+All twelve approved products are activated with their central function lists;
+EU 2009 preference votes and RKL 2002 candidacies remain excluded.
 
-The old `data-v0.1.0` release must not be overwritten. Its files and manifest
-remain immutable historical references. The current registry uses the new
-version/cache namespace and requires a configured current local manifest until
-publication is separately approved. Its remote URL is deliberately unset, so
-it cannot silently select the old release. Eligibility flags are unchanged:
-2018 retains approval, while all EU products remain ineligible for automatic
-selection. Availability and approval are separate.
+All 190 release assets have `build_tree_dirty = false` and match the approved
+prototype byte-for-byte. Fresh build timestamps/commit provenance change manifest
+hashes; they do not justify any election-data difference. Future releases require
+review, a clean committed build, schema/language/source/Parquet checks, tests and
+R CMD check. The exact published inventory is versioned in the
+[release record](releases/v0.4.0.md).
 
-A later publication must use a new version/tag and publish the new manifests
-with their matching asset bytes/SHA256 values. Manifest names/locations for a
-combined multi-product release must be unique by family/event/year and then
-registered explicitly. Restore a remote location only for that approved
-publication. No publication is performed here.
+Manifest table layouts use English selectors. Synthetic data-frame row names
+are not layout keys: the shared builder clears them before JSON serialization
+to avoid legacy Swedish `_row` selectors. Original source-file identifiers and
+source-inventory provenance remain literal.
 
-## Clean-build boundary
+## Comparison and election-basis vocabularies
 
-All current validation builds truthfully record `build_tree_dirty = true` and
-the actual HEAD plus build-code checksums. After review and a separately
-approved commit, repeat the clean production build, record
-`build_tree_dirty = false`, verify byte-identical assets, rerun content/source/
-schema/language/Parquet checks, tests and `R CMD check`, and only then approve
-publication. No clean status is simulated by copying or hiding changes.
+| Swedish comparison category | Canonical / English |
+| --- | --- |
+| Kan jämföras | `comparable` |
+| Ej jämförbart | `not_comparable` |
+| Jämförs mot summerat | `compared_with_aggregate` |
+| Summerad | `aggregated` |
+| Ny | `new` |
+| Modifierad | `modified` |
+| ej jämförbar: Ny | `not_comparable_new` |
+| ej jämförbar: Modifierad | `not_comparable_modified` |
 
-Validation evidence and exact exclusions are recorded in
-[VALIDATION_VALUE_CONTRACT.md](VALIDATION_VALUE_CONTRACT.md).
+| Swedish election-basis description | Canonical / English |
+| --- | --- |
+| Ledamoten är vald på jämförelsetal | `comparison_number` |
+| Ledamoten är vald på personröster | `preference_votes` |
+| Ledamoten är vald som listtrogen efterträdare till dubbelvalsavvecklad | `list_successor_after_dual_election` |
+| Ledamoten är vald på personröster som efterträdare till dubbelvalsavvecklad | `preference_vote_successor_after_dual_election` |
+| Ersättaren är utsedd listtroget | `list_substitute` |
+| Ersättaren är vald på personröster | `preference_vote_substitute` |
 
-Manifest table layouts use the same English selectors. Synthetic data-frame
-row names are not part of that layout contract: the shared build helper clears
-them before JSON serialization, avoiding redundant legacy Swedish `_row`
-selectors beside the authoritative English `table` field. Original source-file
-identifiers and source-inventory provenance remain literal and unchanged.
+Swedish output uses the corresponding source descriptions. Election-basis IDs
+are literal, source-specific codes: matching descriptions do not authorize a
+global cross-year mapping of codes such as P/J/E/PE or 1/2/5/6/10/11.

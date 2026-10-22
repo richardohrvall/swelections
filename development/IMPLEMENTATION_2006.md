@@ -1,5 +1,10 @@
 ## 2006 implementation and validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 2006 is available from the preserved, hash-verified local source collection,
 or from an explicitly configured unpublished canonical prototype. It is not
 canonical-auto-eligible and has no published data release. The R-only workflow

@@ -1,5 +1,10 @@
 # 2002 source inventory and feasibility assessment
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Reviewed 2026-10-12, against commit `bf975682214d967cadb9a79b9915da61901efc30`.
 This is a source review, not a production implementation or canonical build.
 Valmyndigheten is primary; SCB and SND are independent publication/reference

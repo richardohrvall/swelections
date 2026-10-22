@@ -1,5 +1,10 @@
 # 2006 validation and remaining source limitations
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 The 2006 implementation uses Valmyndigheten sources. SCB is an independent
 validation source and does not supply invented candidate records or identities.
 See [IMPLEMENTATION_2006.md](IMPLEMENTATION_2006.md) and

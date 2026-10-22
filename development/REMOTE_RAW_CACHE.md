@@ -1,6 +1,6 @@
 # Verified persistent cache for remote raw result files
 
-Implemented on 21 October 2026. No commit, push, release publication, activation change or canonical rebuild.
+Published in v0.4.0. The implementation/benchmark observations below were recorded on 21 October 2026; they are not current live-source guarantees.
 
 ## Behavior and source semantics
 
@@ -38,7 +38,7 @@ The relevant transfer comparison is 26.92 seconds without cache versus 1.60 seco
 
 The deterministic regression panel covers empty/warm cache, changed/new files, missing/damaged entries, unavailable/malformed index, unsafe/duplicate keys, wrong download checksum, byte-count failure, failed update preserving an earlier generation, standalone readers, actual public request boundaries, uncached candidacy files, unchanged explicit local behavior and auto never selecting local. The existing complete source-selection and download test panels run alongside it.
 
-Full suite and package-check results are recorded below after completion. The pre-existing R/man/tests files changed in this task are only R/download.R, R/api_english.R, R/data_sources.R and man/data_sources.Rd. New implementation/test files are R/remote_raw_cache.R and tests/testthat/test-remote-raw-cache.R. No underlying election readers, election values, candidate identities, schemas, activation registry or canonical assets are changed.
+The completed implementation checks are recorded below; the final published release checks are in [releases/v0.4.0.md](releases/v0.4.0.md). The pre-existing R/man/tests files changed in this task are only R/download.R, R/api_english.R, R/data_sources.R and man/data_sources.Rd. New implementation/test files are R/remote_raw_cache.R and tests/testthat/test-remote-raw-cache.R. No underlying election readers, election values, candidate identities, schemas, activation registry or canonical assets are changed.
 
 All 202 existing distribution files (190 Parquet assets and 12 manifests) match the release inventory. Activation and upload-inventory hashes remain unchanged. Source files were not overwritten. Benchmark/cache test drivers, request metadata, exact outputs and integrity logs remain local under .local-data/remote-raw-cache-20261021; persistent benchmark raw bytes are in a user cache, not .local-data.
 
@@ -49,4 +49,4 @@ All 202 existing distribution files (190 Parquet assets and 12 manifests) match 
 - Final R/man/tests are byte-identical to the staged package checked above.
 - All 290 cached raw files independently match their MD5 keys; all 202 release files remain unchanged.
 - No index, parsed table or final API result is persisted by the new cache; its only persistent payloads in the benchmark are the 290 raw ZIPs.
-- git diff --check passes. No commit, push, canonical-data change or release-scope change.
+- These dated implementation checks preceded publication; the frozen release record gives the final commit and published inventory.

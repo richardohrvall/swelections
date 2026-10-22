@@ -1,5 +1,10 @@
 # EU 2004: source inventory and completeness assessment
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Review date: **17 October 2026**. Election occasion: **13 June 2004**.
 Source review plus implementation follow-up; see COMPLETENESS_EU_2004.md and
 VALIDATION_EU_2004.md for the completed build. No commit/push/tag/release; EU 2009 is unchanged.

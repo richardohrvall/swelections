@@ -1,5 +1,10 @@
 # EU 2024 implementation and validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 ## Source decision and candidacy exception
 
 Valmyndigheten's final and full preliminary JSON ZIPs are authoritative. The

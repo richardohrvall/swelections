@@ -36,8 +36,8 @@ The corrected snapshot is now activated in the current external raw archive,
 and the unchanged candidate CSV were verified before installation and compared
 byte-for-byte with the immutable acquisition snapshot afterward.
 
-Future RF processing uses `source = "local", data_dir = "<archive_root>"`, or
-`source = "auto"` with that archive configured. For example:
+Future RF processing uses `source = "local", data_dir = "<archive_root>"`, or the supported current official remote path. `auto` uses remote for 2026;
+a configured raw archive never makes it local. For example:
 
 ```r
 results(2026, election = "regional", count = "final", level = "region",

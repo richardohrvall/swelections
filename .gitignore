@@ -83,3 +83,6 @@ development/*_INTEGRATION.txt
 /development/smoke_2010.R
 /references/Teknisk beskrivning av resultatfiler _ Valmyndigheten.pdf
 /inlasning_valmyndigheten_2026.qmd
+
+# Retired local genrep index; the frozen tag remains the public reference
+/references/index.md5

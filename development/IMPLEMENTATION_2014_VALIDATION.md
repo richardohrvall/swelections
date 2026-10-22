@@ -1,5 +1,10 @@
 # 2014 implementation and unpublished canonical validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 > Historical validation record: build/commit status and tool names in dated
 > checkpoints describe that checkpoint, not the current worktree. Current R-only
 > commands are indexed in [README.md](README.md); preserved discrepancies and

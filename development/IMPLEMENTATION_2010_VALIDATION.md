@@ -1,5 +1,10 @@
 # 2010 implementation and validation (unpublished working prototype)
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 The source and validation results below record historical build checkpoints.
 The 2010 implementation is committed; checkpoint dirty-tree statements are historical, not current status.
 
@@ -196,7 +201,7 @@ The following list is the union of Git content differences and new non-ignored f
 
 ## Completed preliminary integration validation
 
-See [PRELIMINARY_2010_INTEGRATION.md](PRELIMINARY_2010_INTEGRATION.md) for the full source-role/missingness report and prototype provenance.
+See [PRELIMINARY_2010_INTEGRATION.md](https://github.com/richardohrvall/swelections/blob/v0.4.0/development/PRELIMINARY_2010_INTEGRATION.md) for the full source-role/missingness report and prototype provenance.
 
 - Collection coverage: RD 395/395, RF 392/392, KF 395/395; no duplicate district keys or overlap with ordinary election-night districts.
 - All 1,067 independent preliminary aggregate comparisons pass. National totals are RD 6,027,252; RF 5,927,840; KF 6,007,976.
@@ -207,3 +212,36 @@ See [PRELIMINARY_2010_INTEGRATION.md](PRELIMINARY_2010_INTEGRATION.md) for the f
 - Original 39 sources and all 2,535 preserved preliminary HTML responses have unchanged checksums. The previous prototype's 22 files are unchanged. No commit, push, tag or release has been created.
 
 This is an unpublished working-tree prototype, not a clean release build. Intentional snapshot missingness and the previously documented final-source/candidate limitations remain preserved.
+
+## Consolidated preliminary reporting controls
+
+Preliminary results combine the ordinary `VALDISTRIKT` nodes of the preserved `valnatt.zip` with the separately preserved official preliminary collection HTML in `preliminary-collection-preservation-20261009`. Supplementary aggregate metadata use the earlier `preliminary-presentation-20261008` cache. The new source-manifest SHA256 is `576bb2c1cc2d5f88bedb4c628cc014852e0333d45670579df1db4206b3d36fd6`.
+
+Final XML supplies collection geography and official code relations only in this reader. No final collection vote value fills a preliminary blank. All sources remain unchanged.
+
+## Verified source-level results
+
+| Measure | RD | RF | KF |
+|---|---:|---:|---:|
+| Ordinary election-night districts | 5,668 | 5,629 | 5,668 |
+| Preliminary collection districts | 395 | 392 | 395 |
+| Unique districts in preliminary output | 6,063 | 6,021 | 6,063 |
+| Completely unreported collection districts | 0 | 9 | 9 |
+| Partially reported collection pages | 179 | 292 | 251 |
+| District party rows | 54,567 | 63,574 | 62,613 |
+| Independent aggregate comparisons | 320 | 381 | 366 |
+| National preliminary total votes | 6,027,252 | 5,927,840 | 6,007,976 |
+
+All 1,067 aggregate comparisons match the official preliminary presentation. All ordinary district keys match the election-night XML exactly; collection districts have distinct keys, with no double counting. All 1,182 collection pages are checked against their district output.
+
+The 18 completely unreported pages retain `counted = FALSE` and `NA` for relevant current/previous vote counts, shares and changes. Their municipality/constituency suffixes are `0604-00`, `0780-01`, `0780-02`, `0781-00`, `1784-00`, `2401-00`, `2403-00`, `2480-01` and `2480-02` in both RF and KF.
+
+All 722 partially reported pages retain the available category counts. The source comparison also verifies 4,213 blank current/previous category-count cells as `NA`, and checks explicit party-vote changes against the HTML. Reported changes are preserved even where a comparison count is blank; a blank change is never manufactured as zero.
+
+Aggregates are reported/counting-status totals, not estimates of eventual final totals. They sum available reported categories. Wholly unknown sums stay `NA`. At district level, totals require known components. Explicit preliminary aggregate metadata are retained and checked against reported sums.
+
+The 1,067 aggregate comparisons reproduce the published national preliminary
+totals: RD 6,027,252; RF 5,927,840; KF 6,007,976. This is reported counting
+status, not a reconstruction of final collection votes. The retained raw-source
+and canonical validators cover the integration; old prototype metadata is
+archived in the [v0.4.0 tag](https://github.com/richardohrvall/swelections/blob/v0.4.0/development/PRELIMINARY_2010_INTEGRATION.md).

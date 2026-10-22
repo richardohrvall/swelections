@@ -1,5 +1,10 @@
 # EU2014 validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 The implementation and unpublished local build use the pinned preserved original
 Valmyndigheten XML, headerless ballot-candidacy file, electorate file and
 handwritten-detail SKV. No original source is edited. English/Swedish use the same

@@ -1,5 +1,10 @@
 # 2002 validation and unresolved source limitations
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 This report concerns the unpublished 2002 implementation and local prototype.
 No source file, earlier canonical asset, release, candidate identity or schema
 has been changed. See [IMPLEMENTATION_2002.md](IMPLEMENTATION_2002.md) and

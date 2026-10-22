@@ -1,5 +1,10 @@
 # Re-election implementation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 This implementation supports final event results and mandate allocations for
 Orsa 2003, Västra Götaland 2011, Örebro Nordöstra 2011, Båstad 2015 and Falun 2019.
 The [source inventory](SOURCE_INVENTORY_OMVAL.md) remains the source-review record.

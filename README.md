@@ -359,9 +359,8 @@ The first distribution contains **190 Parquet assets and 12 product manifests**
 under `data-v0.4.0`: RKL 2002/2006/2010/2014/2018/2022, referendum 2003, and
 EU 2004/2009/2014/2019/2024. RKL 2002 excludes candidacies; EU 2009 excludes
 all six preference-vote bases; the referendum has results only. The two historical
-mandate-history assets are shared by their three query functions. Assets remain
-unpublished until a separate publication step. See
-[the release review](development/RELEASE_CANDIDATE_REVIEW.md).
+mandate-history assets are shared by their three query functions. Assets are published in data-v0.4.0. See
+[the release review](development/releases/v0.4.0.md).
 
 Canonical assets are read next to the manifest by default and cached with
 checksum verification. `nanoparquet` is needed only for Parquet use. The

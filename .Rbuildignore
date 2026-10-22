@@ -15,3 +15,4 @@
 
 ^CONTRIBUTING\.md$
 ^valresultat_[0-9].*\.tar\.gz$
+^swelections_[0-9].*\.tar\.gz$

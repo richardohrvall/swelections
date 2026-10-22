@@ -1,5 +1,10 @@
 # 2002 implementation and source limitations
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 The 2002 implementation reads preserved official final-election XML and reuses
 the established historical XML normalisation and public standard/full and
 English/Swedish layers. It does not modify any raw source or older canonical asset.

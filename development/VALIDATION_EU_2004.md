@@ -1,5 +1,10 @@
 # EU 2004 implementation validation
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 The R-only adapter uses pinned original final XML,30 official district/list
 exports,20 complete named preference exports, the definitive ballot ZIP, the
 original Katrineholm municipal XML for the zero Wednesday unit, and the SCB

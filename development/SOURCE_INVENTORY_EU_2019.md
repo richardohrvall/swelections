@@ -1,5 +1,10 @@
 # Source inventory: European Parliament election 2019
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 Assessment date: 2026-10-15. Election occasion: **26 May 2019**.
 This is a source inventory and independent R audit only. No production reader,
 public API support, canonical build, commit or push is part of this assessment.

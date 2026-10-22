@@ -1,5 +1,10 @@
 # RKL 2018: final-stage guard and corrected Ragunda result
 
+> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
+> prototype and validation statements below are historical evidence, not current
+> activation/publication status. Source limitations and provenance remain applicable.
+
+
 This records the reviewed 20 October 2026 correction. Published `data-v0.1.0`
 assets and all earlier build generations remain immutable. New files are a local,
 unpublished prototype; no release/registry activation is changed.
