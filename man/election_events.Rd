@@ -29,9 +29,10 @@ results/allocations. Use \code{\link[=seats]{seats()}} with \code{after_re_elect
 original ordinary year for a derived composition retaining the original year.
 Örebro has 17 seats in its 2011 Nordöstra event and 65 in its adjusted 2010
 composition (48 + 17). Discovery requires no source downloads. Current
-re-election readers require preserved local final sources; availability flags
-do not imply remote or published canonical support. Unknown legal decision
-dates remain missing.
+final result/seat readers use canonical for auto/canonical; local sources
+require explicit local selection. Canonical availability refers only to these
+two views, not the five unimplemented candidate-related views. Remote and
+preliminary re-election support are unavailable. Unknown legal decision dates remain missing.
 }
 \examples{
 election_events(election_kind = "re_election")

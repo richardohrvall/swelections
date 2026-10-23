@@ -114,8 +114,8 @@ test_that('new normal reading refuses old canonical value contracts', {
  r<-.canonical_release_registry()
  expect_true(all(r$schema_version==3L))
  expect_true(.canonical_release(2018L)$auto_eligible)
- expect_identical(.canonical_release(2018L)$data_version,'data-v0.4.0')
- expect_match(.canonical_release(2018L)$base_url,'/data-v0.4.0$')
+ expect_identical(.canonical_release(2018L)$data_version,'data-v0.4.1')
+ expect_match(.canonical_release(2018L)$base_url,'/data-v0.4.1$')
  for(y in c(2004L,2009L,2014L,2019L,2024L))expect_true(.canonical_release(y,'eu')$auto_eligible)
 })
 test_that('new Boolean applicability details preserve standard/full projection', {

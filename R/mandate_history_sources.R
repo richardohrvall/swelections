@@ -50,9 +50,14 @@
   x <- fetch(asset)
   layout <- manifest$tables$columns[manifest$tables$asset == asset &
     manifest$tables$table == "intervals"]
+  required <- c("component_id", "component_scope_level", "component_scope_code",
+    "start_reason", "end_reason", "interval_coverage",
+    "component_start_date", "component_end_date", "reported_end_reason")
+  if (!all(required %in% names(x)))
+    stop("Canonical mandate history predates the component/reason contract; a validated history rebuild is required. Frozen release assets are unchanged.", call. = FALSE)
   if (length(layout) != 1L || !identical(names(x), strsplit(layout, ",", fixed = TRUE)[[1L]]) ||
       anyNA(x$election_year) || any(x$election_year != year) ||
-      anyNA(x$status) || any(!x$status %in% c("occupied", "vacant")) ||
+      anyNA(x$status) || any(!x$status %in% c("occupied", "vacant", "unknown")) ||
       anyNA(x$start_date) || anyNA(x$coverage_end) || anyDuplicated(x$interval_id) ||
       !all(vapply(x[c("start_date", "end_date", "event_date", "coverage_end")],
                   inherits, logical(1), "Date")))

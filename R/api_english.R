@@ -93,11 +93,11 @@
 #' the actual polling year. Örebro 2011 covers Nordöstra only, not all Örebro.
 #' Use [election_events()] to discover events, scopes and original-election links.
 #'
-#' Current re-election readers require preserved local final-result sources in
-#' `data_dir` or explicit paths through `options(swelections.re_election_sources = ...)`.
-#' Use `source = "local"` or `"auto"`. The ordinary-election source rules below
-#' do not enable remote/canonical re-election sources, update/archive operations
-#' or preliminary re-election readers; these are unavailable.
+#' Final re-election results and seats use published canonical data with
+#' `source = "auto"` or `"canonical"`. Explicit `source = "local"` accepts
+#' compatible preserved sources via `data_dir` or
+#' `options(swelections.re_election_sources = ...)`. Auto never chooses local.
+#' Remote, update/archive and preliminary re-election readers are unavailable.
 #' No post-re-election combined vote or turnout result is provided.
 #' @param year One or more supported election years, or `"all"`. Defaults to
 #'   2026 unless `from` or `to` is supplied.
@@ -268,13 +268,13 @@ results <- function(
 #' have several component rows: sum `seats`; repeated `total_seats` is not
 #' additive. This is an electoral composition, not membership history.
 #'
-#' @section Local re-election sources:
-#' Current re-election allocations and compositions require preserved local
-#' final sources (`source = "local"` or `"auto"`). Compositions also require
-#' the original ordinary inputs through the selected source route. Remote and
-#' canonical re-election routes, update/archive and preliminary re-election
-#' readers are unavailable. Configure `data_dir` or explicit source paths via
-#' `options(swelections.re_election_sources = ...)`. See [election_events()].
+#' @section Re-election sources:
+#' Final event allocations use canonical with `source = "auto"` or
+#' `"canonical"`; compositions also read the original ordinary inputs
+#' through that source route. Explicit `source = "local"` accepts preserved
+#' files via `data_dir` or `options(swelections.re_election_sources = ...)`.
+#' Auto never chooses local. Remote, update/archive and preliminary re-election
+#' readers are unavailable. See [election_events()].
 #' @param after_re_election If `TRUE`, derive the composition after verified
 #'   linked re-elections, anchored on the original ordinary election. Requires
 #'   `election_kind = "ordinary"`, `count = "final"` and a whole-area level.

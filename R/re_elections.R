@@ -33,7 +33,11 @@
   x$annulment_decision_reference <- NA_character_
   x$annulment_decision_date <- as.Date(NA)
   x$final_results_available <- TRUE; x$final_seats_available <- TRUE
-  x$canonical_available <- FALSE; x$preliminary_available <- FALSE
+  x$canonical_available <- vapply(x$election_year, function(y) {
+    e <- .canonical_release(y, "rkl", "re_election")
+    isTRUE(e$auto_eligible) && all(c("results", "seats") %in% e$auto_functions)
+  }, logical(1))
+  x$preliminary_available <- FALSE
   x$verified_allocation <- list(c(M=2L,C=8L,FP=1L,KD=2L,S=12L,V=2L,MP=1L,SPI=2L,SD=1L),
     c(M=38L,C=9L,FP=11L,KD=9L,S=52L,V=9L,MP=12L,SD=9L),
     c(M=3L,C=1L,FP=1L,KD=1L,S=8L,V=1L,MP=1L,SD=1L),
@@ -90,9 +94,10 @@
 #' original ordinary year for a derived composition retaining the original year.
 #' Örebro has 17 seats in its 2011 Nordöstra event and 65 in its adjusted 2010
 #' composition (48 + 17). Discovery requires no source downloads. Current
-#' re-election readers require preserved local final sources; availability flags
-#' do not imply remote or published canonical support. Unknown legal decision
-#' dates remain missing.
+#' final result/seat readers use canonical for auto/canonical; local sources
+#' require explicit local selection. Canonical availability refers only to these
+#' two views, not the five unimplemented candidate-related views. Remote and
+#' preliminary re-election support are unavailable. Unknown legal decision dates remain missing.
 #' @examples
 #' election_events(election_kind = "re_election")
 #' election_events(2003, "municipal", "re_election") # Orsa
@@ -344,15 +349,24 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   }
   if(nrow(re)) {
     src<-match.arg(source,c('auto','local','remote','canonical'))
-    .auto_requires_local(src, 're-election results')
-    if(src %in% c('remote','canonical'))stop('Re-election ',src,' source is not available; use preserved local sources. No canonical re-election release exists.',call.=FALSE)
+    if(src == 'remote')stop('Re-election remote source is not available; use preserved local sources.',call.=FALSE)
     if(update||archive)stop('Preserved re-election sources are immutable; update/archive are not supported.',call.=FALSE)
     if(!identical(count,'final'))stop('Re-election preliminary readers are not yet verified; final sources will not replace them.',call.=FALSE)
     if(table=='results'&&length(codes)!=1L)stop('Select one election type for re-election results.',call.=FALSE)
     for(i in seq_len(nrow(re))) {
       e<-re[i,];lev<-if(is.null(level))if(e$scope_level=='region')'region'else if(e$scope_level=='municipal_constituency')'municipal_constituency'else'municipality' else level
       for(l in lev) {
-        niva<-.english_argument_value(l,'level');f<-.re_file(e,data_dir,if(table=='seats')'seats'else'final')
+        niva<-.english_argument_value(l,'level')
+        selected <- .select_public_source(src, e$election_year, table, data_dir,
+          event_kind='re_election', val=e$election_code, niva=niva)
+        if (selected %in% c('canonical', 'canonical_auto')) {
+          if (selected == 'canonical' && !is.null(data_dir)) stop('Canonical requests do not accept raw data_dir.',call.=FALSE)
+          pieces[[length(pieces)+1L]] <- .re_canonical_read(e, table, niva, detail, language,
+            auto_selected=identical(selected,'canonical_auto'))
+          next
+        }
+        .auto_requires_local(selected, 're-election results')
+        f<-.re_file(e,data_dir,if(table=='seats')'seats'else'final')
         raw<-if(!is.na(e$comparison_stem)).re_2011(e,f$path,table,niva)else .re_xml(e,f$path,table,niva)
         if(table=='seats'&&sum(raw$antal_mandat)!=e$seats_expected)stop('Re-election party allocations do not match verified seats.',call.=FALSE)
         pieces[[length(pieces)+1L]]<-.re_present(raw,e,table,detail,language,f)

@@ -1,8 +1,9 @@
 # Re-election implementation
 
-> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
-> prototype and validation statements below are historical evidence, not current
-> activation/publication status. Source limitations and provenance remain applicable.
+> Current implementation: [v0.4.1 candidate](releases/v0.4.1.md), not yet
+> published. Final results/seats are approved for canonical auto-selection.
+> The [frozen v0.4.0 record](releases/v0.4.0.md) retains the previous local-only
+> distribution; its files remain unchanged.
 
 
 This implementation supports final event results and mandate allocations for
@@ -55,8 +56,8 @@ whole-area result.
 Swedish wrappers share the same implementation:
 `mandat(ar = 2010, val = "KF", efter_omval = TRUE)` and
 `mandat(ar = 2011, val = "KF", valklass = "omval")`.
-Selector aliases `ordinarie`/`omval`/`alla` are accepted; output values do not
-change with the output-name language. Standard is a projection of full and keeps
+Selector aliases `ordinarie`/`omval`/`alla` are accepted; technical output values
+are localized with the output language through the shared value contract. Standard is a projection of full and keeps
 all event/component provenance fields. Existing ordinary schemas are unchanged.
 
 ## Preserved local sources
@@ -93,11 +94,14 @@ replacement rows additionally retain the exact rerun file/hash. Unknown original
 file-level provenance is not fabricated; the component event identifies the
 existing ordinary source product.
 
-`source = "auto"` uses the configured preserved local rerun inputs. Explicit
-`remote` and `canonical` rerun requests fail: no verified remote downloader or
-published canonical rerun release is supplied. `update`/`archive` are rejected
-for immutable rerun sources. No canonical assets or source files are rebuilt.
-Parquet round-trip validation covers the new output schemas locally.
+`source = "auto"` selects the registered v0.4.1 canonical results/seats when
+the approved distribution is available; `source = "canonical"` explicitly uses
+those views. The candidate URLs are not live before publication. Explicit
+`source = "local"` retains the verified saved-source route above. Auto never
+selects local, and no supported remote re-election downloader is supplied.
+`update`/`archive` are rejected for immutable re-election sources. The central
+function allowlist also gates explicit canonical: a full private manifest cannot
+enable the five unimplemented candidate-related functions.
 
 ## Supported final levels and explicit gaps
 
@@ -148,3 +152,65 @@ whose original retrieval receipt has not been established.
 
 Validation commands, results, exact schema additions and changed files are in
 [VALIDATION_OMVAL.md](VALIDATION_OMVAL.md).
+
+## Canonical scope and preserved auxiliary sources
+
+The v0.4.1 candidate contains two final assets per event (results and seats),
+ten assets in four manifests; the two 2011 events remain geographically separate.
+All 20 table/level views have raw/canonical comparisons in both languages and
+detail modes. Schema/value/storage versions remain 3/1/1. See
+[release provenance](releases/v0.4.1.md) for the exact 200-asset/16-manifest
+distribution, checksums and approved source permissions.
+
+
+- Orsa: original archived `slutresultat_2034K.xml`, capture 2003-04-26 22:32:58,
+  labelled `Omval 16 Mars 2003`, SHA256
+  `2ed9f72f36cbbb2b682d42d7a299a388b2c394d9ee4e3b393c46c9cd1fe4775c`.
+  The ordinary 2002 XML is not substituted. All six final reporting units exist;
+  959 PERSONVAL nodes are repeated source observations, not 959 people.
+  The XML has 31 elected and 28 substitute relations, no stable person IDs.
+  A complete separate ballot register is unrecovered (number missing unknown).
+  Eight signed protocol attachments remain unrecovered. Combined invalid = 13;
+  its blank/other-invalid decomposition is unpublished in this XML and stays NA.
+- VG/Örebro 2011: final `slutlig2011_{vg,orebro}_jmf2010_antal.skv` and
+  `_mandat.skv`; VG geography additionally uses `rostberattigade_vg.skv`.
+  The 2011 result columns are distinct from the 2010 comparison. Pinned hashes
+  and official protocol references are retained in the event registry.
+  Ballot files preserve 7,420 VG candidacies (1,401 source IDs, 52 lists,
+  15 labels) and 342 Nordöstra candidacies/IDs (eight lists/labels).
+  A complete result-ID union and candidate/preference/protocol extraction
+  remains NOT VERIFIED; there is no recovered final-result XML archive.
+  Elected/substitute protocol annexes exist; their exact machine-readable
+  relationship reconciliation is not implemented. Comparison SKVs cannot prove
+  that unknown unfilled-seat counts are zero. Other-party aggregates are retained;
+  the separate 193-row handwritten file is not automatically disaggregated into them.
+- Båstad 2015: the preserved original `slutresultat.zip`, specifically
+  `slutresultat_1278K.xml`; final protocol and headerless `alkandur_K.skv`.
+  The latter has 198 list-position rows/185 source IDs; final preference XML
+  has 163 IDs, including six absent from that snapshot:
+  1259, 1255, 1392, 1256, 1349, 1341. The union is 191 IDs. XML has 41 elected
+  and 28 substitute relations (24 distinct source IDs). No result-only record
+  may be discarded through a ballot-file inner join. The current official
+  protocol is redacted; the preserved full original remains the control.
+- Falun 2019: preserved original `slutresultat.zip`, specifically
+  `slutresultat_2080K.xml`, full protocol and `kandidaturer.skv`.
+  There are 490 data rows plus a header (483 valid, seven invalid), 300 source IDs,
+  and 260 preference-result IDs. Reported preference/elected/substitute IDs
+  occur in the ballot snapshot; XML has 61 elected and 35 substitute relations.
+  Candidate extraction still requires the separate re-election adapter and
+  public-name policy. The recovered 37 preliminary pages are not final counts
+  and are not enabled by this final-only canonical generation.
+
+Exact SCB/SND candidate-by-candidate and party-by-party independent reconciliation
+is NOT VERIFIED for all events. The preserved official protocols and comparison
+controls support the final reported totals; rounded SCB turnout/scope corroboration
+is not misrepresented as a full microdata reconciliation. The inventory records
+which Stata datasets are locally derived rather than independent SCB evidence.
+
+
+These retained candidate, ballot, protocol and preliminary sources support future
+reader development. Their existence is not a claim that those public re-election
+functions are implemented. Missing physical-person linkage does not erase a
+reported preference-vote observation. The shared mandate component model and
+its different public period coverage are documented in
+[MANDATE_HISTORY.md](MANDATE_HISTORY.md#component-and-transition-contract-interval-schema-2).

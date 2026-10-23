@@ -142,14 +142,14 @@ have several component rows: sum \code{seats}; repeated \code{total_seats} is no
 additive. This is an electoral composition, not membership history.
 }
 
-\section{Local re-election sources}{
+\section{Re-election sources}{
 
-Current re-election allocations and compositions require preserved local
-final sources (\code{source = "local"} or \code{"auto"}). Compositions also require
-the original ordinary inputs through the selected source route. Remote and
-canonical re-election routes, update/archive and preliminary re-election
-readers are unavailable. Configure \code{data_dir} or explicit source paths via
-\code{options(swelections.re_election_sources = ...)}. See \code{\link[=election_events]{election_events()}}.
+Final event allocations use canonical with \code{source = "auto"} or
+\code{"canonical"}; compositions also read the original ordinary inputs
+through that source route. Explicit \code{source = "local"} accepts preserved
+files via \code{data_dir} or \code{options(swelections.re_election_sources = ...)}.
+Auto never chooses local. Remote, update/archive and preliminary re-election
+readers are unavailable. See \code{\link[=election_events]{election_events()}}.
 }
 
 \examples{

@@ -1,7 +1,10 @@
 # Mandate-period history
 
-Implemented in the published v0.4.0 release. The dated validation observations below describe preserved snapshots, not live guarantees.
-The verified source-role and Ragunda/Överkalix/Kiruna evidence is consolidated below.
+History functions were introduced in [frozen v0.4.0](releases/v0.4.0.md). The
+[v0.4.1 candidate](releases/v0.4.1.md) rebuilds the two completed-period products
+with interval schema 2 and the component/transition model documented here. It is
+not yet published. Dated validation observations describe preserved snapshots,
+not live guarantees. Source-role and Ragunda/Överkalix/Kiruna evidence is retained below.
 
 ## Public functions
 
@@ -13,7 +16,9 @@ The verified source-role and Ragunda/Överkalix/Kiruna evidence is consolidated 
 
 Supported original election years are 2014, 2018 and 2022, for RD/RF/KF.
 These functions are separate from the fixed-election `elected()`/`valda()` API.
-They do not change any existing election-result, candidate or canonical table.
+They do not alter fixed election-result or candidate tables. The v0.4.1
+generation replaces only the two completed-period history assets; frozen release
+files are unchanged.
 
 ```r
 archive <- "path/to/preserved/archive"
@@ -51,8 +56,9 @@ checked against the existing independently verified event/party allocations.
 Intervals are `[start_date, end_date)`: the outgoing row is excluded on the
 successor's start date. Zero-length source intervals remain in history but
 never appear in a snapshot. Overlapping intervals, gaps, unlinked holders,
-unknown starts and failed independent vacancy counts raise errors. No permanent
-`unknown` state is substituted for a reconstructable chair.
+unknown starts and failed independent vacancy counts raise errors. Explicit
+`unknown` continuity is retained only where source evidence cannot establish
+occupancy (the specified Båstad interval below); it is never a verified vacancy.
 
 Initial vacancies are created from allocated-minus-filled chairs even without
 a history/person row. Later vacancies come from explicit current vacant-chair
@@ -63,7 +69,9 @@ links; no name matching or physical-person ID harmonisation is performed.
 The implementation verifies the allocated population on the initial date,
 the final coverage date, and immediately before/at each supported re-election.
 The per-chair checks ensure that intervening changes do not introduce gaps or
-overlaps. Occupied plus vacant chairs equals the active allocated population.
+overlaps. Occupied plus vacant plus explicitly unknown chairs equals the active
+allocated population. Both dated functions refuse selections containing unknown
+continuity rather than returning an apparently complete snapshot.
 
 ## Dates and provenance
 
@@ -132,7 +140,8 @@ Current source contract (21 October 2026): auto selects complete canonical
 history for 2014/2018 and current remote history for 2022. The latter combines
 fresh official membership CSVs with the validated fixed original result.
 Local membership files require explicit local selection. See
-[the published release record](releases/v0.4.0.md).
+[the frozen v0.4.0 record](releases/v0.4.0.md) and
+[the v0.4.1 candidate record](releases/v0.4.1.md).
 
 
 ## Real-source validation
@@ -159,7 +168,8 @@ use integer day storage for reproducible Parquet round trips.
 Independent diagnostics, logs and source checksums remain in the ignored local
 audit directory. No raw sources or generated history/Parquet assets are tracked.
 
-Final package validation:
+Historical v0.4.0 package validation (current candidate checks are recorded in
+[the v0.4.1 record](releases/v0.4.1.md)):
 
 - **3,832 passed assertions, 16 explicit integration skips, zero failures or
   warnings**, including 50 targeted interval/source regression assertions.
@@ -179,8 +189,9 @@ intended installed package contents were changed.
 
 ## Explicit boundaries
 
-- 2010–2014 is not implemented: its individual departure linkage lacks required
-  source candidate identifiers.
+- Public history coverage excludes 2002–2006 and 2010–2014. The latter lacks
+  required source candidate identifiers for individual departure linkage.
+  Generic component fixtures are not a publication of either historical period.
 - Temporary substitute attendance and actual meeting service are not modelled.
 - These functions report source electoral-history dates; they do not establish
   actual statutory/physical service commencement.
@@ -323,3 +334,130 @@ start `2022-09-11`, with no reported holder transition through the inspected
 2026 snapshots. No vacancy interval or unknown chair is supported. The prior
 missing-row conclusion was entirely an audit parsing error. Temporary meeting
 substitution, if any, is not a departure from the electoral chair.
+
+## Component and transition contract (interval schema 2)
+
+
+The allocated mandates remain the population. Holder intervals, verified vacancy
+intervals and explicitly unverified intervals describe that same population.
+A re-election replaces an electoral component within the original mandate period;
+it does not extend or restart that period. No physical-person matching is added.
+
+The shared scope predicate uses election type and electoral area, plus constituency
+for a constituency-scoped replacement. Missing constituency information fails
+rather than widening a partial replacement to the whole municipality. The same
+predicate is used for source event assignment, original-holder recovery, interval
+clipping, component lifetime, transition reasons and allocation verification.
+Successive replacements can also close a previous re-election component.
+
+| Field | Meaning |
+| --- | --- |
+| `component_id` | Original year + component election date + election type + geographic scope; not a physical chair/person identifier |
+| `component_scope_level`, `component_scope_code` | The geographic allocation component, including constituency where applicable |
+| `component_start_date`, `component_end_date` | Component lifetime; half-open, with an open end when no end has been established |
+| `chair_id` | Existing party/chair identity within its electoral component |
+| `start_date`, `end_date` | Half-open holder/status observation interval |
+| `start_reason`, `end_reason` | Electoral/holder transition, separate from the evidence for its date |
+| `start_date_basis`, `end_date_basis` | Reported or derived date provenance |
+| `reported_start_date`, `reported_end_date` | Original reported dates, retained in full output |
+| `reported_end_reason` | Optional explicitly evidenced cause, retained in full output |
+| `interval_coverage` | `source_chain`, `original_election_only` or `unverified_continuity` |
+
+`start_reason` distinguishes `ordinary_election`, `re_election`, `succession`,
+`vacancy` and `coverage_boundary`. `end_reason` distinguishes `departure`,
+`re_election`, `succession` and `coverage_boundary`, and supports `resignation`,
+`death` and `term_end` only when explicitly established by source evidence.
+The inspected membership exports do not establish those specific departure
+causes. No death, voluntary resignation or term end is inferred from a date alone.
+An open interval at the last snapshot is not converted into a term-end event.
+
+A reported end exactly on the replacement date retains date basis `reported`,
+but gets end reason `re_election`. A date shortened by replacement retains the
+existing derived basis `re_election_replacement`. These are distinct dimensions.
+Closing an electoral component is never used as evidence for a vacancy.
+
+## Geographic scope and public coverage
+
+| Event | Replaced allocation | Unaffected allocation |
+| --- | --- | --- |
+| Orsa 2003-03-16 | Municipality 2034: 31 seats | Other municipalities |
+| VG 2011-05-15 | Region 14, five constituencies: 50 + 31 + 27 + 18 + 23 = 149 | Other regions |
+| Örebro 2011-05-15 | Municipality 1880, constituency 188004: 17 | 188001/188002/188003: 16 + 16 + 16 = 48 |
+| Båstad 2015-05-10 | Municipality 1278: 41 | Other municipalities |
+| Falun 2019-04-07 | Municipality 2080: 61 | Other municipalities |
+
+Tests use synthetic holder IDs with the verified scopes, dates and allocation
+counts. They do not manufacture historical person histories for 2002 or 2010.
+Those original years remain explicitly unsupported by the public history API.
+The historical source/linkage work required to publish their histories is separate
+from the model's ability to represent their re-election scope.
+
+## Båstad: preserve the source limitation
+
+The 41 original 2014 holders are verified at the ordinary election. The surviving
+current/departure files carry the subsequent re-election cohort and do not prove
+continuous membership by the original holders throughout the intervening period.
+The model therefore retains the original election-day observations, and represents
+the same allocated chairs as `status = "unknown"`, without a candidate/name, from
+2014-09-15 until 2015-05-10. This next-day boundary is a boundary of knowledge at
+calendar-day resolution, not a claim that anyone departed on 15 September.
+`start_reason = "coverage_boundary"` and `interval_coverage =
+"unverified_continuity"` make that explicit. The original source candidate remains
+available through `original_candidate_number` in full output.
+
+The 41 fabricated zero-length vacancies are no longer generated. The 41 unknown
+intervals are not vacancies. Both dated functions fail explicitly if their selected
+population contains unknown continuity; they neither report unknown chairs as
+empty nor silently return an apparently complete subset of known holders.
+Queries from the re-election date have the verified new cohort. Other independently
+supported source-reported zero-length observations keep their existing semantics.
+
+
+### Schema and generation boundary
+
+All three history functions use the same allocated mandate population; dated
+functions filter its status intervals rather than storing duplicate snapshots.
+Standard/full gain the component, transition and coverage fields above; full
+retains reported dates/reasons and original candidate references. Swedish names
+and technical values use the shared dictionaries. No physical-person matching
+is performed. The reader rejects the old history layout rather than silently
+converting it. The two v0.4.1 history assets have been rebuilt and validated;
+publication still requires an approved clean-commit rebuild. 2022–2026 remains
+remote with source-header coverage bounds.
+
+### Source evidence behind the component correction
+
+The frozen Båstad history contained 41 synthetic zero-length vacancy intervals
+on 2015-05-10. They arose from terminal-departure handling at component closure,
+not from reported vacancies. The preserved original
+`ursprungligt_valda_ledamoter_RLK.skv` identifies the 41 original holders. The
+2018-11-07 `nuvarande_ledamoter.skv` contains 41 re-election rows;
+`avgangna_ledamoter.skv` contains 12 re-election departures and
+`ledamoter_och_ersattare.skv` 11 re-election relation rows, without ordinary-cohort
+changes. These endpoints do not establish continuity before the re-election.
+Recovering it requires an original-cohort change history or a verified roster
+plus intervening dated transitions. The new 41 unknown intervals preserve this
+precise evidence gap; no departure on 2014-09-15 is asserted.
+
+Falun history source rows 958/959 record V chair 1 changing from candidate 63810
+(Daniel Riazat) to 63822 (Thomas Nilsson) on 2018-11-06. This remains a departure/
+succession. The successor and 60 other ordinary intervals end on 2019-04-07
+by re-election. Those dates were already reported; the new reason distinguishes
+component replacement from an ordinary holder transition without changing dates.
+
+The v0.4.1 raw checks produce 18,684 intervals for 2014 (Båstad: 41 original
+observations, 41 unknown intervals, 53 re-election holder intervals, no vacancies)
+and 18,422 for 2018 (Falun: 62 ordinary and 76 re-election holder intervals,
+61 re-election closures). Existing columns, row ordering and interval IDs outside
+Båstad/Falun remain identical to the published histories after portable source-
+path mapping. The verified 2022 remote snapshot retains 18,079 intervals and
+14,683 active chairs, with all pre-existing fields/IDs unchanged. An older local
+2022-10-11 snapshot has two undated person rows that cannot be matched to the
+current original baseline and is rejected; it is not used to extend coverage.
+
+Regression tests cover all five verified re-election scopes, successive
+replacements, missing partial geography, ordinary succession, vacancy boundaries,
+language/detail projections and unsupported cause coding. The Örebro fixture
+retains all 48 unaffected mandates; it does not create a public 2010 history.
+Current package and release validation is recorded once in
+[the v0.4.1 provenance](releases/v0.4.1.md).

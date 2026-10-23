@@ -26,15 +26,17 @@
 #' preliminary source is never replaced by final data.
 #'
 #' The release-candidate registry enables RKL 2002--2022, EU 2004--2024 and the
-#' 2003 referendum under data-v0.4.0. RKL 2002 excludes candidacies; the referendum
+#' 2003 referendum under data-v0.4.1. RKL 2002 excludes candidacies; the referendum
 #' supports results only. EU 2009 excludes automatic preference votes even if a
 #' configured private manifest contains those assets. Use explicit local sources
 #' for that historical preference-vote archive. RKL 2018 selects the corrected
-#' generation, never the former data-v0.1.0 files.
+#' generation, never the former data-v0.1.0 files. Re-elections in 2003, 2011,
+#' 2015 and 2019 enable final results/seats only, preserving their actual scope.
+#' These use four manifests such as `rkl2011-re-election-manifest.json`.
 #'
 #' Each product has a unique manifest filename such as `rkl2018-manifest.json`,
 #' `eu2009-manifest.json` or `referendum2003-manifest.json`, alongside the uniquely
-#' named Parquet assets in the data-v0.4.0 GitHub release. Publication is a separate
+#' named Parquet assets in the data-v0.4.1 GitHub release. Publication is a separate
 #' step: an enabled but not yet published release gives a download error; it does
 #' not silently fall back to raw files. Configured local canonical manifests remain
 #' available for validation; they cannot extend the central auto permission.

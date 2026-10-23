@@ -14,6 +14,7 @@ test_that("central auto permissions are explicit for all twelve products", {
   all <- c("results", "seats", "candidacies", "candidates", "elected",
            "substitutes", "preference_votes")
   registry <- .canonical_release_registry()
+  registry <- registry[registry$event_kind == "ordinary", ]
   expect_equal(nrow(registry), 12L)
   expect_identical(registry$auto_eligible, rep(TRUE, 12L))
   for (i in seq_len(nrow(registry))) {

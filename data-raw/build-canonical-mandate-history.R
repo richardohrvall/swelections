@@ -12,7 +12,9 @@ build_canonical_mandate_history <- function(year, parent, root, output) {
   stopifnot(m$valserie=="rkl",as.integer(m$valar)==year,
     m$schema_version==3L,m$value_schema_version==1L,m$storage_schema_version==1L)
   asset<-paste0("rkl",year,"-mandate-history")
-  if(asset%in%m$assets$asset)stop("Parent already contains history.")
+  inherited <- m[c("data_version","build_commit","build_tree_dirty","built_at_utc")]
+  m$assets <- m$assets[m$assets$asset != asset, , drop=FALSE]
+  m$tables <- m$tables[m$tables$asset != asset, , drop=FALSE]
   if(dir.exists(file.path(root,"rkl")))root<-file.path(root,"rkl")
   raw<-swelections:::.mh_files(year,root,list())
   old<-options(swelections.canonical_manifest=parent,
@@ -54,12 +56,14 @@ build_canonical_mandate_history <- function(year, parent, root, output) {
     columns=paste(names(x),collapse=",")))
   first<-swelections:::.mh_at(x,min(x$event_date))
   last<-swelections:::.mh_at(x,min(x$coverage_end))
-  m$mandate_history<-list(original_year=year,coverage_start=as.character(min(x$event_date)),
+  m$mandate_history<-list(interval_schema_version=2L,original_year=year,coverage_start=as.character(min(x$event_date)),
     coverage_end=as.character(min(x$coverage_end)),intervals=nrow(x),
     active_chairs=nrow(first),initial_vacancies=sum(first$status=="vacant"),
     final_occupied=sum(last$status=="occupied"),final_vacant=sum(last$status=="vacant"),
     original_result_manifest_sha256=swelections:::.canonical_sha256(parent),inputs=inputs)
   component<-canonical_build_contract(list())
+  m <- canonical_build_contract(m)
+  m$inherited_build <- inherited
   m$component_builds$mandate_history<-component
   m$build_tree_dirty<-isTRUE(m$build_tree_dirty)||isTRUE(component$build_tree_dirty)
   jsonlite::write_json(m,file.path(output,"manifest.json"),pretty=TRUE,auto_unbox=TRUE,na="null")

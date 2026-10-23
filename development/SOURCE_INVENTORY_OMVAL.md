@@ -1,8 +1,10 @@
 # Omval source inventory and implementation assessment
 
-> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
-> prototype and validation statements below are historical evidence, not current
-> activation/publication status. Source limitations and provenance remain applicable.
+> Source inventory dated 17 October 2026. Original findings below retain their
+> date; they are not current activation status. Final results/seats now belong
+> to the [unpublished v0.4.1 candidate](releases/v0.4.1.md). The
+> [frozen v0.4.0 record](releases/v0.4.0.md) and all source limitations remain
+> unchanged. Candidate/preliminary availability here does not promise API support.
 
 
 Inventory date: 17 October 2026. This is a source review, not an implementation

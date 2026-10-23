@@ -1,14 +1,14 @@
 # Canonical coverage and reader support are registered once, separately from
-# raw-source availability. Only the twelve reviewed ordinary products are registered.
+# raw-source availability. Twelve ordinary and four re-election products are registered.
 .canonical_release_registry <- function() {
   years <- list(rkl = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L),
                 eu = c(2004L, 2009L, 2014L, 2019L, 2024L), folkomr = 2003L)
   out <- purrr::list_rbind(lapply(names(years), function(series) {
     y <- years[[series]]
     data.frame(year = y, series = series, event_kind = "ordinary",
-      data_version = "data-v0.4.0", schema_version = 3L,
+      data_version = "data-v0.4.1", schema_version = 3L,
       auto_eligible = TRUE,
-      base_url = "https://github.com/richardohrvall/swelections/releases/download/data-v0.4.0",
+      base_url = "https://github.com/richardohrvall/swelections/releases/download/data-v0.4.1",
       manifest_file = paste0(if (series == "folkomr") "referendum" else series, y, "-manifest.json"),
       cache_key = NA_character_,
       reader = if (series == "rkl") ".canonical_source" else if (series == "eu")
@@ -29,10 +29,17 @@
     functions
   })
   i <- out$series == "rkl" & out$year == 2018L
-  out$data_version[i] <- "data-v0.4.0"
-  out$cache_key[i] <- "data-v0.4.0"
+  out$data_version[i] <- "data-v0.4.1"
+  out$cache_key[i] <- "data-v0.4.1"
   out$auto_eligible[i] <- TRUE
-  out
+  # Approved re-election coverage is final results and seats only.
+  re <- data.frame(year = c(2003L, 2011L, 2015L, 2019L), series = 'rkl',
+    event_kind = 're_election', data_version = 'data-v0.4.1', schema_version = 3L,
+    auto_eligible = TRUE, base_url = "https://github.com/richardohrvall/swelections/releases/download/data-v0.4.1",
+    manifest_file = paste0('rkl', c(2003L, 2011L, 2015L, 2019L), '-re-election-manifest.json'),
+    cache_key = NA_character_, reader = '.re_canonical_read', stringsAsFactors = FALSE)
+  re$auto_functions <- rep(list(c('results', 'seats')), nrow(re))
+  dplyr::bind_rows(out, re)
 }
 
 .canonical_release <- function(year, series = "rkl", event_kind = "ordinary") {
@@ -109,6 +116,8 @@
 .canonical_view_covered <- function(manifest, surface, val = NULL, niva = NULL,
                                     rakning = "slutlig", include_results = TRUE) {
   surface <- .canonical_surface(surface)
+  if (identical(manifest$event_kind, 're_election'))
+    return(.re_canonical_covered(manifest, surface, val, niva, rakning))
   series <- manifest$valserie; year <- as.integer(manifest$valar)
   prefix <- paste0(if (series == "folkomr") "referendum" else series, year, "-")
   has <- function(asset, level = NULL) {
@@ -164,6 +173,9 @@
                                   include_results = TRUE, series = "rkl",
                                   event_kind = "ordinary", val = NULL, niva = NULL,
                                   rakning = "slutlig") {
+  if (source == "canonical" && event_kind == "re_election" &&
+      !.canonical_auto_function_allowed(.canonical_release(year, series, event_kind), surface))
+    stop("No approved canonical re-election coverage for this function; a prototype manifest cannot grant permission.", call. = FALSE)
   if (source != "auto" || update || archive || isTRUE(getOption("swelections.internal_raw_request", FALSE))) return(source)
   entry <- .canonical_release(year, series, event_kind)
   if (is.null(entry) || !isTRUE(entry$auto_eligible) ||
@@ -231,7 +243,8 @@
 # Resolve assets independently of their transport. All readers retain the same
 # checksum-verified cache; no raw source is used to repair canonical failures.
 .canonical_fetcher <- function(manifest, path) {
-  registration <- .canonical_release(as.integer(manifest$valar), manifest$valserie)
+  registration <- .canonical_release(as.integer(manifest$valar), manifest$valserie,
+    if (is.null(manifest$event_kind)) "ordinary" else manifest$event_kind)
   directory <- getOption("swelections.canonical_assets_dir", dirname(path))
   base <- getOption("swelections.canonical_base_url", NULL)
   if (is.null(base) && !is.null(registration$base_url) &&

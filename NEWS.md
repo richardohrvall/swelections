@@ -1,3 +1,14 @@
+# swelections 0.4.1
+
+- Add final canonical results and seat allocations for the five re-elections in
+  2003, 2011, 2015 and 2019, with function-specific automatic selection.
+- Represent mandate components and transition reasons separately from date
+  provenance. Preserve partial replacement scope and source coverage gaps;
+  remove artificial Båstad vacancies and distinguish Falun re-election closure
+  from departures. Rebuild only the 2014/2018 history assets.
+- Prepare data-v0.4.1: 200 Parquet assets and 16 manifests. The frozen v0.4.0
+  releases are unchanged. Publication remains a separate step.
+
 # swelections 0.4.0
 
 - Prepare the first combined canonical distribution: 190 Parquet assets and 12

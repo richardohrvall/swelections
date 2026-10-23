@@ -2,7 +2,7 @@
 canonical_build_contract <- function(manifest) {
   # JSON must not retain obsolete Swedish table selectors as synthetic _row keys.
   if (is.data.frame(manifest$tables)) rownames(manifest$tables) <- NULL
-  manifest$data_version <- 'data-v0.4.0'
+  manifest$data_version <- 'data-v0.4.1'
   manifest$schema_version <- 3L
   manifest$value_schema_version <- 1L
   manifest$storage_schema_version <- 1L
@@ -19,6 +19,6 @@ canonical_build_contract <- function(manifest) {
     list.files('data-raw',pattern='^(build-canonical|export-canonical|standardize-canonical|canonical-build-contract).*R$',full.names=TRUE))
   manifest$build_code_sha256 <- data.frame(file=files,
     sha256=vapply(files,swelections:::.canonical_sha256,''),stringsAsFactors=FALSE)
-  manifest$release_status <- 'unpublished_value_contract_validation_build'
+  manifest$release_status <- 'unpublished_release_candidate_build'
   manifest
 }

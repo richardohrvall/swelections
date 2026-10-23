@@ -27,22 +27,25 @@
 
 # Prepare the reviewed flat GitHub release; never rebuild or edit election data.
 # Rscript data-raw/prepare-canonical-release.R MANIFESTS.csv EMPTY_OUTPUT_DIR [--allow-dirty]
-# CSV columns: manifest (one preserved build manifest for each of the 12 products).
+# CSV columns: manifest (one preserved build manifest for each of the 16 products).
 prepare_canonical_release <- function(manifests, output, allow_dirty = FALSE) {
   pkgload::load_all('.', quiet = TRUE)
   registry <- swelections:::.canonical_release_registry()
   expected <- c(rkl2002=14L,rkl2006=15L,rkl2010=24L,rkl2014=25L,rkl2018=21L,
-    rkl2022=24L,folkomr2003=1L,eu2004=14L,eu2009=8L,eu2014=14L,eu2019=15L,eu2024=15L)
+    rkl2022=24L,folkomr2003=1L,eu2004=14L,eu2009=8L,eu2014=14L,eu2019=15L,eu2024=15L,
+    `rkl2003-re-election`=2L,`rkl2011-re-election`=4L,
+    `rkl2015-re-election`=2L,`rkl2019-re-election`=2L)
   if (length(manifests) != length(expected) || anyDuplicated(manifests))
-    stop('Supply exactly twelve distinct input manifests.')
+    stop('Supply exactly sixteen distinct input manifests.')
   if (dir.exists(output) && length(list.files(output, all.files=TRUE, no..=TRUE)))
     stop('Use an empty output directory.')
   specs <- lapply(manifests, function(path) {
     m <- swelections:::.canonical_manifest(path)
-    key <- paste0(m$valserie, m$valar)
+    kind <- if(is.null(m$event_kind)) "ordinary" else m$event_kind
+    key <- paste0(m$valserie, m$valar, if(kind=="re_election") "-re-election" else "")
     if (!key %in% names(expected)) stop('Unapproved release product: ', key)
-    e <- swelections:::.canonical_release(as.integer(m$valar), m$valserie)
-    if (!isTRUE(e$auto_eligible) || m$data_version != e$data_version ||
+    e <- swelections:::.canonical_release(as.integer(m$valar), m$valserie, kind)
+    if (!isTRUE(e$auto_eligible) || !m$data_version %in% c("data-v0.4.0", e$data_version) ||
         m$schema_version != 3L || m$value_schema_version != 1L ||
         m$storage_schema_version != 1L || !is.logical(m$build_tree_dirty) ||
         length(m$build_tree_dirty) != 1L || is.na(m$build_tree_dirty))
@@ -62,11 +65,11 @@ prepare_canonical_release <- function(manifests, output, allow_dirty = FALSE) {
   })
   keys <- vapply(specs, `[[`, '', 'key')
   if (!setequal(keys, names(expected)) || anyDuplicated(keys))
-    stop('The twelve approved products must each occur exactly once.')
+    stop('The sixteen approved products must each occur exactly once.')
   names <- unlist(lapply(specs, function(s)c(s$entry$manifest_file,s$manifest$assets$file)),use.names=FALSE)
-  if (length(names)!=202L || anyDuplicated(names) ||
+  if (length(names)!=216L || anyDuplicated(names) ||
       any(!grepl('^[a-z0-9][a-z0-9_.-]*[.](json|parquet)$', names)))
-    stop('Release filenames must be globally unique safe basenames: 190 Parquet + 12 JSON.')
+    stop('Release filenames must be globally unique safe basenames: 200 Parquet + 16 JSON.')
   dir.create(output, recursive=TRUE, showWarnings=FALSE)
   upload <- file.path(output,'upload');dir.create(upload)
   inventory <- list()
@@ -88,6 +91,7 @@ prepare_canonical_release <- function(manifests, output, allow_dirty = FALSE) {
       add('parquet',s$key,target,e$base_url)
     }
     # Preserve original build provenance, including truthful dirty status.
+    m$data_version <- e$data_version
     m$auto_eligible <- TRUE
     m$auto_functions <- e$auto_functions
     m$event_kind <- e$event_kind

@@ -26,14 +26,27 @@
     election_kind = c("ordinarie val" = "ordinary", Ordinarie = "ordinary",
       ordinarie = "ordinary", omval = "re_election"),
     voting_option_name = c(Ja = "yes", Nej = "no", Blank = "blank"),
-    status = c(besatt = "occupied", vakant = "vacant"),
+    status = c(besatt = "occupied", vakant = "vacant", okand = "unknown"),
     composition_type = c(efter_omval = "after_re_election"),
     source_kind = c(nuvarande = "current", avgangar = "departures",
       mandatfordelning = "allocation", ursprungligt_val = "original_election", historik = "history"),
     start_date_basis = c(kallrapporterat = "reported", matchat_ursprungligt_vald = "original_elected_match",
       ursprungligen_otillsatt = "original_unfilled_allocation",
+      rattat_ursprungligt_vald = "corrected_original_elected",
+      ursprunglig_observationsgrans = "original_election_observation_boundary",
       verifierad_vakans_efter_avgang = "departure_without_successor_verified_vacancy_control"),
-    end_date_basis = c(kallrapporterat = "reported", ersatt_genom_omval = "re_election_replacement"),
+    reported_end_reason = c(avgang = "departure", avsagelse = "resignation",
+      dodsfall = "death", mandatperiodens_slut = "term_end"),
+    start_reason = c(ordinarie_val = "ordinary_election", omval = "re_election",
+      eftertradare = "succession", vakans = "vacancy", tackningsgrans = "coverage_boundary"),
+    end_reason = c(omval = "re_election", avgang = "departure", avsagelse = "resignation",
+      dodsfall = "death", eftertradare = "succession", mandatperiodens_slut = "term_end",
+      tackningsgrans = "coverage_boundary"),
+    interval_coverage = c(kallkedja = "source_chain", enbart_ursprungligt_val = "original_election_only",
+      obestyrkt_kontinuitet = "unverified_continuity"),
+    component_scope_level = level,
+    end_date_basis = c(kallrapporterat = "reported", ersatt_genom_omval = "re_election_replacement",
+      ursprunglig_observationsgrans = "original_election_observation_boundary"),
     scope_level = level, event_scope_level = level,
     component_geographic_level = c(level, valkrets = "constituency"))
 }
@@ -46,14 +59,18 @@
   out$sex <- c(male = "man", female = "kvinna")
   out$ballot_status <- c(final = "definitiv", draft = "utkast", S = "S", B = "B")
   out$election_kind <- c(ordinary = "ordinarie", re_election = "omval")
-  out$status <- c(occupied = "besatt", vacant = "vakant")
+  out$status <- c(occupied = "besatt", vacant = "vakant", unknown = "okand")
   out$source_kind <- c(current = "nuvarande", departures = "avgangar",
     allocation = "mandatfordelning", original_election = "ursprungligt_val", history = "historik")
   out$start_date_basis <- c(reported = "kallrapporterat",
     original_elected_match = "matchat_ursprungligt_vald",
     original_unfilled_allocation = "ursprungligen_otillsatt",
+    corrected_original_elected = "rattat_ursprungligt_vald",
+    original_election_observation_boundary = "ursprunglig_observationsgrans",
     departure_without_successor_verified_vacancy_control = "verifierad_vakans_efter_avgang")
-  out$end_date_basis <- c(reported = "kallrapporterat", re_election_replacement = "ersatt_genom_omval")
+  out$end_date_basis <- c(reported = "kallrapporterat", re_election_replacement = "ersatt_genom_omval",
+    original_election_observation_boundary = "ursprunglig_observationsgrans")
+  out$reported_end_reason <- out$end_reason
   out$composition_type <- c(after_re_election = "efter_omval")
   for (f in c("scope_level", "event_scope_level", "component_geographic_level"))
     out[[f]] <- c(out$geographic_level, constituency = "valkrets")

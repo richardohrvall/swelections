@@ -6,6 +6,12 @@ and final checks. Its [file inventory](releases/data-v0.4.0-files.csv) contains 
 actual published sizes, SHA256 values and URLs. Package and data versions are
 separate; old releases are immutable. Do not overwrite their files or tags.
 
+The unpublished [v0.4.1 candidate](releases/v0.4.1.md) contains **200 assets and
+16 manifests**: 188 unchanged assets, two rebuilt completed-period histories and
+ten new final re-election results/seats assets. Its
+[file inventory](releases/data-v0.4.1-files.csv) identifies the exact planned payload.
+It must not overwrite frozen v0.4.0.
+
 Current data use schema 3 and [value/storage contracts 1/1](VALUE_CONTRACT.md).
 Canonical columns and technical values are English; Swedish output localizes
 column names and technical categories. Proper names and literal source IDs are
@@ -28,7 +34,9 @@ to activate new functions. English and Swedish wrappers use the same decision.
 4. If neither route exists, the request fails. Where supported, the message
    explains how to supply raw files explicitly with `source = "local"`.
 
-`source = "canonical"` explicitly requests actual manifest coverage.
+`source = "canonical"` explicitly requests actual manifest coverage. For
+re-elections, the central allowlist also restricts explicit canonical requests to
+results/seats; a private manifest cannot enable unimplemented candidate views.
 `source = "remote"` explicitly requests supported current Valmyndigheten sources,
 even when canonical exists. `source = "local"` reads the user's own saved source
 files in a supported layout; it does not access the network. `data_dir` and raw-root
@@ -40,8 +48,9 @@ RKL 2002 candidacies and EU 2009 preference votes are not auto-approved. A full
 private prototype does not expand the central list. Unavailable views/stages are
 not filled from other counts: in particular, preliminary 2018 results/mandates
 are rejected instead of returning final results. Newer supported elections
-without canonical retain their remote path. Re-election raw reads remain explicit
-local requests; their event/composition model is unchanged.
+without canonical retain their remote path. The five re-election events have
+approved canonical results/seats in v0.4.1; their raw replay remains explicit
+local. Their event/composition semantics and geographic restrictions are unchanged.
 
 ## Configuration and caching
 
@@ -55,7 +64,8 @@ results(2018, "municipal", source = "local", data_dir = "my_raw_archive")
 ```
 
 Manifest overrides can be named by `series:ordinary:year`, `series:year`, or legacy
-year keys. `swelections.canonical_assets_dir` and `swelections.canonical_base_url`
+year keys; re-election overrides use `rkl:re_election:year` to avoid selecting an
+ordinary election with the same year. `swelections.canonical_assets_dir` and `swelections.canonical_base_url`
 control explicit asset locations; `swelections.canonical_cache_dir` controls the
 canonical cache. Manifest keys include the family/event/year/version namespace.
 Asset bytes are checked against the manifest. A local canonical cache is still
@@ -92,6 +102,7 @@ Rscript data-raw/build-canonical-eu-2019.R RAW_ROOT OUTPUT_EU2019
 Rscript data-raw/build-canonical-eu-2024.R RAW_ROOT OUTPUT_EU2024
 Rscript data-raw/build-canonical-mandate-history.R 2014 OUTPUT_2014_RESULTS/manifest.json RAW_ROOT OUTPUT_2014
 Rscript data-raw/build-canonical-mandate-history.R 2018 OUTPUT_2018_RESULTS/manifest.json RAW_ROOT OUTPUT_2018
+Rscript data-raw/build-canonical-re-elections.R RAW_ROOT ORSA_RERUN_XML OUTPUT_RE_ELECTIONS
 ```
 
 Source-root layouts and required auxiliary snapshots differ by builder; use its
@@ -125,23 +136,26 @@ or byte differences. Check the full suite, R CMD check and source integrity.
 Build time, commit and corresponding JSON provenance/checksums may change on a
 fresh build; they are not permission to accept changed election data.
 
-Prepare a CSV with a `manifest` column containing the twelve final product build
+Prepare a CSV with a `manifest` column containing the sixteen final product build
 manifests (including the combined history products), then run:
 
 ```sh
 Rscript data-raw/prepare-canonical-release.R MANIFESTS.csv EMPTY_DISTRIBUTION
-Rscript data-raw/validate-canonical-release-metadata.R ORIGINAL_STAGE PORTABLE_STAGE MANIFESTS.csv
+Rscript development/validate-canonical-v0.4.1.R CANDIDATE FROZEN_V040_DOWNLOADS VALIDATION_OUTPUT
 ```
 
-The second command compares preserved original/nonportable and portable staging
-receipts when validating the metadata transformation. Preparation never changes
+The second command verifies the v0.4.1 inventory and actual activated API routing
+against the staged distribution. The older
+`data-raw/validate-canonical-release-metadata.R` is retained for frozen v0.4.0
+(190 assets/twelve products), not as the current generation validator.
+Preparation never changes
 Parquet bytes; source path conversion is portable provenance only. Raw/build
 manifests remain preserved. Public manifest fields do not require users to have
 our raw archive layout. Absolute-path detection and unchanged operational fields
 have separate regression coverage.
 
-The preparer is explicitly scoped to data-v0.4.0's twelve products and approved
-counts. It filters EU 2009's full fourteen-asset build to eight publishable assets;
+The current preparer is explicitly scoped to the sixteen v0.4.1 products and
+approved counts (200 assets). It filters EU 2009's full fourteen-asset build to eight publishable assets;
 the six preference bases must not be uploaded. A future product/version change
 needs review of the registry, preparer and tests, not manual additions to an
 upload directory. All release filenames must be globally unique.
@@ -158,3 +172,19 @@ Ragunda generation at its own URLs/cache namespace; no permanent old-format
 read-time upgrade or modification of old release files is used. Reproduce a frozen
 release from its tag and pinned sources. Later maintenance commits can have new
 code fingerprints without changing that historical build record.
+
+### Reproduce the v0.4.1 generation
+
+The coordinator retains the approved 188 frozen Parquet files unchanged and
+rebuilds only the two history products and ten re-election assets:
+
+```sh
+Rscript data-raw/prepare-canonical-v0.4.1.R FROZEN_V040_DOWNLOADS RAW_ROOT ORSA_RERUN_XML EMPTY_OUTPUT
+```
+
+It stages an independent v0.4.1 distribution and checks frozen input hashes.
+It does not modify or republish v0.4.0. The two completed history products use
+interval schema 2; the ongoing 2022 period remains remote. Model details and
+source coverage are maintained in [MANDATE_HISTORY.md](MANDATE_HISTORY.md).
+An uncommitted review build truthfully reports `build_tree_dirty = true`; it is
+not a substitute for the clean-commit rebuild required for publication.

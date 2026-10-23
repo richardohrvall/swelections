@@ -144,7 +144,7 @@ test_that("failed raw operations restore the request-local source context", {
 })
 
 test_that("published 2018 uses a new contract-specific manifest-cache key", {
-  expect_identical(.canonical_release(2018L)$cache_key, "data-v0.4.0")
+  expect_identical(.canonical_release(2018L)$cache_key, "data-v0.4.1")
   expect_identical(.canonical_release(2018L)$event_kind, "ordinary")
 })
 
@@ -234,5 +234,5 @@ test_that("same-version EU releases have independent year-specific manifest cach
     expect_identical(.canonical_release_manifest(releases[[i]]), cached[[i]])
   }
   # Explicit keys, including the published 2018 cache layout, stay compatible.
-  expect_identical(.canonical_release(2018L)$cache_key, "data-v0.4.0")
+  expect_identical(.canonical_release(2018L)$cache_key, "data-v0.4.1")
 })

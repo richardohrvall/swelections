@@ -1,14 +1,15 @@
 # Re-election validation and review report
 
-> Release status: [published v0.4.0](releases/v0.4.0.md). Dated source,
-> prototype and validation statements below are historical evidence, not current
-> activation/publication status. Source limitations and provenance remain applicable.
+> Current canonical validation: the [v0.4.1 candidate](releases/v0.4.1.md)
+> supports final results/seats for all five events. The original 17 October
+> implementation checks below are retained as historical source evidence;
+> their local-only statements do not describe the current candidate.
 
 
 Implementation date: 17 October 2026. No commit, push, tag or release was made.
 No original source or existing canonical asset was rebuilt or edited.
 
-## Final API
+## Current event API
 
 ```r
 election_events(election_kind = "re_election")
@@ -18,7 +19,9 @@ seats(year = 2010, election = "municipal", after_re_election = TRUE)
 seats(from = 2002, to = 2022, election = "municipal", after_re_election = TRUE)
 ```
 
-Preserved raw inputs must be configured; see [source setup](IMPLEMENTATION_OMVAL.md).
+Canonical results/seats need no raw archive after publication. To replay the
+source checks explicitly, use `source = "local"` and configure the preserved
+inputs described in [source setup](IMPLEMENTATION_OMVAL.md).
 These municipality selections cover all selected municipal areas, not just
 Örebro. Filter `municipality_code == "1880"` to inspect its composition.
 
@@ -31,7 +34,8 @@ composition uses municipality/region/national, avoiding simultaneous overlapping
 seat views. An ordinary year without a replacement keeps its original allocations.
 
 There is no `effective_seats()` export, no after-re-election vote/turnout view,
-no arbitrary as-of query and no membership-history or physical-person linkage.
+no effective-vote as-of query or physical-person linkage. Dated member/vacancy
+queries belong to the separate [mandate-history API](MANDATE_HISTORY.md).
 
 ## Verified events and compositions
 
@@ -131,9 +135,9 @@ Published 2018 RD/RF/KF `results()` and `seats()` were also compared through the
 public API against the preserved raw route: **six exact full-output comparisons
 passed**. The canonical cache used for these checks was isolated from the assets.
 
-New re-election canonical/raw routing is not claimed: no re-election canonical
-release/manifest exists. Explicit rerun `source = "canonical"` fails clearly;
-the new output schemas were tested through local Parquet round-trips instead.
+At the original v0.4.0 implementation stage, canonical re-election routing was
+unavailable and schemas were tested locally through Parquet. The v0.4.1
+canonical/raw checks below supersede that routing restriction.
 
 ## Tests and package check
 
@@ -174,8 +178,9 @@ several rows for the same party/municipality; sum `seats`, not repeated
 
 ## Explicit remaining limitations
 
-1. Reruns currently use preserved local final sources. Remote and canonical
-   rerun routes are unavailable; no automatic download/release was introduced.
+1. Final results/seats now have approved v0.4.1 canonical coverage, while raw
+   replay requires explicit local selection. A remote rerun route is unavailable.
+   The candidate is not a public distribution until separately published.
 2. Preliminary rerun results remain unsupported, including Falun pending a
    separately validated adapter. Final figures never fill preliminary gaps.
 3. Orsa's eight signed protocol attachments remain unrecovered. Its separately
@@ -195,37 +200,9 @@ several rows for the same party/municipality; sum `seats`, not repeated
 7. Additional geographic levels beyond those listed in IMPLEMENTATION_OMVAL.md
    fail explicitly. No technical `00` constituency is invented as a substantive
    constituency. Future partial replacements require verified component inputs.
-8. No full mandate-period history, effective vote composite or physical-person
-   harmonisation has been implemented.
-
-## Exact changed-file inventory
-
-Production and mapping:
-`R/re_elections.R` (new), `R/api_english.R`, `R/output_names.R`,
-`R/zzz_public_wrappers.R`, `NAMESPACE`,
-`inst/extdata/re-election-party-identifiers-2011.csv` (documented metadata lookup).
-
-Roxygen source documentation only:
-`R/api_mandat.R`, `R/api_valresultat.R`.
-
-Tests:
-`tests/testthat/test-re-elections.R` (new),
-`tests/testthat/test-release-contract.R` (expected new discovery export).
-
-Documentation/tooling:
-`README.md`, `man/results.Rd`, `man/seats.Rd`, `man/mandat.Rd`,
-`man/valresultat.Rd`, `man/election_events.Rd` (new),
-`development/IMPLEMENTATION_OMVAL.md` (new),
-`development/validate-re-elections.R` (new),
-`development/VALIDATION_OMVAL.md` (this report).
-
-The three untracked files from the preceding approved inventory are retained:
-`development/SOURCE_INVENTORY_OMVAL.md`,
-`development/SOURCE_INVENTORY_OMVAL_FILES.csv`,
-`development/SOURCE_INVENTORY_OMVAL_RETRIEVAL.csv`.
-
-No raw source files, archived source objects, SCB/SND data, generated Parquet
-files or package-check outputs are intended for Git tracking.
+8. No effective vote composite or physical-person harmonisation is supplied.
+   Membership history has separate public coverage (2014/2018 canonical, 2022
+   remote); event support does not extend it to original years 2002/2010.
 
 ## User-facing documentation clarification, 18 October 2026
 
@@ -259,3 +236,40 @@ Repeated validation after regeneration passed:
 - Final diff/whitespace review passed; no raw or generated assets are tracked.
 
 No canonical build, source edit, commit, push, tag or release was performed.
+
+## Canonical validation for v0.4.1
+
+The maintained builder and independent validator are:
+
+```sh
+Rscript data-raw/build-canonical-re-elections.R ARCHIVE_ROOT ORSA_RERUN_XML OUTPUT
+Rscript development/validate-canonical-re-elections.R ARCHIVE_ROOT ORSA_RERUN_XML OUTPUT VALIDATION_OUTPUT
+```
+
+The ten assets contain 20 supported table/level views. All **80 canonical/raw
+combinations** (two languages and two detail modes) match values, types, row order
+and attributes after mapping only raw source paths to portable provenance labels.
+Swedish wrappers match the equivalent English-interface Swedish output. Full
+retains standard columns and values. The 2011 aggregate reader retains named
+numeric column attributes through per-table `column_names_attributes` metadata.
+
+District populations, party/category sums, valid/cast/eligible counts and party
+mandates match the established official controls. All ten files pass schema/
+value/storage checks, size/SHA256 verification, byte-identical gzip Parquet round
+trips and repeated-build comparisons. The five effective compositions work from
+canonical alone: Orsa 31, VG 149, Örebro 65 (48 + 17), Båstad 41 and Falun 61.
+No combined-vote seat algorithm or inferred new person identity is used.
+
+Source-integrity validation checks the 54 inventoried originals, separately
+archived Orsa XML, 100 successfully preserved official web objects, and frozen
+v0.4.0 distribution receipts. Failed retrievals are not result sources. Original
+archives, candidate files and unimplemented preliminary/candidate material remain
+local for future work; no source byte was overwritten. Exact candidate-source
+populations and exclusions are consolidated in
+[the implementation record](IMPLEMENTATION_OMVAL.md#canonical-scope-and-preserved-auxiliary-sources).
+
+The final working-tree candidate checks (200 assets/16 manifests, 768 actual
+auto/canonical API combinations, complete tests and package check) are maintained
+in [the v0.4.1 release record](releases/v0.4.1.md). That record, not retired
+prototype readiness reports, is the current inventory and publication boundary.
+A clean committed rebuild remains required before publication.

@@ -1,4 +1,26 @@
 # Membership is a separate layer: none of these readers changes election results.
+.mh_election_date <- function(year) {
+  dates <- c(`2002`="2002-09-15", `2010`="2010-09-19", `2014`="2014-09-14",
+    `2018`="2018-09-09", `2022`="2022-09-11")
+  if (!as.character(year) %in% names(dates)) stop("Unknown original election date.", call. = FALSE)
+  as.Date(unname(dates[as.character(year)]))
+}
+
+# A replacement affects a geographic component, never implicitly its parent area.
+.mh_component_hit <- function(x, event) {
+  hit <- x$election_code == event$election_code[[1L]] &
+    x$electoral_area_code == event$electoral_area_code[[1L]]
+  level <- event$scope_level[[1L]]
+  if (level %in% c("municipal_constituency", "regional_constituency", "parliamentary_constituency")) {
+    if (any(hit & (is.na(x$constituency) | !nzchar(x$constituency))))
+      stop("Missing constituency for partial replacement scope.", call. = FALSE)
+    hit <- hit & x$constituency == event$scope_code[[1L]]
+  } else if (!level %in% c("municipality", "region"))
+    stop("Unsupported mandate replacement scope.", call. = FALSE)
+  hit[is.na(hit)] <- FALSE
+  hit
+}
+
 .mh_date <- function(x) {
   out <- suppressWarnings(as.Date(substr(x, 1L, 10L), format = "%Y-%m-%d"))
   if (any(!is.na(x) & is.na(out))) stop("Invalid mandate-history date.", call. = FALSE)
@@ -68,7 +90,7 @@
     paste0(area, const)))
   event <- col("Valtillf\u00e4lle")
   rerun <- grepl("omval", event, ignore.case = TRUE)
-  dates <- c(`2014` = "2014-09-14", `2018` = "2018-09-09", `2022` = "2022-09-11")
+  dates <- stats::setNames(as.character(.mh_election_date(year)), as.character(year))
   event_date <- rep(unname(dates[as.character(year)]), nrow(x))
   events <- .re_elections()
   labels <- tolower(gsub("[^A-Za-z0-9]", "", event))
@@ -79,7 +101,11 @@
   if (anyNA(labels) || any(!labels %in% allowed))
     stop("Membership source belongs to a different or unknown election period.", call. = FALSE)
   for (i in which(events$original_year == year)) {
-    hit <- rerun & type == events$election_code[[i]] & area == events$electoral_area_code[[i]]
+    hit <- rep(FALSE, nrow(x))
+    rows <- which(rerun & labels %in% c(paste0("omval", events$election_year[[i]]),
+      paste0("omval", gsub("-", "", events$election_date[[i]]))))
+    hit[rows] <- .mh_component_hit(data.frame(election_code = type[rows],
+      electoral_area_code = area[rows], constituency = const[rows]), events[i, ])
     event_date[hit] <- as.character(events$election_date[[i]])
   }
   if (any(rerun & event_date == dates[as.character(year)]))
@@ -161,7 +187,7 @@
 # This core takes independent allocation/elected/source tables, enabling tests
 # of chains and vacancies without network requests or raw archive dependencies.
 .mh_build <- function(year, allocations, original, history, current, departures, vacancies) {
-  date <- as.Date(c(`2014` = "2014-09-14", `2018` = "2018-09-09", `2022` = "2022-09-11")[[as.character(year)]])
+  date <- .mh_election_date(year)
   a <- allocations[allocations$seats > 0L, ]
   party_reference <- a
   if (!is.null(history)) party_reference <- dplyr::bind_rows(party_reference,
@@ -238,6 +264,8 @@
         paste(utils::head(observed$candidate_number[is.na(observed$seat_number)], 8L), collapse = ", "), call. = FALSE)
   }
   observed$key <- .mh_key(observed)
+  observed$interval_coverage <- "source_chain"
+  if (!"reported_end_reason" %in% names(observed)) observed$reported_end_reason <- NA_character_
   observed$reported_start_date <- observed$start_date
   observed$reported_end_date <- observed$end_date
   observed$start_date_basis <- "reported"
@@ -270,8 +298,7 @@
   # A rerun ends the old component even when surviving original members were
   # omitted from the later term export instead of recorded as departures.
   for (j in which(events$original_year == year)) {
-    candidates <- original[original$election_code == events$election_code[[j]] &
-      original$electoral_area_code == events$electoral_area_code[[j]], ]
+    candidates <- original[.mh_component_hit(original, events[j, ]), ]
     for (i in seq_len(nrow(candidates))) {
       r <- candidates[i, ]
       if (any(observed$key == r$key & observed$candidate_number %in% r$candidate_number &
@@ -280,6 +307,7 @@
       for (col in intersect(names(r), names(z))) z[[col]] <- r[[col]]
       z$start_date <- date; z$end_date <- as.Date(events$election_date[[j]])
       z$event_date <- date; z$election_kind <- "ordinary"; z$status <- "occupied"
+      z$interval_coverage <- "original_election_only"
       z$start_date_basis <- "original_elected_match"
       z$end_date_basis <- "re_election_replacement"
       z$source_kind <- "original_election"
@@ -292,7 +320,13 @@
   # Create a vacancy only when no subsequent holder exists and an independent
   # vacancy snapshot is available to verify the resulting chair counts.
   if (is.null(history) && !is.null(vacancies)) {
-    terminal <- which(!is.na(observed$end_date) & is.na(observed$successor_number))
+    closes_component <- rep(FALSE, nrow(observed))
+    for (j in which(events$original_year == year))
+      closes_component <- closes_component | (.mh_component_hit(observed, events[j, ]) &
+        observed$event_date < as.Date(events$election_date[[j]]) &
+        observed$end_date %in% as.Date(events$election_date[[j]]))
+    terminal <- which(!is.na(observed$end_date) & is.na(observed$successor_number) &
+      !closes_component)
     additions <- list()
     for (i in terminal) {
       next_row <- observed$key == observed$key[[i]] &
@@ -314,7 +348,8 @@
   empty <- current[is.na(current$candidate_number), , drop = FALSE]
   for (i in seq_len(nrow(empty))) {
     k <- .mh_key(empty[i, ])
-    if (!any(observed$key == k & observed$status == "vacant")) {
+    if (!any(observed$key == k & observed$event_date == empty$event_date[[i]] &
+        observed$status == "vacant")) {
       z <- empty[i, ]; z$key <- k; z$reported_start_date <- z$start_date
       if (is.na(z$start_date)) {
         if (!k %in% setdiff(slots$key, original$key)) stop("Undated vacancy without allocation evidence.", call. = FALSE)
@@ -340,14 +375,27 @@
   }
   # Re-elections replace their original chairs; do not append them to the active universe.
   for (i in which(events$original_year == year)) {
-    hit <- observed$election_code == events$election_code[[i]] &
-      observed$electoral_area_code == events$electoral_area_code[[i]] &
-      observed$election_kind == "ordinary"
     cut <- as.Date(events$election_date[[i]])
+    hit <- .mh_component_hit(observed, events[i, ]) & observed$event_date < cut
     hit <- hit & (is.na(observed$end_date) | observed$end_date > cut)
     observed$end_date[hit] <- cut
     observed$end_date_basis[hit] <- "re_election_replacement"
   }
+  observed$interval_coverage[is.na(observed$interval_coverage)] <- "source_chain"
+  uncertain <- which(observed$interval_coverage == "original_election_only")
+  additions <- list()
+  for (i in uncertain) {
+    if (observed$end_date[[i]] <= date + 1L) next
+    z <- observed[i, ]
+    z$start_date <- date + 1L
+    z$candidate_number <- NA_character_; z$name <- NA_character_
+    z$status <- "unknown"; z$interval_coverage <- "unverified_continuity"
+    z$start_date_basis <- "original_election_observation_boundary"
+    observed$end_date[[i]] <- date + 1L
+    observed$end_date_basis[[i]] <- "original_election_observation_boundary"
+    additions[[length(additions) + 1L]] <- z
+  }
+  observed <- dplyr::bind_rows(observed, dplyr::bind_rows(additions))
   observed$chair_id <- paste(year, observed$event_date, observed$key, sep = ":")
   observed <- observed[order(observed$chair_id, observed$start_date, observed$end_date), ]
   groups <- split(seq_len(nrow(observed)), observed$chair_id)
@@ -364,12 +412,10 @@
   observed$coverage_end <- min(current$source_as_of)
   boundaries <- c(date, min(current$source_as_of))
   for (i in which(events$original_year == year)) {
-    if (!any(a$election_code == events$election_code[[i]] &
-        a$electoral_area_code == events$electoral_area_code[[i]])) next
+    if (!any(.mh_component_hit(a, events[i, ]))) next
     cut <- as.Date(events$election_date[[i]])
     boundaries <- c(boundaries, cut - 1L, cut)
-    rerun <- observed[observed$election_code == events$election_code[[i]] &
-      observed$electoral_area_code == events$electoral_area_code[[i]] &
+    rerun <- observed[.mh_component_hit(observed, events[i, ]) &
       observed$election_kind == "re_election", ]
     at <- .mh_at(rerun, cut)
     expected <- events$verified_allocation[[i]]
@@ -394,6 +440,49 @@
     if (any(xx != yy)) stop("Vacancy intervals disagree with the vacancy control snapshot: ",
       paste(paste0(keys[xx != yy], " (intervals=", xx[xx != yy], ", control=", yy[xx != yy], ")"), collapse = "; "), call. = FALSE)
   }
+  observed$start_reason <- ifelse(observed$status == "vacant", "vacancy",
+    ifelse(observed$start_date == observed$event_date,
+      ifelse(observed$election_kind == "re_election", "re_election", "ordinary_election"), "succession"))
+  observed$start_reason[observed$status == "unknown"] <- "coverage_boundary"
+  observed$end_reason <- ifelse(is.na(observed$end_date), NA_character_, "departure")
+  observed$end_reason[observed$interval_coverage == "original_election_only"] <- "coverage_boundary"
+  # Never infer voluntary resignation, death or term end from a date alone.
+  if ("reported_end_reason" %in% names(observed)) {
+    r <- observed$reported_end_reason
+    if (any(!is.na(r) & !r %in% c("departure", "resignation", "death", "term_end")))
+      stop("Unsupported source-reported end reason.", call. = FALSE)
+    hit <- !is.na(r) & !is.na(observed$end_date)
+    observed$end_reason[hit] <- r[hit]
+  }
+  for (ii in groups) {
+    for (j in seq_along(ii)) {
+      i <- ii[[j]]
+      if (observed$status[[i]] == "vacant" && !is.na(observed$end_date[[i]]))
+        observed$end_reason[[i]] <- "succession"
+      if (j > 1L && observed$status[[i]] == "occupied")
+        observed$start_reason[[i]] <- "succession"
+    }
+  }
+  for (j in which(events$original_year == year)) {
+    hit <- .mh_component_hit(observed, events[j, ]) & observed$event_date < as.Date(events$election_date[[j]]) &
+      observed$end_date %in% as.Date(events$election_date[[j]])
+    observed$end_reason[hit] <- "re_election"
+  }
+  observed$component_scope_level <- ifelse(nzchar(observed$constituency),
+    ifelse(observed$election_code == "KF", "municipal_constituency",
+      ifelse(observed$election_code == "RF", "regional_constituency", "parliamentary_constituency")),
+    ifelse(observed$election_code == "KF", "municipality", ifelse(observed$election_code == "RF", "region", "national")))
+  observed$component_scope_code <- ifelse(nzchar(observed$constituency), observed$constituency, observed$electoral_area_code)
+  observed$component_start_date <- observed$event_date
+  observed$component_end_date <- as.Date(NA)
+  for (j in which(events$original_year == year)) {
+    cut <- as.Date(events$election_date[[j]])
+    hit <- .mh_component_hit(observed, events[j, ]) & observed$event_date < cut &
+      (is.na(observed$component_end_date) | observed$component_end_date > cut)
+    observed$component_end_date[hit] <- cut
+  }
+  observed$component_id <- paste(year, observed$event_date, observed$election_code,
+    observed$component_scope_level, observed$component_scope_code, sep = ":")
   observed$election_year <- as.integer(year)
   observed$original_candidate_number <- original$candidate_number[match(observed$key, original$key)]
   observed$municipality_code <- ifelse(observed$election_code == "KF", observed$electoral_area_code, NA_character_)
@@ -401,7 +490,7 @@
   observed$municipal_constituency_code <- ifelse(observed$election_code == "KF" & nzchar(observed$constituency), observed$constituency, NA_character_)
   observed$constituency_code <- ifelse(observed$election_code != "KF" & nzchar(observed$constituency), observed$constituency, NA_character_)
   observed$interval_id <- paste(observed$chair_id, observed$start_date,
-    ifelse(is.na(observed$candidate_number), "vacant", observed$candidate_number), seq_len(nrow(observed)), sep = ":")
+    ifelse(is.na(observed$candidate_number), observed$status, observed$candidate_number), seq_len(nrow(observed)), sep = ":")
   observed
 }
 
@@ -414,8 +503,10 @@
     "municipal_constituency_code", "party_code", "party_abbreviation", "seat_number",
     "candidate_number", "name", "status", "start_date", "end_date", "start_date_basis",
     "end_date_basis", "correction_date", "correction_reference", "coverage_end")
+  standard <- c(standard, "component_id", "component_scope_level", "component_scope_code",
+    "start_reason", "end_reason", "interval_coverage", "component_start_date", "component_end_date")
   extra <- c("reported_start_date", "source_file", "source_md5", "source_as_of", "source_row", "source_kind",
-    "original_candidate_number", "reported_end_date")
+    "original_candidate_number", "reported_end_date", "reported_end_reason")
   x <- x[, c(standard, if (detail == "full") extra), drop = FALSE]
   for (k in names(x)) if (inherits(x[[k]], "Date"))
     x[[k]] <- structure(as.integer(x[[k]]), class = "Date")
@@ -426,8 +517,15 @@
       "partiforkortning", "mandatnummer", "kandidatnummer", "namn", "status",
       "startdatum", "slutdatum", "startdatumgrund", "slutdatumgrund", "rattelsedatum",
       "rattelsereferens", "tackning_till", "kallrapporterat_startdatum", "kallfil",
-      "kall_md5", "kalldatum", "kallrad", "kalltyp", "ursprungligt_kandidatnummer", "kallrapporterat_slutdatum")
-    names(x) <- swedish[seq_len(ncol(x))]
+      "kall_md5", "kalldatum", "kallrad", "kalltyp", "ursprungligt_kandidatnummer", "kallrapporterat_slutdatum", "kallrapporterad_slutorsak")
+    map <- stats::setNames(swedish, c(setdiff(standard, c("component_id",
+      "component_scope_level", "component_scope_code", "start_reason", "end_reason", "interval_coverage",
+      "component_start_date", "component_end_date")), extra))
+    map <- c(map, component_id = "mandatkomponent_id", component_scope_level = "komponent_omfattningsniva",
+      component_scope_code = "komponent_omfattningskod", start_reason = "startorsak",
+      end_reason = "slutorsak", interval_coverage = "intervalltackning",
+      component_start_date = "komponent_startdatum", component_end_date = "komponent_slutdatum")
+    names(x) <- unname(map[names(x)])
   }
   x
 }
@@ -447,6 +545,27 @@
 #' Ragunda's corrected original 2018 result starts on election day, with the
 #' 12 December correction recorded separately. Re-elections replace original
 #' components from their own event date within the continuing period.
+#'
+#' Components retain `component_id`, geographic `component_scope_level`/
+#' `component_scope_code` and `component_start_date`/`component_end_date`. Partial
+#' replacements close only the affected constituency; other components continue.
+#' `start_reason` and `end_reason` are separate from date provenance: ordinary_election,
+#' re_election, succession, vacancy, departure or coverage_boundary as applicable.
+#' Resignation, death and term_end require explicit source evidence; a departure
+#' date alone does not establish any of these causes. An open end is not a
+#' fabricated term end.
+#'
+#' For Båstad's original 2014 cohort, the surviving exports verify election-day
+#' holders but not their continuity until the 2015 re-election. History retains
+#' election-day observations and allocated chairs with status unknown and
+#' interval_coverage unverified_continuity from the next day until replacement.
+#' This is a knowledge boundary, not an inferred departure. Both dated functions
+#' fail when their selected population includes such an interval, rather than
+#' silently omitting chairs or asserting vacancies.
+#'
+#' Histories with the older canonical schema require a separately validated
+#' rebuild before this reader can use them. No frozen published asset is modified.
+#' Internal model support for older events does not extend public year coverage.
 #'
 #' Source dates, hashes and row references are available with `detail = "full"`.
 #' Coverage is bounded by the inspected source dates. Remote coverage is bounded by
@@ -498,6 +617,8 @@ mandate_history <- function(year = 2018, election = NULL, data_dir = NULL,
     stop("Snapshot date is outside verified source coverage.", call. = FALSE)
   x <- .mh_at(x, date)
   if (anyDuplicated(x$chair_id)) stop("Multiple holders for one chair at snapshot date.", call. = FALSE)
+  if (any(x$status == "unknown"))
+    stop("Snapshot includes unverified holder continuity; inspect mandate_history() interval_coverage.", call. = FALSE)
   x <- x[x$status == status, ]
   .mh_present(x, match.arg(names, c("en", "sv")), match.arg(detail, c("standard", "full")))
 }

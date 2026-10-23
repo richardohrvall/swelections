@@ -164,11 +164,11 @@ separate ordinary and re-election events. \code{year} and \code{election_year} r
 the actual polling year. Örebro 2011 covers Nordöstra only, not all Örebro.
 Use \code{\link[=election_events]{election_events()}} to discover events, scopes and original-election links.
 
-Current re-election readers require preserved local final-result sources in
-\code{data_dir} or explicit paths through \code{options(swelections.re_election_sources = ...)}.
-Use \code{source = "local"} or \code{"auto"}. The ordinary-election source rules below
-do not enable remote/canonical re-election sources, update/archive operations
-or preliminary re-election readers; these are unavailable.
+Final re-election results and seats use published canonical data with
+\code{source = "auto"} or \code{"canonical"}. Explicit \code{source = "local"} accepts
+compatible preserved sources via \code{data_dir} or
+\code{options(swelections.re_election_sources = ...)}. Auto never chooses local.
+Remote, update/archive and preliminary re-election readers are unavailable.
 No post-re-election combined vote or turnout result is provided.
 }
 

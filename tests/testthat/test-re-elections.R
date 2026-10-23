@@ -79,7 +79,7 @@ test_that('event ranges select all reruns and do not reinterpret year as parent 
   expect_identical(x$election_year,c(2003L,2011L,2015L,2019L))
   expect_error(seats(year=2010,election='municipal',election_kind='re_election'),'No matching')
   expect_error(results(year=2011,from=2010,election='municipal',election_kind='re_election'),'alternative')
-  expect_error(seats(year=2011,election='municipal',election_kind='re_election',source='canonical'),'No canonical')
+  # Canonical transport is tested separately; never contact an unpublished release here.
   expect_error(results(year=2011,election='municipal',election_kind='re_election',count='preliminary',source='local'),'final sources will not replace')
 })
 

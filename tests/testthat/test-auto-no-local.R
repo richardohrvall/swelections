@@ -118,7 +118,8 @@ test_that("partial EU 2009 approval uses canonical for six functions, never loca
 })
 
 test_that("re-election auto never selects a preserved local archive", {
-  local_mocked_bindings(.re_file = function(...) stop("must not inspect user archive"))
+  local_mocked_bindings(.re_file = function(...) stop("must not inspect user archive"),
+    .canonical_manifest_path = function(...) stop("canonical fixture unavailable"))
   for (year in c(2003L, 2011L, 2015L, 2019L))
-    expect_error(seats(year, "municipal", election_kind = "re_election"), 'source = "local"')
+    expect_error(seats(year, "municipal", election_kind = "re_election"), "canonical fixture unavailable")
 })

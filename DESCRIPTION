@@ -1,6 +1,6 @@
 Package: swelections
 Title: Read and Harmonise Swedish Election Results
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: person("Richard", "Öhrvall", email = "richard.ohrvall@gmail.com",
     role = c("aut", "cre"))
 Description: Downloads, archives and parses Swedish election data published by

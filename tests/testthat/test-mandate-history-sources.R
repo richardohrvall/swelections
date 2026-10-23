@@ -159,3 +159,14 @@ test_that("conflicting remote holder snapshots fail rather than inventing an int
   current<-z$u;current$candidate_number[1]<-"999"
   expect_error(.mh_check_remote_current(x,current),"disagree")
 })
+
+test_that("older canonical histories cannot silently bypass component and reason semantics", {
+  legacy <- tibble::tibble(election_year=2018L,status="occupied")
+  local_mocked_bindings(.canonical_manifest_path=function(...)"fixture",
+    .canonical_manifest=function(...)list(tables=data.frame(asset="rkl2018-mandate-history",
+      table="intervals",columns=paste(names(legacy),collapse=","))),
+    .canonical_require_reader=function(...)NULL,
+    .canonical_view_covered=function(...)TRUE,
+    .canonical_fetcher=function(...)function(...)legacy)
+  expect_error(.mh_canonical(2018L,"KF",FALSE),"validated history rebuild is required")
+})

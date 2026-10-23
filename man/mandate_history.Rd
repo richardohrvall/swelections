@@ -87,6 +87,27 @@ Ragunda's corrected original 2018 result starts on election day, with the
 12 December correction recorded separately. Re-elections replace original
 components from their own event date within the continuing period.
 
+Components retain \code{component_id}, geographic \code{component_scope_level}/
+\code{component_scope_code} and \code{component_start_date}/\code{component_end_date}. Partial
+replacements close only the affected constituency; other components continue.
+\code{start_reason} and \code{end_reason} are separate from date provenance: ordinary_election,
+re_election, succession, vacancy, departure or coverage_boundary as applicable.
+Resignation, death and term_end require explicit source evidence; a departure
+date alone does not establish any of these causes. An open end is not a
+fabricated term end.
+
+For Båstad's original 2014 cohort, the surviving exports verify election-day
+holders but not their continuity until the 2015 re-election. History retains
+election-day observations and allocated chairs with status unknown and
+interval_coverage unverified_continuity from the next day until replacement.
+This is a knowledge boundary, not an inferred departure. Both dated functions
+fail when their selected population includes such an interval, rather than
+silently omitting chairs or asserting vacancies.
+
+Histories with the older canonical schema require a separately validated
+rebuild before this reader can use them. No frozen published asset is modified.
+Internal model support for older events does not extend public year coverage.
+
 Source dates, hashes and row references are available with \code{detail = "full"}.
 Coverage is bounded by the inspected source dates. Remote coverage is bounded by
 both history and current-member dates. Later dates fail rather than extrapolate.

@@ -6,6 +6,11 @@ The [frozen v0.4.0 record](releases/v0.4.0.md) gives the published commit,
 file sizes, hashes and URLs. Raw sources, caches and generated outputs stay
 outside Git. No Python executable is required.
 
+The separate [v0.4.1 candidate record](releases/v0.4.1.md) and
+[planned inventory](releases/data-v0.4.1-files.csv) cover 200 assets and sixteen
+manifests, including five final results/seats re-elections and two rebuilt
+mandate-history products. This is not yet a published release.
+
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for R dependencies and package checks.
 Run tools from the repository root with an explicitly configured library/input
 archive. Historical snapshots are not interchangeable with current remote files.
@@ -55,7 +60,10 @@ source links for future geography work; no GIS implementation is implied.
 [CANONICAL_DATA.md](CANONICAL_DATA.md) lists the complete build sequence. Keep
 all `data-raw/build-canonical-*.R` builders, `canonical-build-contract.R`,
 `prepare-canonical-2022.R`, `export-canonical-parquet-2018.R` and the release
-preparer/metadata validator. History uses the two combined 2014/2018 manifests.
+preparer and frozen-release metadata validator. History uses the two combined
+2014/2018 manifests. `data-raw/prepare-canonical-v0.4.1.R` coordinates the new
+generation without changing frozen v0.4.0 inputs;
+`data-raw/build-canonical-re-elections.R` retains the five separate event scopes.
 
 - `data-raw/preserve-final-2002.R` and `data-raw/preserve-final-2006.R` preserve
   official sources sequentially with provenance, without replacing original files.
@@ -83,6 +91,8 @@ preparer/metadata validator. History uses the two combined 2014/2018 manifests.
 | `test_r_only_preparation.R`, `test_source_retrieval.R` | Deterministic ZIP/JSON and retrieval/backoff/cache regressions |
 | `validate_r_only_2022.R` | Historical preparation-migration comparison; requires the preserved old staging reference, not ordinary release inputs |
 | `validate-re-elections.R` | Independent omval controls; requires tracked `SOURCE_INVENTORY_OMVAL_FILES.csv` |
+| `validate-canonical-re-elections.R` | All final re-election canonical/raw levels, languages, details and source controls |
+| `validate-canonical-v0.4.1.R` | Current 200-asset/16-manifest inventory, hashes/schema/roundtrips and actual activated API routing |
 | `run_2022_sweep.R`, `run_mandat_2022_sweep.R`, `validate_tomma_stolar_2026.R` | Explicit opt-in official remote sweeps, distinct from pinned-source reproducibility |
 | `data-raw/validate-electorate-2003.R` | Independent SCB composition checks plus a legacy prototype regression; its old physical-layout assertions are schema-specific |
 
@@ -104,3 +114,14 @@ as current specifications. The [release record](releases/v0.4.0.md) links that
 history and the two retired schema-2 migration/incremental tools. Their local
 copies and evidence remain ignored. No original sources or published assets are
 deleted by this documentation cleanup.
+
+## Consolidated v0.4.1 preparation
+
+Temporary re-election readiness, membership audit and intermediate component-model
+reports are consolidated into [IMPLEMENTATION_OMVAL.md](IMPLEMENTATION_OMVAL.md),
+[VALIDATION_OMVAL.md](VALIDATION_OMVAL.md) and
+[MANDATE_HISTORY.md](MANDATE_HISTORY.md). The current release decisions, exact file
+inventory and final validation belong to [releases/v0.4.1.md](releases/v0.4.1.md).
+Original report copies and diagnostic receipts remain in ignored local storage.
+No source collections, independent validators, canonical builders or GIS source
+links are retired by this consolidation.

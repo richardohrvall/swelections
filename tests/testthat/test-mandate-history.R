@@ -150,3 +150,17 @@ test_that("2014 separate exports reconstruct multi-step chains and terminal vaca
   x <- .mh_build(2014, z$a, z$e, NULL, current, dep, z$v)
   expect_equal(sum(.mh_at(x, as.Date("2014-09-14"))$status == "vacant"), 2L)
 })
+
+ test_that("ordinary succession remains separate from replacement and cause is not invented", {
+  z <- mh_fixture();x <- mh_fixture_build(z)
+  expect_true(all(x$end_reason[x$candidate_number %in% c("101","102","104")]=="departure"))
+  expect_true(all(x$start_reason[x$candidate_number %in% c("102","103")]=="succession"))
+  expect_equal(x$start_reason[x$status=="vacant"],rep("vacancy",2L))
+  expect_false(any(x$end_reason %in% c("resignation","death","term_end","re_election")))
+  z$h$reported_end_reason <- c("resignation","death",NA,"departure")
+  x <- mh_fixture_build(z)
+  expect_equal(x$end_reason[x$candidate_number %in% "101"],"resignation")
+  expect_equal(x$end_reason[x$candidate_number %in% "102"],"death")
+  z$h$reported_end_reason[1]<-"unsupported-guess"
+  expect_error(mh_fixture_build(z),"Unsupported source-reported end reason")
+})
