@@ -271,7 +271,7 @@ test_that("the intended public namespace is fixed", {
                   c("results", "seats", "candidacies", "candidates",
                     "elected", "substitutes", "valresultat", "mandat",
                     "kandidaturer", "kandidater", "personroster", "valda",
-                    "ersattare", "preference_votes", "election_events",
+                    "ersattare", "preference_votes", "election_events", "valtillfallen",
                     "mandate_history", "members_at", "vacant_seats_at",
                     "mandathistorik", "ledamoter_vid", "tomma_stolar_vid"))
 })

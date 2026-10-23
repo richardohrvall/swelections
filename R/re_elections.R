@@ -105,7 +105,7 @@
 #' election_events(2011, "municipal", "re_election") # Örebro Nordöstra
 #' election_events(2015, "municipal", "re_election") # Båstad
 #' election_events(2019, "municipal", "re_election") # Falun
-#' @seealso [results()], [seats()]
+#' @seealso [valtillfallen()], [results()], [seats()]
 #' @param year Event year(s), or `"all"`.
 #' @param election Election type(s), as in [results()]. `NULL` selects RD/RF/KF.
 #' @param election_kind `"ordinary"`, `"re_election"` or `"all"`.
@@ -132,6 +132,58 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   }
   if(!identical(year,'all')) { yrs <- .re_years(year,FALSE,NULL,NULL,unique(out$election_year));out<-out[out$election_year %in% yrs,] }
   out[order(out$election_date,out$election_code,out$scope_code),]
+}
+
+#' Upptäck ordinarie val och omval
+#'
+#' Svensk motsvarighet till [election_events()]. Funktionen listar valtillfällen
+#' utan att hämta resultat. Omval är egna valtillfällen inom den ursprungliga
+#' mandatperioden. Listan hjälper till att välja år och valtyp, men behöver inte
+#' anropas före [valresultat()] eller [mandat()].
+#'
+#' @param ar Valhändelsens år, en vektor av år eller `"alla"`.
+#' @param val Valtyp RD, RF eller KF, alternativt E för Europaparlamentsval.
+#'   `NULL` väljer RD, RF och KF, precis som i [election_events()].
+#' @param valklass `"ordinarie"`, `"omval"` eller `"alla"`.
+#'   Motsvarande engelska värden accepteras också.
+#' @return En tibble med svenska kolumnnamn och tekniska kategorier. Namn,
+#'   valtillfälles-ID, datum, källhänvisningar och sakuppgifter bevaras.
+#'   Tillgänglighetsuppgifter är metadata, inte en garanti om alla datavyer.
+#' @seealso [election_events()], [valresultat()], [mandat()]
+#' @examples
+#' valtillfallen(valklass = "omval")
+#' valtillfallen(ar = 2011, val = "KF", valklass = "omval")
+#' @export
+valtillfallen <- function(ar = "alla", val = NULL, valklass = "alla") {
+  if (identical(ar, "alla")) ar <- "all"
+  x <- election_events(year = ar, election = val,
+    election_kind = .swedish_election_kind(valklass))
+  x <- .values_present(x, "sv")
+  basis <- "Event-specific electoral roll; register reference 30 days before polling; corrections remain source-specific"
+  if ("electoral_roll_basis" %in% names(x)) {
+    hit <- !is.na(x$electoral_roll_basis) & x$electoral_roll_basis == basis
+    x$electoral_roll_basis[hit] <- paste0("Valtillf\u00e4llets egen r\u00f6stl\u00e4ngd; registerdatum 30 dagar f\u00f6re valdagen; ",
+      "r\u00e4ttelser \u00e4r k\u00e4llspecifika")
+  }
+  columns <- c(election_year = "valar", election_date = "valdatum",
+    election_code = "valtyp", scope_level = "omfattningsniva",
+    scope_code = "omfattningskod", scope_name = "omfattningsnamn",
+    original_year = "ursprungligt_valar", seats_expected = "forvantade_mandat",
+    election_event = "valtillfalle", election_kind = "valklass",
+    original_election_event = "ursprungligt_valtillfalle", mandate_period = "mandatperiod",
+    electoral_roll_reference_date = "rostlangd_referensdatum", electoral_roll_basis = "rostlangdsgrund",
+    electoral_area_code = "valomradeskod", electoral_area_name = "valomradesnamn",
+    comparison_stem = "jamforelsefilbas", geography_file = "geografifil",
+    geography_sha256 = "geografi_sha256", source_url = "kalla_url",
+    protocol_reference = "protokollreferens", annulment_decision_reference = "upphavandebeslut_referens",
+    annulment_decision_date = "upphavandebeslut_datum", final_results_available = "slutresultat_tillgangligt",
+    final_seats_available = "slutlig_mandatfordelning_tillganglig", canonical_available = "canonical_tillgangligt",
+    preliminary_available = "preliminar_tillgangligt", verified_allocation = "verifierad_mandatfordelning",
+    final_result_decision_date = "slutresultat_beslutsdatum", final_count_ended_date = "slutrakning_avslutad_datum",
+    final_sha256 = "slutresultat_sha256", seats_sha256 = "mandat_sha256")
+  stopifnot(all(names(x) %in% names(columns)))
+  names(x) <- unname(columns[names(x)])
+  x
 }
 
 .re_ordinary_hint <- function(year, election, from, to) {

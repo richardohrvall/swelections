@@ -565,7 +565,10 @@
 #'
 #' Histories with the older canonical schema require a separately validated
 #' rebuild before this reader can use them. No frozen published asset is modified.
-#' Internal model support for older events does not extend public year coverage.
+#' The published 2014 and 2018 histories include Båstad 2015 and Falun 2019
+#' within their original periods. The general component model also supports
+#' Orsa 2003 and the 2011 re-election scopes, but no public 2002 or 2010 history
+#' product is provided. Model support does not extend public data coverage.
 #'
 #' Source dates, hashes and row references are available with `detail = "full"`.
 #' Coverage is bounded by the inspected source dates. Remote coverage is bounded by

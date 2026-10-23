@@ -21,6 +21,7 @@ export(tomma_stolar_vid)
 export(vacant_seats_at)
 export(valda)
 export(valresultat)
+export(valtillfallen)
 importFrom(utils,
   download.file,
   unzip

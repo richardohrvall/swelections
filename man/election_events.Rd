@@ -43,5 +43,5 @@ election_events(2015, "municipal", "re_election") # Båstad
 election_events(2019, "municipal", "re_election") # Falun
 }
 \seealso{
-\code{\link[=results]{results()}}, \code{\link[=seats]{seats()}}
+\code{\link[=valtillfallen]{valtillfallen()}}, \code{\link[=results]{results()}}, \code{\link[=seats]{seats()}}
 }

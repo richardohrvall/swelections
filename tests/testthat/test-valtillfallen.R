@@ -1,0 +1,52 @@
+test_that("Swedish event discovery matches English selection without downloads", {
+  local_mocked_bindings(.download_file = function(...) stop("network forbidden"))
+  en <- election_events(election_kind = "re_election")
+  sv <- valtillfallen(valklass = "omval")
+  expect_equal(nrow(sv), 5L)
+  expect_identical(sv$valtillfalle, en$election_event)
+  expect_identical(sv$valar, en$election_year)
+  expect_identical(sv$valdatum, en$election_date)
+  expect_identical(sv$omfattningsnamn, en$scope_name)
+  expect_identical(sv$ursprungligt_valtillfalle, en$original_election_event)
+  expect_identical(sv$mandatperiod, en$mandate_period)
+  expect_identical(sv$verifierad_mandatfordelning, en$verified_allocation)
+  expect_identical(sv$kalla_url, en$source_url)
+  expect_identical(sv$slutresultat_sha256, en$final_sha256)
+  expect_identical(sv$upphavandebeslut_datum, en$annulment_decision_date)
+  expect_identical(sv$canonical_tillgangligt, en$canonical_available)
+  expect_type(sv$slutresultat_tillgangligt, "logical")
+  expect_true(all(sv$valklass == "omval"))
+  expect_identical(.value_recode(sv$omfattningsniva,
+    .value_dictionary()$scope_level,"scope_level"), en$scope_level)
+  expect_true(all(grepl("röstlängd",sv$rostlangdsgrund,fixed=TRUE)))
+  expect_identical(election_events(election_kind = "re_election"), en)
+})
+
+test_that("Swedish event discovery preserves defaults, vectors and empty results", {
+  en <- election_events()
+  sv <- valtillfallen()
+  expect_identical(sv$valtillfalle,en$election_event)
+  expect_identical(sv$valar,en$election_year)
+  expect_setequal(sv$valklass,c("ordinarie","omval"))
+  expect_identical(valtillfallen(ar="all",valklass="re_election"),
+    valtillfallen(valklass="omval"))
+  for(i in seq_len(nrow(.re_elections()))) {
+    e <- .re_elections()[i,]
+    x <- valtillfallen(ar=e$election_year,val=e$election_code,valklass="omval")
+    expect_equal(nrow(x),1L)
+    expect_identical(x$valtillfalle,e$election_event)
+    expect_equal(x$forvantade_mandat,e$seats_expected)
+  }
+  expect_equal(nrow(valtillfallen(ar=c(2003,2019),valklass="omval")),2L)
+  expect_identical(valtillfallen(ar=2019,val="municipal",valklass="omval"),
+    valtillfallen(ar=2019,val="KF",valklass="omval"))
+  expect_equal(nrow(valtillfallen(ar=2019,val="E",valklass="ordinarie")),1L)
+  empty <- valtillfallen(ar=2024,val="E",valklass="omval")
+  expect_equal(nrow(empty),0L)
+  expect_type(empty$valar,"integer")
+  expect_type(empty$slutresultat_tillgangligt,"logical")
+  expect_s3_class(empty$upphavandebeslut_datum,"Date")
+  expect_error(valtillfallen(valklass="bad"),"Unknown election kind")
+  expect_error(valtillfallen(ar=2011.5),"integer")
+  expect_error(valtillfallen(val="bad"),"Invalid")
+})
