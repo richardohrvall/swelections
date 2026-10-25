@@ -67,8 +67,8 @@ requires optional \code{readxl}. Public redacted candidate names are \code{NA}.
 Preliminary 2019 results retain ten named parties plus other parties.
 The fixed final result has 20 seats; later Brexit changes are excluded.
 Local EU input may be the \code{eu/2024} archive itself or its parent root;
-read-only snapshots do not support \code{update} or \code{archive}. Unpublished EU
-canonical builds require an explicitly configured local manifest.}
+read-only snapshots do not support \code{update} or \code{archive}. Published canonical
+coverage is selected by \code{auto}; EU 2009 preference votes require explicit local sources.}
 
 \item{count}{\code{"final"} or \code{"preliminary"}.}
 
@@ -76,29 +76,13 @@ canonical builds require an explicitly configured local manifest.}
 the election. Supported combinations depend on election and year;
 unsupported combinations give an error.}
 
-\item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
-\code{auto} prefers approved canonical coverage for the requested election family,
-event, year and view, even when local raw files exist. Without that coverage,
-it uses a supported remote route, never the user's local raw files.
-If neither is available, select \code{source = "local"} explicitly for a saved
-archive. Explicit \code{remote} uses Valmyndigheten
-where supported; \code{local} requires the user's saved raw archive and never
-uses the network. \code{canonical} requires canonical data without raw fallback.
-Use \code{source = "local"} to select \code{data_dir} instead of canonical under \code{auto}.
-Private prototypes cannot extend automatic permission. Configured manifests may be
-a single path or named paths keyed by \code{series:ordinary:year} (e.g.
-\code{eu:ordinary:2014}), \code{series:year}, or legacy year keys. See \link{data_sources}.
-Canonical Parquet reading requires optional package \code{nanoparquet}.
-The 2014 raw route requires a preserved local archive: final XML under
-\code{2014/valresultat/slutresultat_20141001}, election-night XML under
-\code{2014/valresultat/valnatt}, ballot files under \code{2014/kandidater}, and the
-independently captured preliminary collection-district presentation.
-Remote/update/archive operations are not implemented for this historical
-source collection. Preliminary results combine ordinary election-night
-districts with preliminary collection districts, never final collection
-votes. Seats, elected members, substitutes and preference votes use final
-election XML; later membership files are excluded. Candidate names are
-typed missing values. Unsupported historical attributes remain missing.}
+\item{source}{How data are obtained. \code{"auto"} selects approved canonical
+coverage, otherwise a supported current remote source; never local files.
+\code{"canonical"} explicitly reads canonical data. \code{"remote"} explicitly reads a
+supported official Valmyndigheten source. Neither silently falls back to
+another source. \code{"local"} reads your own compatible raw archive using
+\code{data_dir}. Canonical reading requires \code{nanoparquet}. See \link{data_sources}
+for source requirements, historical archives and manifest configuration.}
 
 \item{data_dir}{Local root directory for raw files.}
 
@@ -139,20 +123,19 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=valresultat]{valresultat()}}.
 }
 \description{
+Read official voting results at one geographic level and counting stage.
+The English interface returns English columns and technical categories;
+Swedish output preserves the same observations and values. See \link{data_sources}.
+}
+\details{
 2002 final results use preserved official XML; the original Orsa election
 is separate from its 2003 rerun. Candidate keys identify source observations,
 not persons; names are missing and full ballot candidacies are unavailable.
 Full preliminary collection results remain unrecovered.
-2006 requires preserved local final sources or an explicitly configured
-unpublished canonical build; full preliminary results are unavailable.
+2006 final data are available through published canonical tables or compatible
+local raw sources; complete preliminary results are unavailable.
 Candidate numbers in 2006 identify source observations rather than people.
 See the repository's 2006 implementation documentation for source limitations.
-}
-\details{
-Read official voting results at one geographic level and one count stage.
-The English interface uses English column names and technical categories.
-Swedish output localizes those categories. Proper names and literal source
-identifiers are preserved; Boolean properties remain logical. See \link{data_sources}.
 }
 \section{Re-elections}{
 

@@ -1,5 +1,8 @@
 #' Personröster per personvalsområde, valdistrikt eller större valområde
 #'
+#' Läser rapporterade personröster på stödd geografisk nivå eller per lista.
+#'
+#' @details
 #' För 2002 används bevarad officiell slutlig XML och hashverifierade historiska
 #' Valmyndigheten-sidor för RD-distrikt i Halmstad, Laholm och Kungsbacka.
 #' HTML-fältet Nr anger personröstrang, inte valsedelsposition eller person-ID.
@@ -91,7 +94,7 @@
 #'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 #'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
 #'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
-#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+#'   `"canonical"` använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.

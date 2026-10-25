@@ -27,7 +27,7 @@
 #' A missing or incomplete
 #' preliminary source is never replaced by final data.
 #'
-#' The release-candidate registry enables RKL 2002--2022, EU 2004--2024 and the
+#' Published canonical coverage enables RKL 2002--2022, EU 2004--2024 and the
 #' 2003 referendum under data-v0.4.1. RKL 2002 excludes candidacies; the referendum
 #' supports results only. EU 2009 excludes automatic preference votes even if a
 #' configured private manifest contains those assets. Use explicit local sources
@@ -38,10 +38,10 @@
 #'
 #' Each product has a unique manifest filename such as `rkl2018-manifest.json`,
 #' `eu2009-manifest.json` or `referendum2003-manifest.json`, alongside the uniquely
-#' named Parquet assets in the data-v0.4.1 GitHub release. Publication is a separate
-#' step: an enabled but not yet published release gives a download error; it does
-#' not silently fall back to raw files. Configured local canonical manifests remain
-#' available for validation; they cannot extend the central auto permission.
+#' named Parquet assets in the published data-v0.4.1 GitHub release. Configured
+#' unpublished builds can be used explicitly for validation. A missing selected
+#' canonical file gives an error, without silent raw fallback. Local manifest overrides
+#' cannot extend the central auto permission.
 #'
 #' Once selected, canonical download, checksum or schema failures are errors, not
 #' reasons to silently change source. Parquet reading requires optional package
@@ -50,7 +50,7 @@
 #'
 #' Mandate-period history uses canonical intervals for 2014/2018 and current
 #' remote member/history exports for 2022. The two date queries filter the same
-#' chair population. 2022 history is not made canonical merely because its fixed
+#' population of allocated mandates. 2022 history is not made canonical merely because its fixed
 #' election results are canonical. See [mandate_history()] for source coverage.
 #'
 #' @section 2022 remote coverage:
@@ -86,6 +86,16 @@
 #' `.local-data` location is required. Historical adapters retain their documented
 #' snapshot layouts, manifests and integrity requirements. To force an archive
 #' when canonical coverage exists, use `source = "local"` explicitly.
+#'
+#' For a compatible 2014 local archive, final XML is under
+#' `2014/valresultat/slutresultat_20141001`, election-night XML under
+#' `2014/valresultat/valnatt`, and ballot files under `2014/kandidater`.
+#' Preliminary results also require an independently captured preliminary
+#' collection-district presentation; final collection votes cannot fill that gap.
+#' These historical archives are read-only: remote, update and archive operations
+#' are unavailable. Final election files, not later membership exports, supply
+#' elected/substitute and preference-vote results. Missing historical names and
+#' unsupported attributes remain missing.
 #'
 #' Configure a canonical build using `options(swelections.canonical_manifest =
 #' "my-build/manifest.json")`. Multi-product configurations can use a named

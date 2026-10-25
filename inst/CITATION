@@ -1,0 +1,8 @@
+bibentry(
+  bibtype = "Manual",
+  title = "swelections: Read and Harmonise Swedish Election Results",
+  author = person("Richard", "Öhrvall"),
+  year = "2026",
+  note = sprintf("R package version %s", meta$Version),
+  url = sprintf("https://github.com/richardohrvall/swelections/releases/tag/v%s", meta$Version)
+)

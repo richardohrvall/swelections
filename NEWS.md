@@ -1,5 +1,7 @@
 # swelections 0.4.1
 
+Released on 25 October 2026. Package: `v0.4.1`; canonical data: `data-v0.4.1`.
+
 - Fail clearly for the retired 2022 remote result distribution, without fallback
   to canonical, local archives or presentation files. Keep the separate current
   candidacy and mandate-history remote sources available.
@@ -10,8 +12,8 @@
   provenance. Preserve partial replacement scope and source coverage gaps;
   remove artificial Båstad vacancies and distinguish Falun re-election closure
   from departures. Rebuild only the 2014/2018 history assets.
-- Prepare data-v0.4.1: 200 Parquet assets and 16 manifests. The frozen v0.4.0
-  releases are unchanged. Publication remains a separate step.
+- Publish data-v0.4.1: 200 Parquet assets and 16 manifests. The frozen v0.4.0
+  releases remain unchanged.
 
 # swelections 0.4.0
 

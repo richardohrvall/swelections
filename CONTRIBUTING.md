@@ -46,7 +46,7 @@ pkgbuild::build(".", dest_path = ".local-data/package-check", vignettes = FALSE)
 Then run `R CMD check --no-manual --no-vignettes` on the resulting tarball and
 review its complete result. Run `git diff --check` and `git diff --cached --check`.
 Slow/raw-source tests are opt-in: consult their explicit environment variables
-and the [development index](development/README.md). Do not enable live tests
+and the [development index](https://github.com/richardohrvall/swelections/blob/main/development/README.md). Do not enable live tests
 implicitly or silently use a different source snapshot.
 
 ## Sources and reproducibility
@@ -57,17 +57,42 @@ outside Git. Preserve source bytes, URLs, retrieval times, sizes and checksums.
 Use new output directories rather than replacing preserved validation references.
 
 Canonical data versions are separate from package versions. Follow the pinned
-source selection and manifest procedure in [CANONICAL_DATA.md](development/CANONICAL_DATA.md).
+source selection and manifest procedure in [CANONICAL_DATA.md](https://github.com/richardohrvall/swelections/blob/main/development/CANONICAL_DATA.md).
 Only canonical coverage explicitly approved in the registry may be selected by
 `auto`; a local canonical cache is still canonical, not a local raw archive.
 
 Do not use mandate-period membership to redefine the fixed election result.
 Document source ambiguities, historical gaps and approved scoped harmonisations;
 do not force agreement between inconsistent official sources. Independent checks
-use separate R parsing logic where possible. SCB material is validation evidence,
-not a source for fabricating individual candidate records.
+use separate R parsing logic where possible. Statistics Sweden produces official
+election statistics; its data can support validation or supplementation.
+Do not fabricate individual candidate records from aggregate statistics.
 
 Changes to data semantics, identity rules, schemas or release publication require
 explicit review. Generated Parquet assets and raw sources must not enter a code
 commit. Contributor documentation and historical audit reports are excluded from
 the installed R package.
+
+## Documentation website
+
+Install the current package source and `pkgdown` in your development R library.
+Pandoc is required (for example the installation supplied with RStudio). From
+a fresh R session in the repository root:
+
+```r
+install.packages("pkgdown")
+install.packages(".", repos = NULL, type = "source")
+options(warn = 2)
+source("pkgdown/build-site.R")
+```
+
+The build stages only public documentation inputs, excluding agent instructions,
+development reports and raw archives. Data-fetching examples are displayed
+without execution; only source-free event discovery runs in the introductory
+article. The generated `docs/` directory is ignored and must not be committed.
+pkgdown itself may use network access for package-repository metadata; this is
+separate from fetching election data.
+
+The Pages workflow builds pull requests without deployment. Publication from
+`main` requires GitHub Pages to use **GitHub Actions** as its source. Enabling
+that repository setting and publishing are separate approved steps.

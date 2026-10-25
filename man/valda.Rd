@@ -31,7 +31,7 @@ EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"
 år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 \code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
 den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
@@ -72,12 +72,14 @@ områdeslistor, för 2026 från verifierade områdessummeringar.
 Kandidatfilens övriga metadata och dess \code{NA} bevaras.
 }
 \description{
+Läser valda kandidater enligt det slutliga valresultatet.
+}
+\details{
 För 2002 används originalvalets slutliga XML, inklusive Orsas ordinarie
 septemberval i stället för omvalet 2003. Kandidatnycklar identifierar
 utsedda källposter, inte verifierade personer. Namn och personröstkopplingar
 utan säker identifierare är saknade; lika namn används inte för koppling.
-}
-\details{
+
 För 2006 avser kandidatnumret en paketgenererad utsedd källpost, inte
 ett person-ID. Källans \verb{Kunde ej utses} är ett tomt mandat och ingår
 inte som vald person. Personröstetal kopplas inte genom namn.

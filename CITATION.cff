@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+type: software
+message: "If you use swelections in research, please cite the package and the version used."
+title: "swelections: Read and Harmonise Swedish Election Results"
+authors:
+- family-names: "Öhrvall"
+  given-names: "Richard"
+version: "0.4.1"
+date-released: "2026-10-25"
+repository-code: "https://github.com/richardohrvall/swelections"
+url: "https://github.com/richardohrvall/swelections/releases/tag/v0.4.1"
+license: MIT

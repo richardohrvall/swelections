@@ -70,19 +70,19 @@
 
 #' Election results
 #'
+#' Read official voting results at one geographic level and counting stage.
+#' The English interface returns English columns and technical categories;
+#' Swedish output preserves the same observations and values. See [data_sources].
+#'
+#' @details
 #' 2002 final results use preserved official XML; the original Orsa election
 #' is separate from its 2003 rerun. Candidate keys identify source observations,
 #' not persons; names are missing and full ballot candidacies are unavailable.
 #' Full preliminary collection results remain unrecovered.
-#' 2006 requires preserved local final sources or an explicitly configured
-#' unpublished canonical build; full preliminary results are unavailable.
+#' 2006 final data are available through published canonical tables or compatible
+#' local raw sources; complete preliminary results are unavailable.
 #' Candidate numbers in 2006 identify source observations rather than people.
 #' See the repository's 2006 implementation documentation for source limitations.
-#'
-#' Read official voting results at one geographic level and one count stage.
-#' The English interface uses English column names and technical categories.
-#' Swedish output localizes those categories. Proper names and literal source
-#' identifiers are preserved; Boolean properties remain logical. See [data_sources].
 #'
 #' @section Re-elections:
 #' A re-election is a separate election event within the original continuing
@@ -145,35 +145,19 @@
 #'   Preliminary 2019 results retain ten named parties plus other parties.
 #'   The fixed final result has 20 seats; later Brexit changes are excluded.
 #'   Local EU input may be the `eu/2024` archive itself or its parent root;
-#'   read-only snapshots do not support `update` or `archive`. Unpublished EU
-#'   canonical builds require an explicitly configured local manifest.
+#'   read-only snapshots do not support `update` or `archive`. Published canonical
+#'   coverage is selected by `auto`; EU 2009 preference votes require explicit local sources.
 #' @param count `"final"` or `"preliminary"`.
 #' @param level English geographic level. `NULL` selects the main level for
 #'   the election. Supported combinations depend on election and year;
 #'   unsupported combinations give an error.
-#' @param source `"auto"`, `"local"`, `"remote"` or `"canonical"`.
-#'   `auto` prefers approved canonical coverage for the requested election family,
-#'   event, year and view, even when local raw files exist. Without that coverage,
-#'   it uses a supported remote route, never the user's local raw files.
-#'   If neither is available, select `source = "local"` explicitly for a saved
-#'   archive. Explicit `remote` uses Valmyndigheten
-#'   where supported; `local` requires the user's saved raw archive and never
-#'   uses the network. `canonical` requires canonical data without raw fallback.
-#'   Use `source = "local"` to select `data_dir` instead of canonical under `auto`.
-#'   Private prototypes cannot extend automatic permission. Configured manifests may be
-#'   a single path or named paths keyed by `series:ordinary:year` (e.g.
-#'   `eu:ordinary:2014`), `series:year`, or legacy year keys. See [data_sources].
-#'   Canonical Parquet reading requires optional package `nanoparquet`.
-#'   The 2014 raw route requires a preserved local archive: final XML under
-#'   `2014/valresultat/slutresultat_20141001`, election-night XML under
-#'   `2014/valresultat/valnatt`, ballot files under `2014/kandidater`, and the
-#'   independently captured preliminary collection-district presentation.
-#'   Remote/update/archive operations are not implemented for this historical
-#'   source collection. Preliminary results combine ordinary election-night
-#'   districts with preliminary collection districts, never final collection
-#'   votes. Seats, elected members, substitutes and preference votes use final
-#'   election XML; later membership files are excluded. Candidate names are
-#'   typed missing values. Unsupported historical attributes remain missing.
+#' @param source How data are obtained. `"auto"` selects approved canonical
+#'   coverage, otherwise a supported current remote source; never local files.
+#'   `"canonical"` explicitly reads canonical data. `"remote"` explicitly reads a
+#'   supported official Valmyndigheten source. Neither silently falls back to
+#'   another source. `"local"` reads your own compatible raw archive using
+#'   `data_dir`. Canonical reading requires `nanoparquet`. See [data_sources]
+#'   for source requirements, historical archives and manifest configuration.
 #' @param data_dir Local root directory for raw files.
 #' @param update Update the local working copy when `TRUE`.
 #' @param archive Save a dated raw-data snapshot when `TRUE`.
@@ -361,12 +345,14 @@ seats <- function(
 
 #' Candidacies
 #'
-#' 2002 is not supported: a complete ballot-candidacy source has not been recovered.
+#' Read election-specific candidacies and ballot-list positions, with available
+#' candidate and list information.
 #'
+#' @details
+#' 2002 is not supported: a complete ballot-candidacy source has not been recovered.
 #' For 2006, `candidate_number` identifies a geographical ballot-position
 #' observation, not a person. Unstructured `ballot_info` is retained without
 #' inventing a structured name or a printed-ballot status.
-#' Read source-level candidate and ballot-list records through [kandidaturer()].
 #' `ballot_info` is optional candidate identification text printed on the
 #' ballot, such as occupation or age. `list_ballots_ordered` records the
 #' number of ballot papers ordered for the list, not votes cast. The logical
@@ -392,12 +378,15 @@ candidacies <- function(
 
 #' Candidates
 #'
+#' Return one row per candidate within the relevant election type and party,
+#' with additional candidate-level information where available. The resulting
+#' data do not provide a longitudinal link between the same person across elections.
 #'
+#' @details
 #' For 2006, a candidate number is a package-generated source-observation
 #' key. Ballot, area preference-vote and appointment observations are retained
 #' separately; equal names are not linked. Rows are not unique-person counts
 #' and unsupported cross-source totals/attributes remain missing.
-#' Read one row per candidate, election type and party through [kandidater()].
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
@@ -422,12 +411,14 @@ candidates <- function(
 
 #' Elected members
 #'
+#' Read candidates elected in the official final election result. Use
+#' [members_at()] for subsequent mandate holders on a specified date.
 #'
+#' @details
 #' For 2006, candidate numbers identify original appointed source slots,
 #' not persons linked across lists. `Kunde ej utses` positions remain unfilled
 #' seats and are excluded from elected observations.
-#' Read the official final elected-member relation through [valda()]. No
-#' preliminary elected-member result is inferred.
+#' No preliminary elected-member result is inferred.
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
@@ -450,11 +441,13 @@ elected <- function(
 
 #' Substitute relationships
 #'
+#' Read the final election's reported elected-member–substitute relationships.
+#' These relationships do not describe later mandate holders or temporary service.
 #'
+#' @details
 #' For 2006, member and substitute numbers identify original source slots.
 #' Group relationships are expanded without name-based identity linkage or
 #' later mandate-period entrants.
-#' Read final elected-member–substitute relationships through [ersattare()].
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
@@ -477,6 +470,12 @@ substitutes <- function(
 
 #' Preference votes
 #'
+#' Read candidate preference votes by preference-vote area, district or a
+#' supported broader election area. `by_list` retains the observed list dimension;
+#' `include_zeros` adds only verified zero combinations. The default view is
+#' one candidate–party–preference-vote-area row.
+#'
+#' @details
 #' For EU 2009, this function returns preserved candidate/source observations,
 #' not an official all-party aggregate row. The reconciled official total is
 #' 1,876,785: 1,874,130 for the main eleven parties plus the official small-party
@@ -489,10 +488,6 @@ substitutes <- function(
 #' `include_zeros` adds no unsupported combinations; explicit zeros remain.
 #' Area and list views are alternative representations, not additive totals.
 #' Cross-area municipality/region person aggregation is unavailable.
-#' Read candidate preference votes by preference-vote area, district or a
-#' supported broader election area. `by_list` retains the observed list dimension;
-#' `include_zeros` adds only verified zero combinations. The default view is
-#' one candidate–party–preference-vote-area row.
 #' @inheritParams results
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].

@@ -1,0 +1,121 @@
+---
+title: "Accessing the data"
+output: rmarkdown::html_document
+---
+
+Use the R functions for the package's documented output tables, export those
+tables for use in other software, or read the published Parquet files directly.
+`swelections` is an R package; it does not currently provide separate Python,
+Stata or SPSS packages.
+
+## Source selection in R
+
+The `source` argument controls how data are obtained. For most users, keep the
+default `"auto"`; choose another source explicitly when you need a particular input:
+
+- `"auto"` (default) selects approved canonical data for the requested election
+  and function, otherwise a supported remote source. It never selects local raw
+  files. If neither source is supported, the request gives an error.
+- `"canonical"` explicitly reads the package's validated, published historical
+  data, without raw-source fallback.
+- `"remote"` reads a current, official and explicitly supported Swedish Election
+  Authority source, even when canonical data exist. It does not fall back to
+  canonical or local data.
+- `"local"` reads your own compatible saved raw archive, selected explicitly
+  with `data_dir`.
+
+Remote formats and coverage vary between elections and functions. A new
+presentation file does not automatically replace a withdrawn detailed export.
+See [Coverage](coverage.html) for availability and `data_sources` for detailed
+source requirements. [Get started](swelections.html) shows the R interface.
+
+## Exporting tables
+
+After retrieving a table in R, you can export it for use in other software.
+CSV is a general import option. The separate R package `haven` can write Stata
+`.dta` and SPSS `.sav` files:
+
+```r
+results_table <- results(year = 2022, election = "parliamentary", level = "national")
+export_table <- results_table[, c("election_year", "party_code", "party_designation",
+                                  "votes", "vote_share")]
+write.csv(export_table, "results.csv", row.names = FALSE, na = "")
+
+# Requires install.packages("haven")
+haven::write_dta(export_table, "results.dta")
+haven::write_sav(export_table, "results.sav")
+```
+
+The example selects a few columns for export. Stata variable names are limited
+to 32 characters; some full swelections column names exceed that limit.
+
+These are file exports, not separate swelections interfaces. Preserve identifiers
+as text and check how the receiving program imports missing values. A CSV file
+does not retain all R column types; do not replace missing values with zero.
+
+## Published Parquet files
+
+The [data-v0.4.1 release](https://github.com/richardohrvall/swelections/releases/tag/data-v0.4.1)
+contains 200 Parquet files and 16 product manifests. A manifest identifies the
+filenames, schema, sizes, SHA256 checksums and source provenance. Use the data
+generation documented for your package version.
+
+Some files contain several stored tables or geographic levels; other public
+views require joins across files. Directly reading a file therefore need not
+reproduce a complete `results()` call. Consult the manifest rather than combining
+all rows or files indiscriminately.
+
+## Reading a Parquet file in Python
+
+Install `pandas` and a Parquet engine such as `pyarrow` in your Python environment.
+This example reads the published Falun 2019 re-election file directly. The
+manifest is used for file verification: the byte count and SHA256 must match
+before the data are read. The municipality filter then selects one geographic
+level. This is direct file access, not a Python API provided by `swelections`.
+
+```python
+import hashlib
+import io
+import json
+from urllib.request import urlopen
+
+import pandas as pd
+
+base = "https://github.com/richardohrvall/swelections/releases/download/data-v0.4.1"
+with urlopen(f"{base}/rkl2019-re-election-manifest.json") as response:
+    manifest = json.load(response)
+
+# This example targets the documented v0.4.1 storage contract.
+assert manifest["schema_version"] == 3
+asset = next(
+    item for item in manifest["assets"]
+    if item["file"] == "rkl2019-re-election-kf-2080-results-final.parquet"
+)
+with urlopen(f"{base}/{asset['file']}") as response:
+    payload = response.read()
+
+assert len(payload) == asset["bytes"]
+assert hashlib.sha256(payload).hexdigest() == asset["sha256"]
+
+tables = pd.read_parquet(io.BytesIO(payload), engine="pyarrow")
+municipality = tables.loc[tables[".table"].eq("municipality")]
+print(municipality[["municipality_name", "party_abbreviation", "votes"]])
+```
+
+The file also contains district rows. Its `.table` column distinguishes the
+stored views; other files may use `.component` or additional selectors. Check
+the manifest's `tables` entries and declared columns rather than assuming every
+file has the same layout.
+
+Retain the data-release identifier with your analysis. For technical category
+and storage definitions, see the [value/storage contract](https://github.com/richardohrvall/swelections/blob/main/development/VALUE_CONTRACT.md).
+
+## Complementary SCB statistics
+
+Statistics Sweden's aggregate statistics can also be retrieved programmatically
+through its [PxWeb API](https://www.scb.se/en/services/open-data-api/), for example
+with the R package [pxweb](https://ropengov.github.io/pxweb/). This is a separate,
+complementary resource, not a swelections interface. See
+[Sources & methodology](sources-methodology.html#related-official-statistics)
+for relevant statistics and the distinction between aggregates and restricted
+microdata.

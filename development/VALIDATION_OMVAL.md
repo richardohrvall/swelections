@@ -1,9 +1,9 @@
 # Re-election validation and review report
 
-> Current canonical validation: the [v0.4.1 candidate](releases/v0.4.1.md)
+> Current canonical validation: [published v0.4.1](https://github.com/richardohrvall/swelections/releases/tag/data-v0.4.1)
 > supports final results/seats for all five events. The original 17 October
 > implementation checks below are retained as historical source evidence;
-> their local-only statements do not describe the current candidate.
+> their local-only statements do not describe the published canonical generation.
 
 
 Implementation date: 17 October 2026. No commit, push, tag or release was made.
@@ -19,7 +19,7 @@ seats(year = 2010, election = "municipal", after_re_election = TRUE)
 seats(from = 2002, to = 2022, election = "municipal", after_re_election = TRUE)
 ```
 
-Canonical results/seats need no raw archive after publication. To replay the
+Published canonical results/seats need no raw archive. To replay the
 source checks explicitly, use `source = "local"` and configure the preserved
 inputs described in [source setup](IMPLEMENTATION_OMVAL.md).
 These municipality selections cover all selected municipal areas, not just
@@ -180,7 +180,7 @@ several rows for the same party/municipality; sum `seats`, not repeated
 
 1. Final results/seats now have approved v0.4.1 canonical coverage, while raw
    replay requires explicit local selection. A remote rerun route is unavailable.
-   The candidate is not a public distribution until separately published.
+   The canonical generation is published as data-v0.4.1.
 2. Preliminary rerun results remain unsupported, including Falun pending a
    separately validated adapter. Final figures never fill preliminary gaps.
 3. Orsa's eight signed protocol attachments remain unrecovered. Its separately
@@ -271,5 +271,6 @@ populations and exclusions are consolidated in
 The final working-tree candidate checks (200 assets/16 manifests, 768 actual
 auto/canonical API combinations, complete tests and package check) are maintained
 in [the v0.4.1 release record](releases/v0.4.1.md). That record, not retired
-prototype readiness reports, is the current inventory and publication boundary.
-A clean committed rebuild remains required before publication.
+prototype readiness reports, retains the prepublication validation evidence.
+The published data-v0.4.1 manifests identify the released generation; future
+releases still require a new clean committed build and independent validation.

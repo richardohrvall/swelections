@@ -30,29 +30,13 @@ election, geographic level and count stage.}
 \item{election}{One or more English election values or official codes;
 \code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
 
-\item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
-\code{auto} prefers approved canonical coverage for the requested election family,
-event, year and view, even when local raw files exist. Without that coverage,
-it uses a supported remote route, never the user's local raw files.
-If neither is available, select \code{source = "local"} explicitly for a saved
-archive. Explicit \code{remote} uses Valmyndigheten
-where supported; \code{local} requires the user's saved raw archive and never
-uses the network. \code{canonical} requires canonical data without raw fallback.
-Use \code{source = "local"} to select \code{data_dir} instead of canonical under \code{auto}.
-Private prototypes cannot extend automatic permission. Configured manifests may be
-a single path or named paths keyed by \code{series:ordinary:year} (e.g.
-\code{eu:ordinary:2014}), \code{series:year}, or legacy year keys. See \link{data_sources}.
-Canonical Parquet reading requires optional package \code{nanoparquet}.
-The 2014 raw route requires a preserved local archive: final XML under
-\code{2014/valresultat/slutresultat_20141001}, election-night XML under
-\code{2014/valresultat/valnatt}, ballot files under \code{2014/kandidater}, and the
-independently captured preliminary collection-district presentation.
-Remote/update/archive operations are not implemented for this historical
-source collection. Preliminary results combine ordinary election-night
-districts with preliminary collection districts, never final collection
-votes. Seats, elected members, substitutes and preference votes use final
-election XML; later membership files are excluded. Candidate names are
-typed missing values. Unsupported historical attributes remain missing.}
+\item{source}{How data are obtained. \code{"auto"} selects approved canonical
+coverage, otherwise a supported current remote source; never local files.
+\code{"canonical"} explicitly reads canonical data. \code{"remote"} explicitly reads a
+supported official Valmyndigheten source. Neither silently falls back to
+another source. \code{"local"} reads your own compatible raw archive using
+\code{data_dir}. Canonical reading requires \code{nanoparquet}. See \link{data_sources}
+for source requirements, historical archives and manifest configuration.}
 
 \item{data_dir}{Local root directory for raw files.}
 
@@ -103,6 +87,12 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=personroster]{personroster()}}.
 }
 \description{
+Read candidate preference votes by preference-vote area, district or a
+supported broader election area. \code{by_list} retains the observed list dimension;
+\code{include_zeros} adds only verified zero combinations. The default view is
+one candidate–party–preference-vote-area row.
+}
+\details{
 For EU 2009, this function returns preserved candidate/source observations,
 not an official all-party aggregate row. The reconciled official total is
 1,876,785: 1,874,130 for the main eleven parties plus the official small-party
@@ -110,16 +100,11 @@ aggregate of 2,655. The national candidate rows instead sum to 1,876,795:
 small-party source columns report 2,665, an unresolved source inconsistency
 of ten votes. Do not label that candidate-row sum as the official total.
 Values remain source-reported and are not adjusted to force agreement.
-}
-\details{
+
 For 2006, rows identify observed source records, not linked persons.
 \code{include_zeros} adds no unsupported combinations; explicit zeros remain.
 Area and list views are alternative representations, not additive totals.
 Cross-area municipality/region person aggregation is unavailable.
-Read candidate preference votes by preference-vote area, district or a
-supported broader election area. \code{by_list} retains the observed list dimension;
-\code{include_zeros} adds only verified zero combinations. The default view is
-one candidate–party–preference-vote-area row.
 }
 \seealso{
 \code{\link[=personroster]{personroster()}}, \code{\link[=candidates]{candidates()}}

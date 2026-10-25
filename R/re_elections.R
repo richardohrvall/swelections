@@ -84,6 +84,10 @@
 
 #' Discover ordinary elections and re-elections
 #'
+#' List election events, their geographic scope and links to the original
+#' election. Discovery requires no result downloads.
+#'
+#' @details
 #' A re-election is a separate polling event within the original continuing
 #' mandate period. It is neither a new ordinary election in a longitudinal series
 #' nor the start of a new mandate period. Each re-election links to its original

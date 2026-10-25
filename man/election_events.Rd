@@ -18,12 +18,15 @@ An English metadata tibble. Availability is distinct from source completeness.
 Unknown decision references remain missing. Re-elections share the original mandate period.
 }
 \description{
+List election events, their geographic scope and links to the original
+election. Discovery requires no result downloads.
+}
+\details{
 A re-election is a separate polling event within the original continuing
 mandate period. It is neither a new ordinary election in a longitudinal series
 nor the start of a new mandate period. Each re-election links to its original
 election and retains its actual geographic scope.
-}
-\details{
+
 Use \code{\link[=results]{results()}} and \code{\link[=seats]{seats()}} with \code{election_kind = "re_election"} for event
 results/allocations. Use \code{\link[=seats]{seats()}} with \code{after_re_election = TRUE} and the
 original ordinary year for a derived composition retaining the original year.

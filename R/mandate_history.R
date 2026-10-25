@@ -530,10 +530,15 @@
   x
 }
 
-#' Electoral chair histories and dated membership snapshots
+#' Mandate histories and dated membership snapshots
 #'
+#' Return mandate-holder and vacancy intervals, or select verified holders
+#' and vacant seats on a date. All three functions use the same population
+#' of allocated mandates.
+#'
+#' @details
 #' Reads canonical histories for 2014--2018 and 2018--2022, and current official
-#' remote history for 2022--2026. The chair population is allocated mandates, including
+#' remote history for 2022--2026. The population consists of allocated mandates, including
 #' initially unfilled mandates. Successive holders and verified vacancies use
 #' half-open intervals `[start_date, end_date)`. An outgoing holder is excluded
 #' on the successor's start date. Zero-length source intervals are retained in
@@ -597,7 +602,7 @@
 #' @param names Column and technical-category language, `"en"` or `"sv"`.
 #'   Proper names and literal source identifiers are unchanged.
 #' @param detail `"standard"` or `"full"`; standard is a projection of full.
-#' @return A tibble of chair-holder/vacancy intervals, or rows active at `date`.
+#' @return A tibble of mandate-holder/vacancy intervals, or rows active at `date`.
 #' @export
 mandate_history <- function(year = 2018, election = NULL, data_dir = NULL,
     files = list(), source = c("auto", "canonical", "remote", "local"), names = c("en", "sv"),

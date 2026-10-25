@@ -1,36 +1,37 @@
-#' Svenska valdata från Valmyndigheten
+#' Swedish election data in R
 #'
-#' The English-first API provides [results()], [seats()], [candidacies()],
-#' [candidates()], [elected()], [substitutes()] and [preference_votes()]. The Swedish functions,
-#' including [valresultat()] and [personroster()], remain fully supported.
-#' English functions return English column names by default. Use `names = "sv"`
-#' or `options(swelections.names = "sv")` for Swedish output column names.
-#' Language selection changes column names and technical categories. Canonical
-#' and English categories are English; Swedish output localizes them. Booleans
-#' remain logical. Proper names and source identifiers are preserved. Referendum
-#' option names are `yes`/`no`/`blank` in English and `Ja`/`Nej`/`Blank` in Swedish.
-#' Blank is valid, separate from invalid ballots. See [data_sources].
-#' Resultatfiler väljs via `index.md5`. Optionen
-#' `swelections.resultatsamling_2026` väljer resultatsamling och har för närvarande
-#' standardvärdet `"val2026"`. Test-/utvecklingssamlingen `"genrep2026"` kan
-#' väljas uttryckligen.
+#' swelections brings together election information across source files, years,
+#' formats and geographic levels. Public interfaces cover [results()], [seats()],
+#' [candidacies()], [candidates()], [elected()], [substitutes()] and
+#' [preference_votes()]. [election_events()] discovers election occasions;
+#' [mandate_history()], [members_at()] and [vacant_seats_at()] describe supported
+#' mandate periods. Swedish counterparts include [valtillfallen()],
+#' [valresultat()] and [mandathistorik()].
 #'
-#' En lokal rådatamapp anges med `data_dir` eller optionen
-#' `swelections.data_dir`. Explicit `data_dir` har företräde.
-#' Med `source = "auto"` prioriteras godkänd canonical-data för efterfrågad
-#' valfamilj, valhändelse, år och vy. Utan godkänd täckning används befintlig
-#' rådataväg. EU-prototyperna är fortsatt endast explicit valbara. Se [data_sources].
-#' Med `source = "local"` krävs en befintlig lokal fil och nätåtkomst används aldrig.
-#' Med `source = "remote"` används fjärrkällan vid vanlig läsning.
+#' English functions return English columns and technical categories. Use
+#' `names = "sv"` where supported, or a Swedish counterpart. Proper names and
+#' literal source identifiers retain their source spelling. Boolean properties
+#' remain logical. The 2003 referendum options are `yes`, `no` and `blank` in
+#' English and `Ja`, `Nej` and `Blank` in Swedish; Blank is valid and separate
+#' from invalid ballots.
 #'
-#' `update = TRUE` uppdaterar arbetskopian om innehållet har ändrats.
-#' `archive = TRUE` sparar en daterad kopia; en tidigare kopia från samma
-#' datum kan ersättas. Dessa alternativ kräver en lokal rådatamapp och
-#' kan använda nedladdningslogiken med `source = "auto"` eller `"remote"`.
-#' `source = "local", update = TRUE` ger ett fel före filåtkomst.
-#' Lokal arkivering kopierar endast en redan befintlig lokal fil; saknas filen
-#' ges ett fel utan nedladdning.
+#' `source = "auto"` selects approved canonical coverage for the requested
+#' election family, event, year and view; otherwise it uses a supported remote
+#' source. It never discovers local raw files. Explicit `canonical`, `remote`
+#' and `local` choices are described in [data_sources]. Historical canonical
+#' data need no developer archive. `local` requires the user's own compatible
+#' sources, selected through `data_dir` or the documented raw-root options.
 #'
+#' The published data-v0.4.1 generation covers ordinary RKL 2002--2022, EU
+#' 2004--2024, the final 2003 referendum, five re-election results/seats events
+#' and completed-period histories for 2014/2018. Coverage varies by function,
+#' geography and counting stage; RKL 2002 candidacies and EU 2009 canonical
+#' preference votes are excluded. Supported 2026 election data and current
+#' 2022 mandate history use their separate remote sources.
+#'
+#' `update` and `archive` apply only to supported raw-source operations, not
+#' canonical data. They do not make automatic selection choose a local archive.
+#' See [data_sources] and the function help for requirements and restrictions.
 #' @importFrom utils download.file unzip
 #' @keywords internal
 "_PACKAGE"

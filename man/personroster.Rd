@@ -34,7 +34,7 @@ EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"
 år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 \code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
 den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.}
@@ -96,6 +96,9 @@ Partiellt eller oklart underlag ger \code{NA} när raden i övrigt finns;
 oobserverade resultat har ingen rad i en gles vy.
 }
 \description{
+Läser rapporterade personröster på stödd geografisk nivå eller per lista.
+}
+\details{
 För 2002 används bevarad officiell slutlig XML och hashverifierade historiska
 Valmyndigheten-sidor för RD-distrikt i Halmstad, Laholm och Kungsbacka.
 HTML-fältet Nr anger personröstrang, inte valsedelsposition eller person-ID.
@@ -105,8 +108,7 @@ Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
 exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
 identifierar källposter, inte verifierade personer över listor eller val.
 Kandidatnamn och attribut utan säker källa är typade saknade värden.
-}
-\details{
+
 För 2006 används bevarade slutliga lokala källor. \code{kandidatnummer} är
 en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade

@@ -4,7 +4,7 @@
 \alias{mandate_history}
 \alias{members_at}
 \alias{vacant_seats_at}
-\title{Electoral chair histories and dated membership snapshots}
+\title{Mandate histories and dated membership snapshots}
 \usage{
 mandate_history(
   year = 2018,
@@ -69,17 +69,21 @@ Proper names and literal source identifiers are unchanged.}
 supported original election on or before that date, under the source date convention.}
 }
 \value{
-A tibble of chair-holder/vacancy intervals, or rows active at \code{date}.
+A tibble of mandate-holder/vacancy intervals, or rows active at \code{date}.
 }
 \description{
+Return mandate-holder and vacancy intervals, or select verified holders
+and vacant seats on a date. All three functions use the same population
+of allocated mandates.
+}
+\details{
 Reads canonical histories for 2014--2018 and 2018--2022, and current official
-remote history for 2022--2026. The chair population is allocated mandates, including
+remote history for 2022--2026. The population consists of allocated mandates, including
 initially unfilled mandates. Successive holders and verified vacancies use
 half-open intervals \verb{[start_date, end_date)}. An outgoing holder is excluded
 on the successor's start date. Zero-length source intervals are retained in
 history and never appear in a snapshot.
-}
-\details{
+
 Dates follow Valmyndigheten's convention: original elected members start on
 election day; successor dates are administrative appointment dates. These
 functions do not describe attendance or temporary substitute service.

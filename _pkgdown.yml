@@ -1,0 +1,75 @@
+url: https://richardohrvall.github.io/swelections/
+template:
+  bootstrap: 5
+lang: en
+home:
+  title: Swedish election data in R
+  description: Swedish election results, candidate data and mandate histories through a consistent R interface.
+  sidebar:
+    structure: [links, license, community, citation_home, authors]
+    components:
+      citation_home:
+        title: Citation
+        text: "[Cite this version](#citation)"
+navbar:
+  structure:
+    left: [home, intro, reference, data, news]
+    right: [search, github]
+  components:
+    home:
+      text: Home
+      href: index.html
+    intro:
+      text: Get started
+      href: articles/swelections.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    data:
+      text: Data
+      menu:
+      - text: Coverage
+        href: articles/coverage.html
+      - text: Sources & methodology
+        href: articles/sources-methodology.html
+      - text: Accessing the data
+        href: articles/accessing-data.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      text: GitHub
+      href: https://github.com/richardohrvall/swelections
+reference:
+- title: Election events
+  contents: election_events
+- title: Results and seats
+  contents: [results, seats]
+- title: Candidacies and candidates
+  contents: [candidacies, candidates]
+- title: Elected candidates and substitutes
+  contents: [elected, substitutes]
+- title: Preference votes
+  contents: preference_votes
+- title: Mandate-period history
+  contents: [mandate_history, members_at, vacant_seats_at]
+- title: Swedish interface
+  contents:
+  - valtillfallen
+  - valresultat
+  - mandat
+  - kandidaturer
+  - kandidater
+  - valda
+  - ersattare
+  - personroster
+  - mandathistorik
+  - ledamoter_vid
+  - tomma_stolar_vid
+- title: Package and sources
+  contents: [swelections-package, data_sources]
+articles:
+- title: Get started
+  contents: articles/swelections
+- title: Data
+  contents: [articles/coverage, articles/sources-methodology, articles/accessing-data]

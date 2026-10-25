@@ -86,3 +86,6 @@ development/*_INTEGRATION.txt
 
 # Retired local genrep index; the frozen tag remains the public reference
 /references/index.md5
+
+# Local agent instructions
+/AGENTS.md

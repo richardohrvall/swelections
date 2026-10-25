@@ -1,5 +1,10 @@
 #' Kandidater
 #'
+#' Ger en rad per kandidat inom aktuellt val och parti, med ytterligare
+#' kandidatuppgifter där källan stöder dem. Uppgifterna länkar inte samma
+#' person mellan olika val.
+#'
+#' @details
 #' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 #' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 #' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
@@ -71,7 +76,7 @@
 #'   population skapar inte nya offentliga kandidaturposter. Namn är typade
 #'   `NA`; odokumenterade kandidaturattribut för resultat-only kandidater är
 #'   `NA`. Inga senare mandatperiodsfiler används.
-#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+#'   `"canonical"` använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"auto"` använder godkänd canonical eller stödd officiell fjärrkälla.
@@ -251,6 +256,9 @@ kandidater <- function(
 
 #' Valda kandidater
 #'
+#' Läser valda kandidater enligt det slutliga valresultatet.
+#'
+#' @details
 #' För 2002 används originalvalets slutliga XML, inklusive Orsas ordinarie
 #' septemberval i stället för omvalet 2003. Kandidatnycklar identifierar
 #' utsedda källposter, inte verifierade personer. Namn och personröstkopplingar

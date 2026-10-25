@@ -4,10 +4,12 @@ Published in data-v0.4.0. The [frozen release record](releases/v0.4.0.md) identi
 
 ## Versions and scope
 
-All twelve current products use `data_version = data-v0.4.0`,
+The sixteen current products use `data_version = data-v0.4.1`,
 `schema_version = 3`, `value_schema_version = 1` and
-`storage_schema_version = 1`. The 190 published Parquet assets, including two mandate-history assets, cover RKL 2002, 2006,
-2010, 2014, 2018 and 2022, referendum 2003 and EU 2004, 2009, 2014, 2019, 2024.
+`storage_schema_version = 1`. The 200 published Parquet assets cover RKL 2002,
+2006, 2010, 2014, 2018 and 2022, referendum 2003, EU 2004, 2009, 2014, 2019 and
+2024, and five final results/seats re-elections in four additional manifests.
+The two completed-period history assets use interval schema 2.
 Only results are relevant to the referendum. Unsupported views/stages are not
 created by this normalization.
 
@@ -35,7 +37,7 @@ change. Names-only internal helpers remain available for column mapping.
 | `election_basis` | Six separate categories listed below | The six Swedish source descriptions |
 | `election_kind` | `ordinary`, `re_election` | `ordinarie`, `omval` |
 | `voting_option_name` | `yes`, `no`, `blank` | `Ja`, `Nej`, `Blank` |
-| History `status` | `occupied`, `vacant` | `besatt`, `vakant` |
+| History `status` | `occupied`, `vacant`, `unknown` | `besatt`, `vakant`, `okand` |
 | `composition_type` | `after_re_election` | `efter_omval` |
 
 History source kinds, date bases, event-scope levels and component levels also
@@ -124,13 +126,13 @@ release assets were then independently rebuilt from raw sources at the clean
 release commit. This migration is not a required step in a new raw-source build.
 
 The old data-v0.1.0 2018 files remain immutable. The active registry selects
-data-v0.4.0, with the approved Ragunda correction and a separate version/cache
+data-v0.4.1, with the approved Ragunda correction and a separate version/cache
 namespace. There is no normal-read conversion of older canonical formats.
-All twelve approved products are activated with their central function lists;
+All sixteen approved products are activated with their central function lists;
 EU 2009 preference votes and RKL 2002 candidacies remain excluded.
 
-All 190 release assets have `build_tree_dirty = false` and match the approved
-prototype byte-for-byte. Fresh build timestamps/commit provenance change manifest
+All release manifests record `build_tree_dirty = false`; all 200 Parquet assets
+match the approved prototype byte-for-byte. Fresh build timestamps/commit provenance change manifest
 hashes; they do not justify any election-data difference. Future releases require
 review, a clean committed build, schema/language/source/Parquet checks, tests and
 R CMD check. The exact published inventory is versioned in the

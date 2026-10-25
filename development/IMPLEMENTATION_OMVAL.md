@@ -1,7 +1,7 @@
 # Re-election implementation
 
-> Current implementation: [v0.4.1 candidate](releases/v0.4.1.md), not yet
-> published. Final results/seats are approved for canonical auto-selection.
+> Current implementation: [published v0.4.1](https://github.com/richardohrvall/swelections/releases/tag/v0.4.1).
+> Final results/seats are available through canonical auto-selection.
 > The [frozen v0.4.0 record](releases/v0.4.0.md) retains the previous local-only
 > distribution; its files remain unchanged.
 
@@ -96,7 +96,7 @@ existing ordinary source product.
 
 `source = "auto"` selects the registered v0.4.1 canonical results/seats when
 the approved distribution is available; `source = "canonical"` explicitly uses
-those views. The candidate URLs are not live before publication. Explicit
+those views. The canonical files are published in data-v0.4.1. Explicit
 `source = "local"` retains the verified saved-source route above. Auto never
 selects local, and no supported remote re-election downloader is supplied.
 `update`/`archive` are rejected for immutable re-election sources. The central
@@ -155,7 +155,7 @@ Validation commands, results, exact schema additions and changed files are in
 
 ## Canonical scope and preserved auxiliary sources
 
-The v0.4.1 candidate contains two final assets per event (results and seats),
+The published v0.4.1 generation contains two final assets per event (results and seats),
 ten assets in four manifests; the two 2011 events remain geographically separate.
 All 20 table/level views have raw/canonical comparisons in both languages and
 detail modes. Schema/value/storage versions remain 3/1/1. See

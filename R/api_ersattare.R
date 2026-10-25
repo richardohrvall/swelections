@@ -1,5 +1,8 @@
 #' Ersättare
 #'
+#' Läser slutresultatets rapporterade relationer mellan valda ledamöter och ersättare.
+#'
+#' @details
 #' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 #' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 #' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
@@ -26,7 +29,7 @@
 #'   år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 #'   `local` för eget sparat källmaterial eller `remote` för Valmyndigheten där
 #'   den vägen stöds. `data_dir` ensamt väljer inte bort canonical. Se [data_sources].
-#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+#'   `"canonical"` använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.

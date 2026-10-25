@@ -1,9 +1,9 @@
 # Mandate-period history
 
 History functions were introduced in [frozen v0.4.0](releases/v0.4.0.md). The
-[v0.4.1 candidate](releases/v0.4.1.md) rebuilds the two completed-period products
-with interval schema 2 and the component/transition model documented here. It is
-not yet published. Dated validation observations describe preserved snapshots,
+[published v0.4.1 generation](https://github.com/richardohrvall/swelections/releases/tag/data-v0.4.1)
+rebuilds the two completed-period products with interval schema 2 and the
+component/transition model documented here. Dated validation observations describe preserved snapshots,
 not live guarantees. Source-role and Ragunda/Överkalix/Kiruna evidence is retained below.
 
 ## Public functions

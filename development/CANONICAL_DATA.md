@@ -6,11 +6,13 @@ and final checks. Its [file inventory](releases/data-v0.4.0-files.csv) contains 
 actual published sizes, SHA256 values and URLs. Package and data versions are
 separate; old releases are immutable. Do not overwrite their files or tags.
 
-The unpublished [v0.4.1 candidate](releases/v0.4.1.md) contains **200 assets and
-16 manifests**: 188 unchanged assets, two rebuilt completed-period histories and
-ten new final re-election results/seats assets. Its
-[file inventory](releases/data-v0.4.1-files.csv) identifies the exact planned payload.
-It must not overwrite frozen v0.4.0.
+The published [data-v0.4.1 release](https://github.com/richardohrvall/swelections/releases/tag/data-v0.4.1)
+contains **200 assets and 16 manifests**: 188 unchanged assets, two rebuilt
+completed-period histories and ten new final re-election results/seats assets.
+The [prepublication record](releases/v0.4.1.md) and
+[tracked scope/Parquet inventory](releases/data-v0.4.1-files.csv) retain build
+evidence. Final manifest hashes are generated in the separate post-commit
+distribution inventory, not written back into build inputs. Frozen v0.4.0 remains unchanged.
 
 Current data use schema 3 and [value/storage contracts 1/1](VALUE_CONTRACT.md).
 Canonical columns and technical values are English; Swedish output localizes
@@ -80,8 +82,9 @@ result cache. Unindexed candidate/member CSVs are fetched fresh.
 ## Preserved inputs and build chain
 
 Use new output directories and immutable pinned sources with URL/retrieval/size/
-checksum provenance. SCB/SND serve independent validation or source-supported,
-reconciled supplementation; see [SOURCE_POLICY.md](SOURCE_POLICY.md). Do not infer
+checksum provenance. Official SCB statistics and preserved SND material are used
+for validation or source-supported, reconciled supplementation; see
+[SOURCE_POLICY.md](SOURCE_POLICY.md). Do not infer
 identity, unsupported zeros or final values for missing preliminary data.
 
 From the repository root with the documented R dependencies:

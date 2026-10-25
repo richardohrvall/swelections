@@ -34,7 +34,7 @@ den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{
 För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
 \code{alkandur_R/L/K.skv}. Källan saknar bland annat explicit giltighet och
 samtycke; dessa fält är typade \code{NA}. Kandidatnamn exponeras inte.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
@@ -81,6 +81,9 @@ valår som ger \code{FALSE} med en verifierad historisk fil. Listnummer som
 senare uppstår i valresultatet, inklusive \code{90000}, påverkar inte fältet.
 }
 \description{
+Läser kandidaturer och valsedelslistor med tillgängliga listpositioner och attribut.
+}
+\details{
 För 2006 används bevarade slutliga lokala källor. \code{kandidatnummer} är
 en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
@@ -89,8 +92,7 @@ personkopplingar och attribut förblir \code{NA}. Personröster över flera
 personvalsområden kan inte aggregeras på personnivå för 2006 och
 \code{komplettera_nollor} skapar inga oobserverade kandidatkombinationer.
 Slutliga rådatavärden används inte för att fylla preliminära luckor.
-}
-\details{
+
 Hämtar kandidaturdata från Valmyndigheten.
 
 För 2010 används bevarade slutliga XML-/valsedelskällor och samma

@@ -1,0 +1,119 @@
+---
+title: "Coverage"
+output: rmarkdown::html_document
+---
+
+This page describes the published **v0.4.1** interfaces. Availability depends on
+the election event, function, geographic level and counting stage. A supported
+year does not imply that every combination exists. Function coverage indicates
+which interfaces are available, not that every field, geographic level or
+counting stage is available for each election.
+
+## Ordinary elections
+
+The seven election-data functions are `results()`, `seats()`, `candidacies()`,
+`candidates()`, `elected()`, `substitutes()` and `preference_votes()`.
+
+| Election | Normal source | Function coverage | Result counting stages |
+| --- | --- | --- | --- |
+| Parliamentary (RD), regional (RF), municipal (KF), 2002 | Canonical | Six functions; no `candidacies()` | Final |
+| RD/RF/KF, 2006 | Canonical | All seven | Final |
+| RD/RF/KF, 2010 and 2014 | Canonical | All seven | Final and supported preliminary views |
+| RD/RF/KF, 2018 | Canonical | All seven | Final; preliminary requests are rejected |
+| RD/RF/KF, 2022 | Canonical | All seven | Final and supported preliminary views |
+| RD/RF/KF, 2026 | Remote | Supported current functions and files | Availability follows the official current distribution |
+| European Parliament, 2004, 2014 | Canonical | All seven | Final |
+| European Parliament, 2009 | Canonical | Six functions; preference votes require explicit local sources | Final |
+| European Parliament, 2019 and 2024 | Canonical | All seven | Final and supported preliminary views |
+| Euro referendum, 2003 | Canonical | `results()` | Final |
+
+Counting stages in this table refer to results. Candidate preference votes and
+fixed elected/substitute relationships use their documented final-result
+sources; they are not automatically available for every stage.
+
+2022 election results are available through the published canonical data.
+Separately supported current candidacy exports and 2022–2026 mandate-period
+history are also available through remote sources. See `data_sources` for
+function-specific source requirements.
+
+## Geography
+
+`results()` offers national, county/region, municipality, constituency and
+voting-district views where applicable to the election and source. The
+constituency categories include parliamentary, regional and municipal
+constituencies; they are not interchangeable. See `results()` for exact
+`level` values and `seats()` for mandate geography.
+
+District views distinguish ordinary voting districts from collection/Wednesday
+units. These units must not be silently distributed across constituencies.
+Collection units do not receive invented electorate or turnout values.
+Historical codes and names describe the source geography; the package does not
+currently harmonise district boundaries across elections.
+
+## Re-elections
+
+These are separate election events within the original election's continuing
+mandate period, rather than replacement ordinary elections in a time series.
+All five have published canonical `results()` and `seats()`:
+
+| Event | Geographic scope | Event seats |
+| --- | --- | ---: |
+| Orsa, 16 March 2003 | Municipality 2034 | 31 |
+| Västra Götaland, 15 May 2011 | Region 14 and its five constituencies | 149 |
+| Örebro, 15 May 2011 | Nordöstra constituency 188004 only | 17 |
+| Båstad, 10 May 2015 | Municipality 1278 | 41 |
+| Falun, 7 April 2019 | Municipality 2080 | 61 |
+
+Candidate-related functions are not enabled for these event products.
+No complete preliminary re-election result is available.
+Use `election_events()` or `valtillfallen()` to discover the events.
+
+`seats(..., election_kind = "re_election")` returns the event allocation.
+`seats(..., after_re_election = TRUE)` returns the verified effective composition
+under the original ordinary election year. For Örebro this is 65 seats: 48
+unaffected seats from 2010 plus 17 from the 2011 event. No new municipality-wide
+seat allocation is calculated from combined votes.
+
+## Mandate-period history
+
+`mandate_history()`, `members_at()` and `vacant_seats_at()` use the same population
+of allocated mandates.
+
+- **2014–2018 and 2018–2022:** published canonical intervals, including Båstad and
+  Falun re-election transitions within the original periods.
+- **2022–2026:** current supported remote history/member files, not canonical
+  history. Queries cannot extend beyond verified source-date coverage.
+- **Earlier periods:** not included in the public mandate-history coverage.
+
+Båstad's holder continuity from 15 September 2014 until the 2015 re-election is
+unverified. Date queries requiring that interval fail clearly; it is not treated
+as a vacancy. History describes electoral mandate holding under the source date
+conventions, not attendance or temporary substitute service at meetings.
+
+## Important source limitations
+
+- **RKL 2002:** the full ballot-candidacy population has not been recovered.
+  Reported result/preference observations remain separate from that gap. Some
+  small-party votes remain aggregated; missing original files do not imply
+  missing final party totals where complementary official sources reconcile them.
+- **EU 2009:** canonical preference votes are excluded because of unresolved
+  source allocation and linkage issues. A compatible preserved archive can be
+  used explicitly with `source = "local"`; auto never selects it. See the
+  [detailed completeness record](https://github.com/richardohrvall/swelections/blob/main/development/COMPLETENESS_EU_2009.md).
+- **EU 2004:** 943 valid handwritten votes remain a reported aggregate without
+  invented individual party designations.
+- **EU 2014:** ten valid handwritten votes in Vårdsberg have an unreported party
+  designation in the preserved result material; they remain in valid totals.
+- **EU 2024:** candidate 1203 occurs in an earlier candidacy snapshot but is
+  absent from the later approved population. This documented snapshot difference
+  does not change the final votes or mandates.
+- **Referendum 2003:** Blank is a valid voting option, separate from invalid
+  ballots. Electorate-composition counts exist nationally and by county, not
+  below those levels; no downward allocation is made.
+
+An unavailable complete preliminary collection snapshot is a source/recovery
+limitation, not evidence that the authority never produced one. Election-night
+material is not silently substituted for it.
+
+See [Reference](../reference/index.html) for current interfaces and
+[Sources & methodology](sources-methodology.html) for interpretation.

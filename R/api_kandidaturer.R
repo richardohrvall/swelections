@@ -1,5 +1,8 @@
 #' Kandidaturer
 #'
+#' Läser kandidaturer och valsedelslistor med tillgängliga listpositioner och attribut.
+#'
+#' @details
 #' För 2006 används bevarade slutliga lokala källor. `kandidatnummer` är
 #' en paketgenererad nyckel för kandidaturen/källposten, inte ett person-ID.
 #' Lika namn kopplas inte mellan listor, områden eller valtyper. Observerade
@@ -32,7 +35,7 @@
 #'   För 2014 avser tabellen dokumenterade valsedels-/listkandidaturer i
 #'   `alkandur_R/L/K.skv`. Källan saknar bland annat explicit giltighet och
 #'   samtycke; dessa fält är typade `NA`. Kandidatnamn exponeras inte.
-#'   `"canonical"` använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+#'   `"canonical"` använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 #'   Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 #'   väljas via `options(swelections.canonical_manifest = "...")`.
 #'   `"local"` använder aldrig nätet och får inte kombineras med `update = TRUE`.

@@ -31,7 +31,7 @@ EU-valen 2004, 2009, 2014, 2019 och 2024 väljs uttryckligen med \code{val = "E"
 år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 \code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
 den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.
 \code{"local"} använder aldrig nätet och får inte kombineras med \code{update = TRUE}.
@@ -75,14 +75,16 @@ alltid \code{NA}. Rådatavägen kräver en lokal slutresultat-ZIP för 2018;
 \code{source = "canonical"} använder i stället den versionerade Parquet-samlingen.
 }
 \description{
+Läser slutresultatets rapporterade relationer mellan valda ledamöter och ersättare.
+}
+\details{
 För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
 exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
 identifierar källposter, inte verifierade personer över listor eller val.
 Kandidatnamn och attribut utan säker källa är typade saknade värden.
-}
-\details{
+
 För 2006 identifierar kandidatnumren paketgenererade källposter, inte
 personer. Ursprungliga XML-grupper beskriver ledamot–ersättarrelationer;
 senare mandatperiodsförändringar används inte. Lika namn kopplas inte.

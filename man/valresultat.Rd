@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_valresultat.R
 \name{valresultat}
 \alias{valresultat}
-\title{Officiella valresultat för 2014, 2018, 2022 och 2026}
+\title{Officiella valresultat}
 \usage{
 valresultat(ar = 2026, val = "RD",
   rakning = c("slutlig", "preliminar"), niva = NULL,
@@ -46,7 +46,7 @@ RF \code{"region"}, KF \code{"kommun"}. Se nivåerna nedan.}
 år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 \code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
 den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
@@ -94,6 +94,9 @@ Inga mandat eller personröster ingår. \code{dplyr::bind_rows()} kan användas
 för att skapa unionen av kolumner från flera nivåer.
 }
 \description{
+Läser valresultat för valda år, valtyper, geografiska nivåer och räkningar.
+}
+\details{
 För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
@@ -105,8 +108,7 @@ saknade kommunexporter med hashverifierade SCB/SND-distriktsuppgifter som
 stäms av mot Valmyndighetens kommunresultat. Poströster fördelas inte till
 kommunvalkretsar. Kandidat-/personröstuppgifter och XML-metadata återskapas
 inte. Den lokala kompletteringen kräver det valfria paketet \code{haven}.
-}
-\details{
+
 Läser en valtyp, en räkning och en geografisk nivå för ett eller flera valår
 från Valmyndighetens
 officiella primärkälla. Ingen geografisk aggregering eller automatisk

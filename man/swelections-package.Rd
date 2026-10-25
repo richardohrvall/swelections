@@ -4,39 +4,41 @@
 \name{swelections-package}
 \alias{swelections}
 \alias{swelections-package}
-\title{Svenska valdata från Valmyndigheten}
+\title{Swedish election data in R}
 \description{
-The English-first API provides \code{\link[=results]{results()}}, \code{\link[=seats]{seats()}}, \code{\link[=candidacies]{candidacies()}},
-\code{\link[=candidates]{candidates()}}, \code{\link[=elected]{elected()}}, \code{\link[=substitutes]{substitutes()}} and \code{\link[=preference_votes]{preference_votes()}}. The Swedish functions,
-including \code{\link[=valresultat]{valresultat()}} and \code{\link[=personroster]{personroster()}}, remain fully supported.
-English functions return English column names by default. Use \code{names = "sv"}
-or \code{options(swelections.names = "sv")} for Swedish output column names.
-Language selection changes column names and technical categories. Canonical
-and English categories are English; Swedish output localizes them. Booleans
-remain logical. Proper names and source identifiers are preserved. Referendum
-option names are \code{yes}/\code{no}/\code{blank} in English and \code{Ja}/\code{Nej}/\code{Blank} in Swedish.
-Blank is valid, separate from invalid ballots. See \link{data_sources}.
-Resultatfiler väljs via \code{index.md5}. Optionen
-\code{swelections.resultatsamling_2026} väljer resultatsamling och har för närvarande
-standardvärdet \code{"val2026"}. Test-/utvecklingssamlingen \code{"genrep2026"} kan
-väljas uttryckligen.
+swelections brings together election information across source files, years,
+formats and geographic levels. Public interfaces cover \code{\link[=results]{results()}}, \code{\link[=seats]{seats()}},
+\code{\link[=candidacies]{candidacies()}}, \code{\link[=candidates]{candidates()}}, \code{\link[=elected]{elected()}}, \code{\link[=substitutes]{substitutes()}} and
+\code{\link[=preference_votes]{preference_votes()}}. \code{\link[=election_events]{election_events()}} discovers election occasions;
+\code{\link[=mandate_history]{mandate_history()}}, \code{\link[=members_at]{members_at()}} and \code{\link[=vacant_seats_at]{vacant_seats_at()}} describe supported
+mandate periods. Swedish counterparts include \code{\link[=valtillfallen]{valtillfallen()}},
+\code{\link[=valresultat]{valresultat()}} and \code{\link[=mandathistorik]{mandathistorik()}}.
 }
 \details{
-En lokal rådatamapp anges med \code{data_dir} eller optionen
-\code{swelections.data_dir}. Explicit \code{data_dir} har företräde.
-Med \code{source = "auto"} prioriteras godkänd canonical-data för efterfrågad
-valfamilj, valhändelse, år och vy. Utan godkänd täckning används befintlig
-rådataväg. EU-prototyperna är fortsatt endast explicit valbara. Se \link{data_sources}.
-Med \code{source = "local"} krävs en befintlig lokal fil och nätåtkomst används aldrig.
-Med \code{source = "remote"} används fjärrkällan vid vanlig läsning.
+English functions return English columns and technical categories. Use
+\code{names = "sv"} where supported, or a Swedish counterpart. Proper names and
+literal source identifiers retain their source spelling. Boolean properties
+remain logical. The 2003 referendum options are \code{yes}, \code{no} and \code{blank} in
+English and \code{Ja}, \code{Nej} and \code{Blank} in Swedish; Blank is valid and separate
+from invalid ballots.
 
-\code{update = TRUE} uppdaterar arbetskopian om innehållet har ändrats.
-\code{archive = TRUE} sparar en daterad kopia; en tidigare kopia från samma
-datum kan ersättas. Dessa alternativ kräver en lokal rådatamapp och
-kan använda nedladdningslogiken med \code{source = "auto"} eller \code{"remote"}.
-\verb{source = "local", update = TRUE} ger ett fel före filåtkomst.
-Lokal arkivering kopierar endast en redan befintlig lokal fil; saknas filen
-ges ett fel utan nedladdning.
+\code{source = "auto"} selects approved canonical coverage for the requested
+election family, event, year and view; otherwise it uses a supported remote
+source. It never discovers local raw files. Explicit \code{canonical}, \code{remote}
+and \code{local} choices are described in \link{data_sources}. Historical canonical
+data need no developer archive. \code{local} requires the user's own compatible
+sources, selected through \code{data_dir} or the documented raw-root options.
+
+The published data-v0.4.1 generation covers ordinary RKL 2002--2022, EU
+2004--2024, the final 2003 referendum, five re-election results/seats events
+and completed-period histories for 2014/2018. Coverage varies by function,
+geography and counting stage; RKL 2002 candidacies and EU 2009 canonical
+preference votes are excluded. Supported 2026 election data and current
+2022 mandate history use their separate remote sources.
+
+\code{update} and \code{archive} apply only to supported raw-source operations, not
+canonical data. They do not make automatic selection choose a local archive.
+See \link{data_sources} and the function help for requirements and restrictions.
 }
 \seealso{
 Useful links:

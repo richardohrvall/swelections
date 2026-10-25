@@ -6,10 +6,14 @@ The [frozen v0.4.0 record](releases/v0.4.0.md) gives the published commit,
 file sizes, hashes and URLs. Raw sources, caches and generated outputs stay
 outside Git. No Python executable is required.
 
-The separate [v0.4.1 candidate record](releases/v0.4.1.md) and
-[planned inventory](releases/data-v0.4.1-files.csv) cover 200 assets and sixteen
-manifests, including five final results/seats re-elections and two rebuilt
-mandate-history products. This is not yet a published release.
+The published [v0.4.1 package](https://github.com/richardohrvall/swelections/releases/tag/v0.4.1) and
+[data release](https://github.com/richardohrvall/swelections/releases/tag/data-v0.4.1)
+cover 200 assets and sixteen manifests, including five final results/seats
+re-elections and two rebuilt mandate-history products. The
+[prepublication record](releases/v0.4.1.md) and
+[tracked scope/Parquet inventory](releases/data-v0.4.1-files.csv) retain the
+preparation evidence. Final manifest hashes belong to the separate post-commit
+distribution inventory; the tracked scope intentionally leaves those fields blank.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for R dependencies and package checks.
 Run tools from the repository root with an explicitly configured library/input

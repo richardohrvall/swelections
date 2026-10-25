@@ -1,5 +1,8 @@
-#' Officiella valresultat för 2014, 2018, 2022 och 2026
+#' Officiella valresultat
 #'
+#' Läser valresultat för valda år, valtyper, geografiska nivåer och räkningar.
+#'
+#' @details
 #' För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 #' den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 #' Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt

@@ -38,7 +38,7 @@ RF \code{"region"} eller RD \code{"riket"}; endast denna nivå kan väljas expli
 år och vy. Annars används stödd fjärrkälla, aldrig lokala råfiler. Välj uttryckligen
 \code{local} för eget sparat källmaterial eller \code{remote} för Valmyndigheten där
 den vägen stöds. \code{data_dir} ensamt väljer inte bort canonical. Se \link{data_sources}.
-\code{"canonical"} använder releasekandidatens registrerade Parquet-samling eller ett uttryckligen konfigurerat canonical-manifest.
+\code{"canonical"} använder den publicerade registrerade Parquet-samlingen eller ett uttryckligen konfigurerat canonical-manifest.
 Ett publicerat manifest hämtas automatiskt; en lokal byggversion kan
 väljas via \code{options(swelections.canonical_manifest = "...")}.}
 
@@ -101,14 +101,16 @@ För KF är \code{valomradesnamn} paketets korta kommunnamn, uppslaget via
 \code{valomradeskod}; separata kommunfält dupliceras inte.
 }
 \description{
+Läser mandatfördelning vid val eller verifierad sammansättning efter omval.
+}
+\details{
 För 2002 används bevarad officiell slutlig XML. Orsas ordinarie val
 den 15 september 2002 hålls skilt från omvalet den 16 mars 2003.
 Kompletta preliminära uppsamlingsresultat har inte återfunnits; valnatt
 exponeras inte som ett fullständigt preliminärt resultat. Kandidatnycklar
 identifierar källposter, inte verifierade personer över listor eller val.
 Kandidatnamn och attribut utan säker källa är typade saknade värden.
-}
-\details{
+
 Hämtar mandatfördelningen.
 
 För 2010 används bevarade slutliga XML-/valsedelskällor och samma

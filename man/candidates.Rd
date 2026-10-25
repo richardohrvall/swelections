@@ -31,29 +31,13 @@ election, geographic level and count stage.}
 \item{include_results}{Include final preference-vote and elected-member
 results when \code{TRUE}; corresponds to \code{resultat} in \code{\link[=kandidater]{kandidater()}}.}
 
-\item{source}{\code{"auto"}, \code{"local"}, \code{"remote"} or \code{"canonical"}.
-\code{auto} prefers approved canonical coverage for the requested election family,
-event, year and view, even when local raw files exist. Without that coverage,
-it uses a supported remote route, never the user's local raw files.
-If neither is available, select \code{source = "local"} explicitly for a saved
-archive. Explicit \code{remote} uses Valmyndigheten
-where supported; \code{local} requires the user's saved raw archive and never
-uses the network. \code{canonical} requires canonical data without raw fallback.
-Use \code{source = "local"} to select \code{data_dir} instead of canonical under \code{auto}.
-Private prototypes cannot extend automatic permission. Configured manifests may be
-a single path or named paths keyed by \code{series:ordinary:year} (e.g.
-\code{eu:ordinary:2014}), \code{series:year}, or legacy year keys. See \link{data_sources}.
-Canonical Parquet reading requires optional package \code{nanoparquet}.
-The 2014 raw route requires a preserved local archive: final XML under
-\code{2014/valresultat/slutresultat_20141001}, election-night XML under
-\code{2014/valresultat/valnatt}, ballot files under \code{2014/kandidater}, and the
-independently captured preliminary collection-district presentation.
-Remote/update/archive operations are not implemented for this historical
-source collection. Preliminary results combine ordinary election-night
-districts with preliminary collection districts, never final collection
-votes. Seats, elected members, substitutes and preference votes use final
-election XML; later membership files are excluded. Candidate names are
-typed missing values. Unsupported historical attributes remain missing.}
+\item{source}{How data are obtained. \code{"auto"} selects approved canonical
+coverage, otherwise a supported current remote source; never local files.
+\code{"canonical"} explicitly reads canonical data. \code{"remote"} explicitly reads a
+supported official Valmyndigheten source. Neither silently falls back to
+another source. \code{"local"} reads your own compatible raw archive using
+\code{data_dir}. Canonical reading requires \code{nanoparquet}. See \link{data_sources}
+for source requirements, historical archives and manifest configuration.}
 
 \item{data_dir}{Local root directory for raw files.}
 
@@ -91,11 +75,15 @@ Full output preserves the original parent fields as
 A tibble with the same rows, values and types as \code{\link[=kandidater]{kandidater()}}.
 }
 \description{
+Return one row per candidate within the relevant election type and party,
+with additional candidate-level information where available. The resulting
+data do not provide a longitudinal link between the same person across elections.
+}
+\details{
 For 2006, a candidate number is a package-generated source-observation
 key. Ballot, area preference-vote and appointment observations are retained
 separately; equal names are not linked. Rows are not unique-person counts
 and unsupported cross-source totals/attributes remain missing.
-Read one row per candidate, election type and party through \code{\link[=kandidater]{kandidater()}}.
 }
 \seealso{
 \code{\link[=kandidater]{kandidater()}}, \code{\link[=elected]{elected()}}
