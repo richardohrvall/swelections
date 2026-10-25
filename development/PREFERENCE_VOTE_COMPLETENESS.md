@@ -2,7 +2,7 @@
 
 This is a methodological summary, not a new availability rule. The implemented
 readers and their deterministic tests define the detailed year/source behaviour.
-It replaces early genrep-era availability descriptions that are retained locally.
+It replaces early genrep-era availability descriptions available in Git history.
 
 ## Evidence before missing-value inference
 

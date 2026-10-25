@@ -1,9 +1,10 @@
 # Consolidated historical validation notes
 
 This document preserves lasting evidence from retired working plans, early release
-reviews and genrep integrations. Those originals and the exploratory notebook are
-retained locally; their old counts, API layouts and status claims are not current
-contracts. Frozen tests and current source-specific reports remain authoritative.
+reviews and genrep integrations. Original work reports remain in Git history;
+superseded local copies have been removed. Their old counts, API layouts and status
+claims are not current contracts. The exploratory notebook is not a build input.
+Frozen tests and current source-specific reports remain authoritative.
 
 ## Early 2026 source observations
 

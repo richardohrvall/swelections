@@ -166,6 +166,7 @@ kandidater <- function(
   if (source %in% c("canonical", "canonical_auto"))
     return(.canonical_source(ar, "kandidater", val, resultat = resultat,
       auto_selected = identical(source, "canonical_auto")))
+  if (isTRUE(resultat)) .check_resultat_remote_2022(ar, source)
   raw_options <- options(swelections.internal_raw_request = TRUE)
   on.exit(options(raw_options), add = TRUE)
   if (ar == 2002L) {

@@ -176,7 +176,8 @@ supported by a unique official municipality/constituency relation. Only
 constituency/preference-area code/name fields changed; all votes, row counts,
 keys, order, types and other values were identical. Both recomputed files
 passed exact Parquet round trip and the subsequent public raw/API sweep.
-Earlier prototype copies remain locally available; no historical assets changed.
+Earlier prototype locations are historical; original sources and release records
+remain preserved. No historical result assets changed.
 
 Manifest SHA256:
 `5d1d9941bb6f47eee54d8ae95148e4aec3a42f4867de81a4188a130265a636a0`.

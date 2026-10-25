@@ -1,3 +1,13 @@
+.check_resultat_remote_2022 <- function(ar, source) {
+  if (ar == 2022L && source %in% c("auto", "remote"))
+    stop("The supported 2022 remote result distribution is no longer publicly available. ",
+         "Use source = \"canonical\" for validated historical data or ",
+         "source = \"local\" with a compatible saved raw archive. ",
+         "No fallback to canonical, local archives or presentation files is performed.",
+         call. = FALSE)
+  invisible(NULL)
+}
+
 # Resultatindex och ZIP-sökvägar delas mellan valåren. Indexet bestämmer alltid
 # de faktiska filnamnen; varken valdag eller filprefix byggs in i sökvägen.
 .resultatsamling <- function(ar) {
@@ -7,6 +17,7 @@
 }
 
 .read_resultatindex <- function(ar, source, data_dir, update, archive) {
+  .check_resultat_remote_2022(ar, source)
   file <- .resolve_val_file(
     path = "index.md5", ar = ar, samling = .resultatsamling(ar),
     source = source, data_dir = data_dir, update = update, archive = archive
@@ -21,6 +32,7 @@
 }
 
 .resultat_file <- function(ar, path, source, data_dir, update, archive) {
+  .check_resultat_remote_2022(ar, source)
   .resolve_val_file(
     path = path, ar = ar, samling = .resultatsamling(ar),
     source = source, data_dir = data_dir, update = update, archive = archive

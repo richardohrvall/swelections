@@ -15,8 +15,10 @@
 #'   This explicit choice is independent of auto permission and still requires
 #'   the requested asset/view to exist in the selected manifest.
 #' * `source = "local"` uses the user's preserved raw sources, never the network.
-#' * `source = "remote"` uses the supported Valmyndigheten raw route, irrespective
-#'   of canonical availability. Unsupported historical remote formats still fail.
+#' * `source = "remote"` explicitly uses a current, official and supported
+#'   Valmyndigheten source, regardless of format or canonical availability.
+#'   It never falls back to canonical or local sources. A new presentation
+#'   format does not automatically replace an older supported export contract.
 #'
 #' Without approved canonical coverage, `auto` uses a supported remote source,
 #' never user-saved local raw files, even when a raw archive is configured. If
@@ -50,6 +52,15 @@
 #' remote member/history exports for 2022. The two date queries filter the same
 #' chair population. 2022 history is not made canonical merely because its fixed
 #' election results are canonical. See [mandate_history()] for source coverage.
+#'
+#' @section 2022 remote coverage:
+#' The former indexed 2022 result JSON distribution is no longer publicly
+#' available. Explicit remote requests that require it fail with source guidance;
+#' they do not use presentation JSON, old raw caches or saved archives instead.
+#' Approved canonical results and explicit compatible local archives are unchanged.
+#' The separately supported current candidacy ZIP/CSV and mandate-period
+#' member/history exports remain remote sources under their existing contracts.
+#' Source formats and coverage differ by election and function.
 #'
 #' @section Verified remote raw-file cache:
 #' Structured result ZIPs indexed by Valmyndigheten's `index.md5` are stored in

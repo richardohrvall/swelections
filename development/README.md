@@ -93,7 +93,8 @@ generation without changing frozen v0.4.0 inputs;
 | `validate-re-elections.R` | Independent omval controls; requires tracked `SOURCE_INVENTORY_OMVAL_FILES.csv` |
 | `validate-canonical-re-elections.R` | All final re-election canonical/raw levels, languages, details and source controls |
 | `validate-canonical-v0.4.1.R` | Current 200-asset/16-manifest inventory, hashes/schema/roundtrips and actual activated API routing |
-| `run_2022_sweep.R`, `run_mandat_2022_sweep.R`, `validate_tomma_stolar_2026.R` | Explicit opt-in official remote sweeps, distinct from pinned-source reproducibility |
+| `run_2022_sweep.R`, `run_mandat_2022_sweep.R` | Historical diagnostics for the withdrawn 2022 index endpoint; not current remote checks or release requirements. Use preserved local sources and `validate_canonical_2022.R` for reproducibility |
+| `validate_tomma_stolar_2026.R` | Explicit opt-in current 2026 remote sweep, distinct from pinned-source reproducibility |
 | `data-raw/validate-electorate-2003.R` | Independent SCB composition checks plus a legacy prototype regression; its old physical-layout assertions are schema-specific |
 
 Scripts describe their positional inputs in their headers. Source archives may
@@ -112,7 +113,7 @@ Readiness decisions, old asset-count comparisons, the categorical migration audi
 and long performance iterations are preserved in the frozen tag, not maintained
 as current specifications. The [release record](releases/v0.4.0.md) links that
 history and the two retired schema-2 migration/incremental tools. Their local
-copies and evidence remain ignored. No original sources or published assets are
+work copies are no longer retained. No original sources or published assets are
 deleted by this documentation cleanup.
 
 ## Consolidated v0.4.1 preparation
@@ -122,6 +123,6 @@ reports are consolidated into [IMPLEMENTATION_OMVAL.md](IMPLEMENTATION_OMVAL.md)
 [VALIDATION_OMVAL.md](VALIDATION_OMVAL.md) and
 [MANDATE_HISTORY.md](MANDATE_HISTORY.md). The current release decisions, exact file
 inventory and final validation belong to [releases/v0.4.1.md](releases/v0.4.1.md).
-Original report copies and diagnostic receipts remain in ignored local storage.
+Original reports remain available through Git history; superseded local work copies are removed.
 No source collections, independent validators, canonical builders or GIS source
 links are retired by this consolidation.

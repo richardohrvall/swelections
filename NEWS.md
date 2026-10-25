@@ -1,5 +1,9 @@
 # swelections 0.4.1
 
+- Fail clearly for the retired 2022 remote result distribution, without fallback
+  to canonical, local archives or presentation files. Keep the separate current
+  candidacy and mandate-history remote sources available.
+
 - Add final canonical results and seat allocations for the five re-elections in
   2003, 2011, 2015 and 2019, with function-specific automatic selection.
 - Represent mandate components and transition reasons separately from date

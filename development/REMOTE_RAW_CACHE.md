@@ -40,7 +40,7 @@ The deterministic regression panel covers empty/warm cache, changed/new files, m
 
 The completed implementation checks are recorded below; the final published release checks are in [releases/v0.4.0.md](releases/v0.4.0.md). The pre-existing R/man/tests files changed in this task are only R/download.R, R/api_english.R, R/data_sources.R and man/data_sources.Rd. New implementation/test files are R/remote_raw_cache.R and tests/testthat/test-remote-raw-cache.R. No underlying election readers, election values, candidate identities, schemas, activation registry or canonical assets are changed.
 
-All 202 existing distribution files (190 Parquet assets and 12 manifests) match the release inventory. Activation and upload-inventory hashes remain unchanged. Source files were not overwritten. Benchmark/cache test drivers, request metadata, exact outputs and integrity logs remain local under .local-data/remote-raw-cache-20261021; persistent benchmark raw bytes are in a user cache, not .local-data.
+At v0.4.0 validation, all 202 distribution files (190 Parquet assets and 12 manifests) matched the release inventory. Activation and upload-inventory hashes were unchanged, and source files were not overwritten. The temporary benchmark work directory has since been retired; the lasting measurements are recorded here and in HISTORICAL_VALIDATION_NOTES.md. Source snapshots are preserved under SOURCE_POLICY.md. The operational remote cache remains separate from preserved source archives.
 
 ## Completed checks
 
