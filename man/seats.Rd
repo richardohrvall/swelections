@@ -34,7 +34,10 @@ ordinary election, while incorporating its verified subsequent re-elections.}
 For EU 2004/2009/2014/2019/2024, explicitly select \code{"european"} or \code{"E"}; seats are national.
 \code{NULL} retains the existing RD/RF/KF selection.}
 
-\item{count}{\code{"final"} or \code{"preliminary"}.}
+\item{count}{Official counting stage: \code{"final"} or \code{"preliminary"}.
+Preliminary counting includes election-night and collection/Wednesday
+counting where a complete source is supported. These are not separate
+argument values; district types are recorded separately.}
 
 \item{level}{For ordinary mandate results, \code{NULL} retains all relevant
 mandate levels; one or more supported levels may be selected explicitly.
@@ -64,8 +67,10 @@ for source requirements, historical archives and manifest configuration.}
 alternative to \code{year}.}
 
 \item{names}{Output column language: \code{"en"} or \code{"sv"}. \code{NULL} uses
-\code{getOption("swelections.names", "en")}. This controls column names and
-technical categories. Proper names/source identifiers remain unchanged.
+\code{getOption("swelections.names", "en")}. All seven election-data functions
+accept \code{names = "sv"} for Swedish column names and technical categories.
+Proper names and literal source identifiers retain their source spelling.
+\code{election_events()} has no \code{names} argument; use \code{\link[=valtillfallen]{valtillfallen()}} instead.
 Booleans are logical in both languages. Consent/declaration in full output
 have separate \verb{*_applicable} flags; not applicable is not false.}
 

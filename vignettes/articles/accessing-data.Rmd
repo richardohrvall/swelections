@@ -3,9 +3,12 @@ title: "Accessing the data"
 output: rmarkdown::html_document
 ---
 
-Use the R functions for the package's documented output tables, export those
-tables for use in other software, or read the published Parquet files directly.
-`swelections` is an R package; it does not currently provide separate Python,
+Use the R functions for documented output tables, or read the published
+canonical data — the versioned Parquet files distributed by `swelections` —
+directly in other tools such as Python. The published files provide a stable
+data basis for the corresponding release. Direct file access may require
+selecting stored tables or combining files.
+`swelections` is an R package; it does not provide separate Python,
 Stata or SPSS packages.
 
 ## Source selection in R
@@ -16,8 +19,8 @@ default `"auto"`; choose another source explicitly when you need a particular in
 - `"auto"` (default) selects approved canonical data for the requested election
   and function, otherwise a supported remote source. It never selects local raw
   files. If neither source is supported, the request gives an error.
-- `"canonical"` explicitly reads the package's validated, published historical
-  data, without raw-source fallback.
+- `"canonical"` explicitly reads the versioned Parquet files published in a
+  swelections data release, without raw-source fallback.
 - `"remote"` reads a current, official and explicitly supported Swedish Election
   Authority source, even when canonical data exist. It does not fall back to
   canonical or local data.
@@ -28,6 +31,43 @@ Remote formats and coverage vary between elections and functions. A new
 presentation file does not automatically replace a withdrawn detailed export.
 See [Coverage](coverage.html) for availability and `data_sources` for detailed
 source requirements. [Get started](swelections.html) shows the R interface.
+
+## Saving source data locally
+
+For supported remote raw-data sources, `source = "remote"` with
+`update = TRUE` and `data_dir` saves the raw files needed by the call. Use the
+same directory with `source = "local"` to repeat the request later without
+downloading the source again:
+
+```r
+data_dir <- "my-data"
+
+data_remote <- candidacies(
+  year = 2026,
+  election = "parliamentary",
+  source = "remote",
+  data_dir = data_dir,
+  update = TRUE
+)
+
+data_local <- candidacies(
+  year = 2026,
+  election = "parliamentary",
+  source = "local",
+  data_dir = data_dir
+)
+```
+
+Only the raw files needed by the call are saved. `archive = TRUE` is optional:
+add it to the remote call to create a dated copy as well. It is not needed for
+later local use. A dated copy can be replaced if the same source is fetched
+again on the same day; use a separate directory for each snapshot you want
+to preserve. `source = "local"` reads compatible raw source files, not a saved
+output table. See the `data_sources` help page for source requirements.
+
+To save an extracted output table instead, use `saveRDS(data_remote, "data.rds")`
+and read it with `readRDS()`. Such a file is not an input archive for
+`source = "local"`.
 
 ## Exporting tables
 
@@ -68,10 +108,10 @@ all rows or files indiscriminately.
 ## Reading a Parquet file in Python
 
 Install `pandas` and a Parquet engine such as `pyarrow` in your Python environment.
-This example reads the published Falun 2019 re-election file directly. The
+This example reads published 2022 municipal election results directly. The
 manifest is used for file verification: the byte count and SHA256 must match
-before the data are read. The municipality filter then selects one geographic
-level. This is direct file access, not a Python API provided by `swelections`.
+before the data are read. The filter selects Stockholm municipality results,
+keeping them separate from district and constituency rows. This is direct file access, not a Python API provided by `swelections`.
 
 ```python
 import hashlib
@@ -82,14 +122,14 @@ from urllib.request import urlopen
 import pandas as pd
 
 base = "https://github.com/richardohrvall/swelections/releases/download/data-v0.4.1"
-with urlopen(f"{base}/rkl2019-re-election-manifest.json") as response:
+with urlopen(f"{base}/rkl2022-manifest.json") as response:
     manifest = json.load(response)
 
 # This example targets the documented v0.4.1 storage contract.
 assert manifest["schema_version"] == 3
 asset = next(
     item for item in manifest["assets"]
-    if item["file"] == "rkl2019-re-election-kf-2080-results-final.parquet"
+    if item["file"] == "rkl2022-results-slutlig-kf.parquet"
 )
 with urlopen(f"{base}/{asset['file']}") as response:
     payload = response.read()
@@ -98,11 +138,14 @@ assert len(payload) == asset["bytes"]
 assert hashlib.sha256(payload).hexdigest() == asset["sha256"]
 
 tables = pd.read_parquet(io.BytesIO(payload), engine="pyarrow")
-municipality = tables.loc[tables[".table"].eq("municipality")]
-print(municipality[["municipality_name", "party_abbreviation", "votes"]])
+stockholm = tables.loc[
+    tables[".table"].eq("municipality")
+    & tables["municipality_code"].eq("0180")
+]
+print(stockholm[["municipality_name", "party_abbreviation", "votes"]])
 ```
 
-The file also contains district rows. Its `.table` column distinguishes the
+The file also contains district and municipal constituency rows. Its `.table` column distinguishes the
 stored views; other files may use `.component` or additional selectors. Check
 the manifest's `tables` entries and declared columns rather than assuming every
 file has the same layout.
@@ -110,12 +153,50 @@ file has the same layout.
 Retain the data-release identifier with your analysis. For technical category
 and storage definitions, see the [value/storage contract](https://github.com/richardohrvall/swelections/blob/main/development/VALUE_CONTRACT.md).
 
-## Complementary SCB statistics
+## Other data resources
 
-Statistics Sweden's aggregate statistics can also be retrieved programmatically
-through its [PxWeb API](https://www.scb.se/en/services/open-data-api/), for example
-with the R package [pxweb](https://ropengov.github.io/pxweb/). This is a separate,
-complementary resource, not a swelections interface. See
-[Sources & methodology](sources-methodology.html#related-official-statistics)
-for relevant statistics and the distinction between aggregates and restricted
-microdata.
+`swelections` is one way of accessing Swedish election data. Original sources
+and related resources are also available from the organisations that produce,
+preserve and distribute election statistics and research data.
+
+### The Swedish Election Authority
+
+The Swedish Election Authority publishes
+[election results, statistics and raw data](https://www.val.se/valresultat-och-statistik/statistik-och-data)
+in several formats. These official files underlie much of the material used
+by `swelections`; the package does not replace the original source files.
+
+### Complementary statistics from Statistics Sweden
+
+Statistics Sweden (SCB) produces official election statistics. Its
+[general-election statistics](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-elections/general-elections-results/)
+include links to aggregate tables in its PxWeb Statistical Database. These can
+also be retrieved programmatically through the
+[PxWeb API](https://www.scb.se/en/services/open-data-api/), for example with the
+R package [pxweb](https://ropengov.github.io/pxweb/). This is a complementary
+resource, not a swelections interface.
+
+Statistics Sweden also publishes statistics on
+[nominated and elected candidates](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-elections/general-elections-nominated-and-elected-candidates/),
+[elected representatives and their assignments](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-statistics/survey-of-elected-representatives-in-municipalities-and-county-councils/)
+and [electoral participation](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-elections/general-elections-participation-survey/),
+with breakdowns by background characteristics. More detailed microdata are not
+open data or part of `swelections`. Research access may be possible after
+disclosure and eligibility assessment; the
+[English guidance](https://www.scb.se/en/services/ordering-data-and-statistics/microdata/)
+states that release requires a Swedish entity responsible for research. Check
+the conditions and available variables for the specific project; see also the
+[microdata FAQ](https://www.scb.se/vara-tjanster/bestall-data-och-statistik/mikrodata/fragor-och-svar/).
+
+### Swedish National Data Service (SND)
+
+[SND](https://snd.se/en) makes research data discoverable and accessible through
+[Researchdata.se](https://researchdata.se/en), including historical Swedish
+electoral datasets and other election-related research data. Some historical
+datasets, such as [Swedish electoral data for the 2002 general election](https://researchdata.se/en/catalogue/dataset/snd0237-10),
+use Statistics Sweden data processed and documented for research. Other
+election-related collections have different producers and sources; check each
+dataset's documentation and access conditions.
+
+These resources can be useful for original source files, alternative formats,
+statistics outside swelections coverage and related election research data.

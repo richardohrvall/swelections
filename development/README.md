@@ -15,6 +15,11 @@ re-elections and two rebuilt mandate-history products. The
 preparation evidence. Final manifest hashes belong to the separate post-commit
 distribution inventory; the tracked scope intentionally leaves those fields blank.
 
+For the next package version, the intended title is
+`swelections: Swedish Election Data in R`. Update `DESCRIPTION`'s `Title` to
+`Swedish Election Data in R` and update version-matched citation metadata together.
+The released v0.4.1 title and citations must remain unchanged.
+
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for R dependencies and package checks.
 Run tools from the repository root with an explicitly configured library/input
 archive. Historical snapshots are not interchangeable with current remote files.

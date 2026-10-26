@@ -7,7 +7,7 @@ output: rmarkdown::html_document
 election years, formats and geographic levels. Its two main official sources
 are the Swedish Election Authority and Statistics Sweden (SCB).
 The Swedish Election Authority is responsible for planning and coordinating the
-implementation of elections. Statistics Sweden (SCB) is responsible for official
+implementation of elections. Statistics Sweden is responsible for official
 election statistics.
 The package uses data from both.
 
@@ -15,19 +15,22 @@ The package uses data from both.
 
 The legally established final result and official election protocols define the
 final election outcome. The package combines detailed Election Authority files
-with relevant SCB tables and preserved historical sources, keeping their
-definitions and coverage explicit. SCB's official election statistics are also
+with relevant Statistics Sweden tables and preserved historical sources, keeping their
+definitions and coverage explicit. Statistics Sweden's official election statistics are also
 used for validation and supplementation where relevant. Historical exports are
 checked rather than assumed to be error-free.
 
 Where a primary file is unavailable, preserved supplementary material, including
-SCB-derived files and Swedish National Data Service (SND) collections, may support
+files derived from Statistics Sweden and Swedish National Data Service (SND) collections, may support
 a documented reconstruction. Such supplements are identified and checked against
 available official results; they are not presented as the missing original file.
 
 Checks include vote totals, ballots cast, eligible voters, geographic aggregation,
 seat allocations and reported candidate/list totals. They depend on what the
 source reports and which counting stage it describes.
+
+For original data and complementary resources beyond the package, see
+[Other data resources](accessing-data.html#other-data-resources).
 
 ## Differences between sources
 
@@ -43,18 +46,15 @@ The [2002 reconciliation record](https://github.com/richardohrvall/swelections/b
 and [EU 2009 completeness record](https://github.com/richardohrvall/swelections/blob/main/development/COMPLETENESS_EU_2009.md)
 provide detailed examples.
 
-## Provenance and preservation
+## Canonical data
 
-Canonical data are versioned tables with recorded sources and processing
-information. Relevant official raw files are preserved with source URLs,
-retrieval information and checksums, including original indexes where available.
-This allows historical results to remain reproducible when official files or
-their web addresses change or disappear. Raw archives are not distributed with
-the package and are not needed to use published canonical data.
-
-Canonical, remote and local describe how data are obtained, not which official
-source has authority. See [Accessing the data](accessing-data.html) for source
-selection and direct file access.
+Canonical data are versioned Parquet files published with a `swelections` data
+release. They provide a stable and reproducible data basis for the corresponding
+package version and can be used without access to the underlying raw source
+files. `canonical`, `remote` and `local` describe how data are obtained, not
+different degrees of official status or quality. See
+[Accessing the data](accessing-data.html) for source selection and direct file
+access.
 
 ## Missing values and categories
 
@@ -70,7 +70,8 @@ information to the default `"standard"` output without changing shared values.
 
 ## Candidacies, candidates and mandate holders
 
-`candidacies()` describes election-specific candidacies and ballot-list positions.
+`candidacies()` describes election-specific candidacies and ballot-list entries.
+It can contain multiple list entries for the same candidate.
 `candidates()` provides one row per candidate within the relevant election and
 party, with additional candidate-level information where available. The resulting
 data do not provide a longitudinal link between the same person across elections.
@@ -94,44 +95,57 @@ Re-elections are separate events within a continuing mandate period. Effective
 post-re-election seat compositions retain the origins of their components.
 See [Coverage](coverage.html) for the periods and events supported.
 
-## Counting stages and totals
+## Preliminary and final counting
 
-Final and preliminary results, including election-night and collection counts,
-are kept separate. A missing preliminary collection/Wednesday snapshot is not
-completed with final figures. Only verified counting stages and geographic
-detail are exposed.
+The preliminary count begins at polling stations on election night and
+continues with the collection/Wednesday count of late-arriving advance votes
+and votes from abroad. Only parties expected to win seats are reported
+separately at this stage; other parties may be grouped together. Personal votes
+are not counted. Collection votes are reported in collection districts rather
+than ordinary voting districts, to protect ballot secrecy.
 
-Totals may repeat across party rows, and different geographic levels overlap.
-Do not sum repeated totals or combine alternative levels as if they were
-separate populations. Historical source geography is retained; voting-district
-boundaries are not harmonised across elections.
+The county administrative boards conduct the final count, checking votes and
+counting every party's votes and personal votes. It starts on Monday after
+election day, while the preliminary collection count takes place on Wednesday;
+the processes therefore overlap. `preliminary` and `final` are different
+counting stages, not complementary parts to add together. See the Election
+Authority's [English explanation](https://www.val.se/english/the-swedish-electoral-system/preliminary-and-final-election-results)
+and [Swedish guide](https://www.val.se/det-svenska-valsystemet/rostrakning-och-mandatfordelning/preliminar-rostrakning),
+and [Understanding Swedish elections](understanding-elections.html#collection-districts)
+for the geographic context. Missing preliminary snapshots are not completed
+with final figures.
 
-For the 2003 referendum, `yes`, `no` and `blank` are valid voting options, not
-Boolean values. Blank is separate from invalid ballots. Its treatment must not
-be transferred to other elections, where the applicable source definitions differ.
+## Totals and geographic levels
 
-## Related official statistics
+Result tables often have one row per party. Eligible-voter counts, ballots cast
+and other totals for the area can therefore appear on every party row. Summing
+those repeated values across parties would count the same total more than once.
 
-`swelections` complements Statistics Sweden's election-related statistics rather
-than replacing them. SCB publishes aggregate statistics on:
+Geographic levels also overlap: voting districts belong to municipalities,
+which belong to larger areas. Choose the level your analysis concerns rather
+than adding the same population from several levels.
 
-- [Nominated and elected candidates](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-elections/general-elections-nominated-and-elected-candidates/),
-  with background characteristics such as age, sex, education, income and country
-  of birth.
-- [Elected representatives and their assignments](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-statistics/survey-of-elected-representatives-in-municipalities-and-county-councils/),
-  covering a broader population of municipal and regional representatives than
-  council election results alone.
-- [Electoral participation](https://www.scb.se/en/finding-statistics/statistics-by-subject-area/democracy/general-elections/general-elections-participation-survey/),
-  including turnout by demographic and socioeconomic characteristics.
+## Historical geography
 
-More detailed underlying microdata exist for several of these areas. They are
-not open data and are not included in `swelections`. Access for research may be
-possible after Statistics Sweden's disclosure assessment and eligibility checks.
-Its [English guidance](https://www.scb.se/en/services/ordering-data-and-statistics/microdata/)
-states that release requires a Swedish entity responsible for research. See also
-[the microdata FAQ](https://www.scb.se/vara-tjanster/bestall-data-och-statistik/mikrodata/fragor-och-svar/).
-Available variables and possible linkages must be established with SCB for the
-specific project; the package does not guarantee a person-linkage key.
+The package retains the geographic divisions reported by each source.
+Constituencies, voting districts and administrative units can change over time;
+the same code or name does not necessarily identify exactly the same area in
+different elections. See
+[Understanding Swedish elections](understanding-elections.html#historical-comparability).
+Better comparability through harmonisation of historical geographies is a
+long-term development goal, not a completed feature.
 
-For programmatic access to SCB's aggregate statistics, see the practical tip in
-[Accessing the data](accessing-data.html#complementary-scb-statistics).
+## The 2003 euro referendum
+
+`yes`, `no` and `blank` are reported voting options in the 2003 euro referendum.
+They are categories, not Boolean values. Blank votes are separate from invalid
+ballots. This structure is specific to that referendum and should not be
+generalised to other elections.
+
+## Code license and source data
+
+The package code uses the MIT license. Source data retain their provenance
+and the relevant publisher terms; see the
+[Election Authority's open-data information](https://www.val.se/valresultat-och-statistik/statistik-och-data/om-var-oppna-data)
+and [Statistics Sweden's open-data information](https://www.scb.se/en/services/open-data-api/).
+These are separate from the package's code license.

@@ -7,8 +7,14 @@ output: rmarkdown::html_document
 knitr::opts_chunk$set(eval = FALSE)
 ```
 
-This guide introduces results, seats, preference votes and re-elections.
-Install the stable package release and its canonical-data reader:
+The current release covers Swedish electoral events from 2002 onwards,
+including elections to the Riksdag, regional and municipal councils and the
+European Parliament, as well as the 2003 national referendum on the euro
+and re-elections.
+This guide introduces results, seats, mandate-period changes, preference votes
+and re-elections; see [Coverage](coverage.html) for available years and functions.
+Install the current package release, v0.4.1, from GitHub. The `nanoparquet`
+package reads canonical data:
 
 ```{r installation}
 install.packages(c("remotes", "nanoparquet"))
@@ -22,7 +28,15 @@ availability and [Accessing the data](accessing-data.html) for source choices.
 
 ## Results and geographic levels
 
-Read the final 2022 parliamentary result nationally or by voting district:
+`results()` supports national (`"national"`), county (`"county"`), regional
+(`"region"`), municipal (`"municipality"`) and voting-district (`"district"`)
+results. Constituency levels are `"parliamentary_constituency"`,
+`"regional_constituency"` and `"municipal_constituency"`, depending on the
+election. Constituencies are electoral areas for the relevant parliament or
+council. Available levels vary by election, year and counting stage.
+
+For example, read the final 2022 parliamentary result nationally or by voting
+district:
 
 ```{r results}
 national <- results(year = 2022, election = "parliamentary", level = "national")
@@ -34,21 +48,39 @@ head(districts)
 
 Choose one level for an analysis. Totals such as ballots cast can repeat across
 party rows; do not sum those repeated totals or add different geographic levels
-together. Use `detail = "full"` for additional source information.
+together. See [Standard and full detail](coverage.html#standard-and-full-detail)
+for the difference between the default output and `detail = "full"`.
 
 ## Seats
 
-Get municipal seat allocations, then select Stockholm by municipality code:
+Read municipal seat allocations:
 
 ```{r seats}
 municipal_seats <- seats(year = 2022, election = "municipal", level = "municipality")
-stockholm <- subset(municipal_seats, municipality_code == "0180")
-stockholm[, c("municipality_name", "party_abbreviation", "seats")]
-sum(stockholm$seats) # 101 allocated seats
+head(municipal_seats)
 ```
 
-`seats()` describes electoral allocation. Use `members_at()` to find who held a
-mandate on a date during a supported mandate period.
+`seats()` describes the allocation made at an election.
+
+## Mandate-period changes
+
+An election establishes an initial allocation, but mandate holders can change
+during the period. `mandate_history()` describes holder and vacancy intervals;
+`members_at()` returns the people holding mandates on a date; and
+`vacant_seats_at()` returns verified vacancies on that date.
+
+```{r mandate-changes}
+history <- mandate_history(year = 2018, election = "parliamentary")
+head(history)
+
+members <- members_at(date = "2020-01-01", year = 2018, election = "parliamentary")
+head(members)
+```
+
+All three functions use the same population of allocated mandates. They describe
+formal mandate holding under the sources' date conventions, not attendance at
+meetings or temporary substitute service. See
+[Coverage](coverage.html#mandate-period-history) for supported mandate periods.
 
 ## Preference votes
 
@@ -56,8 +88,7 @@ Examine national preference votes in the 2024 European Parliament election:
 
 ```{r preferences}
 personal <- preference_votes(year = 2024, election = "european", level = "national")
-personal <- personal[order(personal$preference_votes, decreasing = TRUE), ]
-head(personal[, c("party_abbreviation", "candidate_number", "preference_votes")])
+head(personal)
 ```
 
 Candidate numbers identify source records and must not be used to link people
@@ -70,12 +101,6 @@ Discover separate re-election events without downloading results:
 ```{r events, eval=TRUE}
 library(swelections)
 election_events(election_kind = "re_election")
-```
-
-The Swedish equivalent is:
-
-```{r swedish-events, eval=TRUE}
-valtillfallen(valklass = "omval")
 ```
 
 Then request Falun's 2019 re-election result:
@@ -101,9 +126,15 @@ archive. Choose a source explicitly when you need a particular input. See
 [Accessing the data](accessing-data.html#source-selection-in-r) for explicit
 source choices.
 
-English functions return English columns and technical categories. Use
-`names = "sv"` where supported, or Swedish functions such as `valresultat()`,
-`mandat()` and `personroster()`. Proper names are preserved. For event discovery,
-use `valtillfallen()` as the Swedish counterpart to `election_events()`.
+English functions use English column names and technical categories by default. All seven election-data functions and
+all three mandate-period functions also accept `names = "sv"` to return Swedish
+column names and technical categories. This does not translate all text from
+the source material. Proper names and literal source identifiers retain their
+source spelling.
+
+Swedish function names provide corresponding interfaces, for example
+`valresultat()` for `results()`, `mandat()` for `seats()` and `personroster()` for
+`preference_votes()`. `election_events()` is the exception: it has no `names`
+argument. Use its Swedish counterpart `valtillfallen()` for Swedish event metadata.
 
 See [Reference](../reference/index.html) for arguments and output definitions.

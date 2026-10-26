@@ -35,7 +35,7 @@ valid; invalid ballots are separate. District output includes ordinary and
 Wednesday units (\code{district_type}); Wednesday electorate/turnout are missing.
 Local 2003 input is the preserved directory containing \code{final.xml} and
 \verb{final-municipal/}; complete preliminary results are not supported.
-County/national referendum results also include three SCB electorate groups:
+County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
 \code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
 and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
 Components are missing at finer levels; counts are never allocated downward.
@@ -70,11 +70,16 @@ Local EU input may be the \code{eu/2024} archive itself or its parent root;
 read-only snapshots do not support \code{update} or \code{archive}. Published canonical
 coverage is selected by \code{auto}; EU 2009 preference votes require explicit local sources.}
 
-\item{count}{\code{"final"} or \code{"preliminary"}.}
+\item{count}{Official counting stage: \code{"final"} or \code{"preliminary"}.
+Preliminary counting includes election-night and collection/Wednesday
+counting where a complete source is supported. These are not separate
+argument values; district types are recorded separately.}
 
-\item{level}{English geographic level. \code{NULL} selects the main level for
-the election. Supported combinations depend on election and year;
-unsupported combinations give an error.}
+\item{level}{Geographic level: \code{"national"}, \code{"county"}, \code{"region"},
+\code{"municipality"}, \code{"parliamentary_constituency"},
+\code{"regional_constituency"}, \code{"municipal_constituency"} or \code{"district"}.
+\code{NULL} selects the main level for the election. Available combinations
+depend on election, year and counting stage; unsupported requests give an error.}
 
 \item{source}{How data are obtained. \code{"auto"} selects approved canonical
 coverage, otherwise a supported current remote source; never local files.
@@ -96,8 +101,10 @@ for source requirements, historical archives and manifest configuration.}
 alternative to \code{year}.}
 
 \item{names}{Output column language: \code{"en"} or \code{"sv"}. \code{NULL} uses
-\code{getOption("swelections.names", "en")}. This controls column names and
-technical categories. Proper names/source identifiers remain unchanged.
+\code{getOption("swelections.names", "en")}. All seven election-data functions
+accept \code{names = "sv"} for Swedish column names and technical categories.
+Proper names and literal source identifiers retain their source spelling.
+\code{election_events()} has no \code{names} argument; use \code{\link[=valtillfallen]{valtillfallen()}} instead.
 Booleans are logical in both languages. Consent/declaration in full output
 have separate \verb{*_applicable} flags; not applicable is not false.}
 

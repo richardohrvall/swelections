@@ -4,7 +4,7 @@
 histories. It brings together and harmonises data from two main official sources.
 The Swedish Election Authority is responsible for planning and coordinating the
 implementation of elections. Statistics Sweden (SCB) is responsible for official
-election statistics. The package draws on data from both, making election information
+election statistics. The package draws on data from both sources, making election information
 easier to find and use, including historical results drawn from preserved
 material whose original files or web locations have changed or disappeared.
 Coverage and available detail vary by election and function.
@@ -20,7 +20,7 @@ by function, geographic level and counting stage; see
 
 ## Installation
 
-Install the current stable package release, v0.4.1, from GitHub.
+Install the current package release, v0.4.1, from GitHub.
 `nanoparquet` is needed to read canonical data.
 
 ```r
@@ -29,8 +29,7 @@ remotes::install_github("richardohrvall/swelections", ref = "v0.4.1")
 ```
 
 The version tag also makes the installation reproducible. For the development
-version, use `ref = "main"` instead. The repository publishes both package and
-data releases, so `@*release` does not reliably select a package release.
+version, use `ref = "main"` instead.
 
 ## Quick start
 
@@ -66,9 +65,9 @@ To report a problem or contribute, use the
 If you use swelections in research, cite the package and the version used.
 For v0.4.1:
 
-> Öhrvall, R. (2026). *swelections: Read and Harmonise Swedish Election Results*
+> Öhrvall, R. (2026). *swelections: Swedish Election Data*
 > (R package version 0.4.1). [GitHub release](https://github.com/richardohrvall/swelections/releases/tag/v0.4.1).
 
 Use `citation("swelections")` for citation information.
 
-License: MIT.
+Code license: MIT.

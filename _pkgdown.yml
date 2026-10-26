@@ -30,6 +30,8 @@ navbar:
       menu:
       - text: Coverage
         href: articles/coverage.html
+      - text: Understanding Swedish elections
+        href: articles/understanding-elections.html
       - text: Sources & methodology
         href: articles/sources-methodology.html
       - text: Accessing the data
@@ -72,4 +74,4 @@ articles:
 - title: Get started
   contents: articles/swelections
 - title: Data
-  contents: [articles/coverage, articles/sources-methodology, articles/accessing-data]
+  contents: [articles/coverage, articles/understanding-elections, articles/sources-methodology, articles/accessing-data]

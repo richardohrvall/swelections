@@ -62,7 +62,8 @@ requires separate approval after reporting has stabilised; no date-triggered
 automatic switch is made.}
 
 \item{names}{Column and technical-category language, \code{"en"} or \code{"sv"}.
-Proper names and literal source identifiers are unchanged.}
+All three English mandate-period functions accept \code{names = "sv"}.
+Proper names and literal source identifiers retain their source spelling.}
 
 \item{detaljniva}{\code{"standard"} eller \code{"full"}.}
 

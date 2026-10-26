@@ -46,7 +46,7 @@ Released on 25 October 2026. Package: `v0.4.1`; canonical data: `data-v0.4.1`.
   presentation. Preserve all reported preference votes, including invalid
   candidacies, without conflating party-specific candidate records.
 * Add an unpublished 15-asset EU 2019 canonical workflow and independent
-  XML/SCB/Excel validation. Original 20-seat election relationships remain
+  validation using XML, Statistics Sweden (SCB) and Excel sources. Original 20-seat election relationships remain
   separate from subsequent mandate-period changes.
 
 * Add European Parliament 2024 (`european` / `E`) across all seven English and
@@ -67,7 +67,7 @@ Released on 25 October 2026. Package: `v0.4.1`; canonical data: `data-v0.4.1`.
   or unobserved zero votes are fabricated.
 
 * Completes final 2002 RD district party results for Halmstad, Laholm and
-  Kungsbacka using verified SCB/SND inputs reconciled with Valmyndigheten.
+  Kungsbacka using verified Statistics Sweden/SND inputs reconciled with Valmyndigheten.
   Postal votes remain outside municipal constituencies; source-specific
   denominators and unavailable candidate/XML details are preserved.
 
@@ -89,7 +89,7 @@ Released on 25 October 2026. Package: `v0.4.1`; canonical data: `data-v0.4.1`.
   smaller-party results and observed preference votes are retained. Allocated
   mandates are distinguished from the 14 unfilled KF positions. No incomplete
   election-night result is relabelled as full preliminary data. Known RD/KF
-  preference discrepancies and RF SCB duplicates remain documented unchanged.
+  preference discrepancies and RF Statistics Sweden duplicates remain documented unchanged.
 
 * Adds preserved-source 2010 XML/ballot adapters through the shared historical
   normalisation layer and an opt-in unpublished canonical prototype. Final

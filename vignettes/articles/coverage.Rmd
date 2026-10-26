@@ -9,6 +9,42 @@ year does not imply that every combination exists. Function coverage indicates
 which interfaces are available, not that every field, geographic level or
 counting stage is available for each election.
 
+## Data source views
+
+`canonical`, `remote` and `local` describe how data are obtained:
+
+- **Canonical:** the versioned set of validated Parquet files published in a
+  swelections data release. These files provide a stable data basis for the
+  published version without a local raw-data archive. They can also be read
+  directly in other tools, such as Python.
+- **Remote:** current data from an explicitly supported official source.
+- **Local:** your own compatible saved source files, selected explicitly.
+
+These source choices describe how data are obtained, not different degrees of
+official status or quality, or the stage of the vote count.
+
+## Counting stages
+
+`final` and `preliminary` describe distinct stages of the official vote count.
+Preliminary results are not simply incomplete final results. See
+[Understanding Swedish elections](understanding-elections.html#electoral-geography)
+for the role of election-night and collection counting.
+
+The package uses only `"final"` and `"preliminary"` in `count_stage`; election
+night and the collection count are not additional `count` choices. District
+records separately identify `"ordinary"`, `"collection"` or `"wednesday"` in
+`district_type`, following the source. Counting-stage availability varies by
+election; a missing preliminary snapshot is never filled with final figures.
+
+## Standard and full detail
+
+`detail = "standard"` is the default output for most analyses. It includes the
+main useful variables, with a structure kept as consistent as practical across
+elections. `detail = "full"` adds information from the selected source, including
+source-specific or technical fields. These additional fields can therefore vary
+between elections and sources. Full output still follows the swelections table
+structure; it is not an unchanged copy of the original raw file.
+
 ## Ordinary elections
 
 The seven election-data functions are `results()`, `seats()`, `candidacies()`,
@@ -44,11 +80,12 @@ constituency categories include parliamentary, regional and municipal
 constituencies; they are not interchangeable. See `results()` for exact
 `level` values and `seats()` for mandate geography.
 
-District views distinguish ordinary voting districts from collection/Wednesday
-units. These units must not be silently distributed across constituencies.
-Collection units do not receive invented electorate or turnout values.
-Historical codes and names describe the source geography; the package does not
-currently harmonise district boundaries across elections.
+District output preserves ordinary and collection/Wednesday reporting units.
+Collection votes are not artificially allocated to ordinary voting districts.
+See [Understanding Swedish elections](understanding-elections.html#electoral-geography)
+for constituencies, district codes, polling stations and collection districts.
+Historical reporting structures can differ; source geography is retained rather
+than harmonised across elections.
 
 ## Re-elections
 
@@ -77,7 +114,9 @@ seat allocation is calculated from combined votes.
 ## Mandate-period history
 
 `mandate_history()`, `members_at()` and `vacant_seats_at()` use the same population
-of allocated mandates.
+of allocated mandates. They describe formal electoral mandate holding under the
+sources' date conventions, not attendance or temporary substitute service at
+meetings.
 
 - **2014–2018 and 2018–2022:** published canonical intervals, including Båstad and
   Falun re-election transitions within the original periods.
@@ -85,10 +124,10 @@ of allocated mandates.
   history. Queries cannot extend beyond verified source-date coverage.
 - **Earlier periods:** not included in the public mandate-history coverage.
 
-Båstad's holder continuity from 15 September 2014 until the 2015 re-election is
-unverified. Date queries requiring that interval fail clearly; it is not treated
-as a vacancy. History describes electoral mandate holding under the source date
-conventions, not attendance or temporary substitute service at meetings.
+For Båstad, the available source material does not allow holder continuity to be
+verified from 15 September 2014 up to the 10 May 2015 re-election. Date-specific
+queries requiring this interval return an error rather than inferring either a
+continuing mandate or a vacancy.
 
 ## Important source limitations
 
@@ -108,8 +147,10 @@ conventions, not attendance or temporary substitute service at meetings.
   absent from the later approved population. This documented snapshot difference
   does not change the final votes or mandates.
 - **Referendum 2003:** Blank is a valid voting option, separate from invalid
-  ballots. Electorate-composition counts exist nationally and by county, not
-  below those levels; no downward allocation is made.
+  ballots. Aggregate electorate composition is available nationally and by county:
+  `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad` and
+  `eligible_foreign_citizens`. These sum to `eligible_voters`; they are missing
+  at finer levels and are never allocated downward.
 
 An unavailable complete preliminary collection snapshot is a source/recovery
 limitation, not evidence that the authority never produced one. Election-night

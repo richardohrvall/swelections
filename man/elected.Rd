@@ -21,8 +21,8 @@ elected(
 \arguments{
 \item{year}{One or more supported election years, or \code{"all"}. Defaults to
 2026 unless \code{from} or \code{to} is supplied.
-Supported years include 2002, 2006, 2010, 2014, 2018, 2022 and 2026, subject to the requested
-election, geographic level and count stage.}
+Availability depends on the election and source.
+See Details for historical coverage limitations.}
 
 \item{election}{One or more English election values or official codes;
 \code{NULL} selects all supported election types. See \code{\link[=results]{results()}}.}
@@ -47,8 +47,10 @@ for source requirements, historical archives and manifest configuration.}
 alternative to \code{year}.}
 
 \item{names}{Output column language: \code{"en"} or \code{"sv"}. \code{NULL} uses
-\code{getOption("swelections.names", "en")}. This controls column names and
-technical categories. Proper names/source identifiers remain unchanged.
+\code{getOption("swelections.names", "en")}. All seven election-data functions
+accept \code{names = "sv"} for Swedish column names and technical categories.
+Proper names and literal source identifiers retain their source spelling.
+\code{election_events()} has no \code{names} argument; use \code{\link[=valtillfallen]{valtillfallen()}} instead.
 Booleans are logical in both languages. Consent/declaration in full output
 have separate \verb{*_applicable} flags; not applicable is not false.}
 

@@ -113,7 +113,7 @@
 #'   Wednesday units (`district_type`); Wednesday electorate/turnout are missing.
 #'   Local 2003 input is the preserved directory containing `final.xml` and
 #'   `final-municipal/`; complete preliminary results are not supported.
-#'   County/national referendum results also include three SCB electorate groups:
+#'   County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.
@@ -147,10 +147,15 @@
 #'   Local EU input may be the `eu/2024` archive itself or its parent root;
 #'   read-only snapshots do not support `update` or `archive`. Published canonical
 #'   coverage is selected by `auto`; EU 2009 preference votes require explicit local sources.
-#' @param count `"final"` or `"preliminary"`.
-#' @param level English geographic level. `NULL` selects the main level for
-#'   the election. Supported combinations depend on election and year;
-#'   unsupported combinations give an error.
+#' @param count Official counting stage: `"final"` or `"preliminary"`.
+#'   Preliminary counting includes election-night and collection/Wednesday
+#'   counting where a complete source is supported. These are not separate
+#'   argument values; district types are recorded separately.
+#' @param level Geographic level: `"national"`, `"county"`, `"region"`,
+#'   `"municipality"`, `"parliamentary_constituency"`,
+#'   `"regional_constituency"`, `"municipal_constituency"` or `"district"`.
+#'   `NULL` selects the main level for the election. Available combinations
+#'   depend on election, year and counting stage; unsupported requests give an error.
 #' @param source How data are obtained. `"auto"` selects approved canonical
 #'   coverage, otherwise a supported current remote source; never local files.
 #'   `"canonical"` explicitly reads canonical data. `"remote"` explicitly reads a
@@ -179,8 +184,10 @@
 #'   Full output preserves the original parent fields as
 #'   `source_electoral_area_*`.
 #' @param names Output column language: `"en"` or `"sv"`. `NULL` uses
-#'   `getOption("swelections.names", "en")`. This controls column names and
-#'   technical categories. Proper names/source identifiers remain unchanged.
+#'   `getOption("swelections.names", "en")`. All seven election-data functions
+#'   accept `names = "sv"` for Swedish column names and technical categories.
+#'   Proper names and literal source identifiers retain their source spelling.
+#'   `election_events()` has no `names` argument; use [valtillfallen()] instead.
 #'   Booleans are logical in both languages. Consent/declaration in full output
 #'   have separate `*_applicable` flags; not applicable is not false.
 #' @return A tibble with the same rows, values and types as [valresultat()].
@@ -359,6 +366,10 @@ seats <- function(
 #' `candidates_registered` and `candidate_declaration` fields retain the
 #' source's `NA` values. `registered_municipality_name` is a name, not a code.
 #' @inheritParams results
+#' @param year One or more supported election years, or `"all"`. Defaults to
+#'   2026 unless `from` or `to` is supplied.
+#'   Availability depends on the election and source.
+#'   See Details for historical coverage limitations.
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [kandidaturer()].
@@ -388,6 +399,10 @@ candidacies <- function(
 #' separately; equal names are not linked. Rows are not unique-person counts
 #' and unsupported cross-source totals/attributes remain missing.
 #' @inheritParams results
+#' @param year One or more supported election years, or `"all"`. Defaults to
+#'   2026 unless `from` or `to` is supplied.
+#'   Availability depends on the election and source.
+#'   See Details for historical coverage limitations.
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
 #' @param include_results Include final preference-vote and elected-member
@@ -420,6 +435,10 @@ candidates <- function(
 #' seats and are excluded from elected observations.
 #' No preliminary elected-member result is inferred.
 #' @inheritParams results
+#' @param year One or more supported election years, or `"all"`. Defaults to
+#'   2026 unless `from` or `to` is supplied.
+#'   Availability depends on the election and source.
+#'   See Details for historical coverage limitations.
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [valda()].
@@ -449,6 +468,10 @@ elected <- function(
 #' Group relationships are expanded without name-based identity linkage or
 #' later mandate-period entrants.
 #' @inheritParams results
+#' @param year One or more supported election years, or `"all"`. Defaults to
+#'   2026 unless `from` or `to` is supplied.
+#'   Availability depends on the election and source.
+#'   See Details for historical coverage limitations.
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
 #' @return A tibble with the same rows, values and types as [ersattare()].
@@ -489,6 +512,10 @@ substitutes <- function(
 #' Area and list views are alternative representations, not additive totals.
 #' Cross-area municipality/region person aggregation is unavailable.
 #' @inheritParams results
+#' @param year One or more supported election years, or `"all"`. Defaults to
+#'   2026 unless `from` or `to` is supplied.
+#'   Availability depends on the election, geographic level and source.
+#'   See Details for historical coverage limitations.
 #' @param election One or more English election values or official codes;
 #'   `NULL` selects all supported election types. See [results()].
 #' @param level EU 2004/2009/2014/2019/2024 also supports `"national"`, `"county"`,

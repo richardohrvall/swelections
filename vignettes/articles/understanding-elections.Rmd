@@ -1,0 +1,163 @@
+---
+title: "Understanding Swedish elections"
+output: rmarkdown::html_document
+---
+
+This guide explains the electoral context needed to interpret swelections data.
+It is not a complete account of Swedish electoral law. The rules below describe
+the current system unless a historical change is specified; use the rules for
+the relevant election when comparing years. See [Coverage](coverage.html) for
+available data and [Sources & methodology](sources-methodology.html) for how
+they are constructed and checked.
+
+## Electoral geography
+
+- **Electoral constituencies** are areas used to allocate seats. The Riksdag
+  has parliamentary constituencies; regional and municipal councils may also
+  have several constituencies. Only some municipalities are divided this way.
+- **Voting districts** are smaller geographic units for election-day voting
+  and the reporting of ordinary polling-station results.
+- **Polling stations** are the places where election-day voting takes place.
+  Each voting district has an assigned polling station. A station is a location,
+  not another result level in swelections; venue details are separate from the
+  result tables described here.
+
+The Election Authority explains these distinctions in its
+[guide to constituencies and voting districts](https://www.val.se/det-svenska-valsystemet/grunderna-i-det-svenska-valsystemet/valkretsar-och-valdistrikt).
+
+Current ordinary voting-district codes have eight digits, `LLKKXXXX`: two for
+the county, two more for the municipality, and four for the district within it.
+For example, `01140101` identifies county `01`, municipality `0114` and district
+`0101`. Keep codes as text to preserve leading zeros. This is the current
+[official coding convention](https://valcentralen.val.se/kommun/valgeografi-for-kommuner/genomfor-oversyn-av-valdistrikt),
+not a guarantee that every historical source or special reporting unit uses
+that format. Codes alone do not establish comparable boundaries over time.
+
+### Collection districts
+
+Not all votes are counted at an ordinary polling station or reported for an
+ordinary voting district. Late-arriving advance votes and votes from abroad
+are among those handled in **collection districts**, also called Wednesday
+units in some sources. A collection district corresponds to a municipal
+constituency, or to the whole municipality if it is not divided into
+constituencies. This is why municipal constituency boundaries affect where
+these votes can be observed. The reported votes cannot be allocated to
+individual ordinary voting districts.
+
+The preliminary count includes election-night counting and the subsequent
+collection count. The final count checks the votes and counts personal votes.
+The stages are distinct; `count = "preliminary"` is not simply an incomplete
+version of `count = "final"`. See the Election Authority's
+[description of preliminary and collection counting](https://www.val.se/det-svenska-valsystemet/rostrakning-och-mandatfordelning/preliminar-rostrakning).
+
+`swelections` retains the reporting units supported by each source and does not
+artificially distribute collection votes across ordinary districts. Historical
+reporting structures differ. Historical district boundaries are not currently
+harmonised across elections.
+
+## From votes to seats
+
+Swedish elections use proportional seat allocation: parties' shares of seats
+are intended to reflect their shares of votes, subject to eligibility rules
+and thresholds. In elections with several constituencies, **fixed seats** are
+allocated within constituencies and **adjustment seats** help bring the overall
+allocation closer to proportionality. The Riksdag uses both. Regional and
+municipal councils with several constituencies also use both under current
+rules. A single-constituency election, including Sweden's European Parliament
+election, has no such split. See the Election Authority's
+[seat-allocation guide](https://www.val.se/det-svenska-valsystemet/rostrakning-och-mandatfordelning/sa-fordelas-mandaten).
+
+Current party thresholds are:
+
+| Election | Threshold for participation in seat allocation |
+| --- | --- |
+| Riksdag | 4% nationally; alternatively, 12% in a constituency permits participation in its fixed-seat allocation only |
+| European Parliament | 4% nationally |
+| Regional council | 3% across the region |
+| Municipal council, one constituency | 2% across the municipality |
+| Municipal council, several constituencies | 3% across the municipality |
+
+Crossing a threshold permits participation; it does not itself guarantee a seat.
+The [Elections Act, chapter 14](https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/vallag-2005837_sfs-2005-837/)
+sets out these rules.
+
+Explicit municipal party thresholds and municipal adjustment seats were first
+applied in the **2018 ordinary elections**, following legislation that entered
+into force in 2015. Earlier municipal elections had no explicit party threshold
+or adjustment seats, although the number of available seats imposed a practical
+barrier to small parties. Regional adjustment seats are older: they were first
+used in the **1976 county-council elections**. These were not simultaneous local
+and regional reforms. See the official
+[2018 election report](https://www.val.se/download/18.162047b519a91d0533117a82/1592299588277/erfarenhetsrapport-2018.pdf)
+and [historical account in SOU 2012:94](https://data.riksdagen.se/dokument/H0B394).
+
+`seats()` reports the established allocations, rather than recalculating all
+elections under today's rules.
+
+## How candidates are elected
+
+First, seats are allocated to parties. Personal votes can then affect which
+of a party's candidates receive those seats. Candidates reaching the personal
+vote threshold are considered first, ordered by their personal votes. Remaining
+places are determined from the candidate order on the ballot lists and the
+applicable counting rules. Multiple lists and candidates elected in more than
+one constituency require further rules; ballot position alone is not always
+enough to reconstruct the outcome.
+
+Currently, the personal-vote threshold is 5% of the party's votes in the
+constituency, with additional minima of 100 personal votes in regional elections
+and 50 in municipal elections. For the European Parliament, the threshold is
+5% of the party's votes nationally. Reaching the threshold does not create an
+additional party seat. See the Election Authority's
+[guide to choosing elected members](https://www.val.se/det-svenska-valsystemet/rostrakning-och-mandatfordelning/sa-utses-ledamoter).
+
+In the package, `seats()` describes party allocations, `preference_votes()`
+describes reported personal votes, `candidates()` summarises candidate records,
+and `elected()` identifies the reported elected candidates. Subsequent mandate
+holding is a separate question, covered by the mandate-period functions.
+
+## Personal votes and candidate nomination
+
+The modern personal-voting system was tried in **seven municipalities in 1994**
+and used in Sweden's **1995 European Parliament election** before its broad
+introduction in the **1998 Riksdag, county-council and municipal elections**.
+See the official [review of the first decade of personal voting](https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/ett-decennium-med-personval-erfarenheter-och_gvb368/html/).
+The Riksdag personal-vote threshold was originally 8%; the reduction to 5% was
+first applied in the **2014 election**, as recorded in the
+[constitutional committee's review](https://data.riksdagen.se/fil/B8A1A05A-B7A3-4DC2-A962-561BAEDDAAE3).
+Personal-vote rules have therefore changed within the package's coverage.
+
+Nomination rules also changed gradually. Sweden historically allowed voters
+broad freedom to nominate candidates by adding names to ballots. From the
+1998 elections, parties could protect their nominations by registering their
+party designation and notifying all their candidates, with their consent;
+other parties remained subject to broader voter nomination. See
+[SOU 2012:94](https://data.riksdagen.se/dokument/H0B394).
+The later reform requiring advance party participation and candidate consent
+was first applied at the 2018 ordinary elections. Open and locked candidate
+lists still differ under current rules; open lists do not dispense with the
+consent requirement. See the
+[Elections Act and its transitional provisions](https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/vallag-2005837_sfs-2005-837/)
+and the official [2026 review of the ballot system](https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/710-miljoner-skal-till-reformer_heb32/html/).
+
+Older candidate records therefore need not describe exactly the same nominated
+population as later files. `candidacies()` preserves election-specific candidacies
+and list positions; `candidates()` provides candidate summaries within the
+relevant election and party. Neither names nor candidate numbers establish
+physical-person identity across elections.
+
+## Historical comparability
+
+Three kinds of change matter for comparisons over time:
+
+- **Electoral rules:** personal voting, party thresholds and adjustment seats.
+- **Electoral geography:** constituency and voting-district boundaries.
+- **Administrative geography:** municipalities, counties and other units,
+  including changes in their boundaries and codes.
+
+`swelections` preserves the historical units reported by its sources; it does
+not treat equal codes or names as proof of unchanged geography. Better
+comparability over time, including harmonisation of historical geographies,
+is a long-term development goal, not an existing feature. See
+[Sources & methodology](sources-methodology.html) for source handling and
+[Coverage](coverage.html) for available levels and limitations.

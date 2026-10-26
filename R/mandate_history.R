@@ -600,7 +600,8 @@
 #'   requires separate approval after reporting has stabilised; no date-triggered
 #'   automatic switch is made.
 #' @param names Column and technical-category language, `"en"` or `"sv"`.
-#'   Proper names and literal source identifiers are unchanged.
+#'   All three English mandate-period functions accept `names = "sv"`.
+#'   Proper names and literal source identifiers retain their source spelling.
 #' @param detail `"standard"` or `"full"`; standard is a projection of full.
 #' @return A tibble of mandate-holder/vacancy intervals, or rows active at `date`.
 #' @export

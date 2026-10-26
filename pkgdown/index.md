@@ -10,14 +10,16 @@ Swedish election data are spread across election years, source files, formats
 and geographic levels. The package makes these data easier to find and use
 through a consistent R interface. Preserved official sources also support
 historical results when files or their original web addresses have changed
-or disappeared; users of published canonical data do not need a raw-data archive.
+or disappeared.
 
 ## What you can do
 
-Retrieve votes at national, municipal or voting-district level; examine seat
-allocations, candidacies and preference votes; or follow mandate holders and
-vacancies during supported mandate periods. English and Swedish interfaces
-are available.
+Depending on the election and function, you can retrieve votes and vote shares,
+aggregate counts of eligible voters and electorate composition, turnout, seat
+allocations, candidacies and candidate characteristics such as age and sex where
+reported. You can also examine preference votes, elected candidates and
+substitutes, or follow mandate holders and vacancies during supported periods.
+English and Swedish interfaces are available.
 
 The current release covers ordinary parliamentary, regional and municipal
 elections, European Parliament elections, the 2003 euro referendum and five
@@ -37,14 +39,18 @@ and source detail. It does not currently harmonise historical voting-district
 boundaries or establish person identities across elections.
 
 Use the R functions for documented output tables, or read the published
-canonical Parquet files directly in other tools. Direct file access may require
+canonical data — the versioned Parquet files distributed by `swelections` —
+directly in other tools such as Python. The published files provide a stable
+data basis for the corresponding release. Direct file access may require
 selecting stored tables or combining files.
 
 ## Explore the documentation
 
 - [Get started](articles/swelections.html): results and geographic levels, seats,
-  preference votes and re-elections.
+  mandate-period changes, preference votes and re-elections.
 - [Coverage](articles/coverage.html): available elections, functions and levels.
+- [Understanding Swedish elections](articles/understanding-elections.html):
+  electoral geography, seat allocation, personal voting and historical changes.
 - [Sources & methodology](articles/sources-methodology.html): construction,
   data processing, validation and treatment of source differences.
 - [Accessing the data](articles/accessing-data.html): source choices, data exports
@@ -55,7 +61,7 @@ selecting stored tables or combining files.
 If you use swelections in research, cite the package and the version used.
 For v0.4.1:
 
-> Öhrvall, R. (2026). *swelections: Read and Harmonise Swedish Election Results*
+> Öhrvall, R. (2026). *swelections: Swedish Election Data*
 > (R package version 0.4.1). [GitHub release](https://github.com/richardohrvall/swelections/releases/tag/v0.4.1).
 
 Use `citation("swelections")` for citation information.

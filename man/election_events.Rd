@@ -20,6 +20,7 @@ Unknown decision references remain missing. Re-elections share the original mand
 \description{
 List election events, their geographic scope and links to the original
 election. Discovery requires no result downloads.
+This function has no \code{names} argument. Use \code{\link[=valtillfallen]{valtillfallen()}} for Swedish metadata.
 }
 \details{
 A re-election is a separate polling event within the original continuing

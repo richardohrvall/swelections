@@ -8,8 +8,9 @@
 #' mandate periods. Swedish counterparts include [valtillfallen()],
 #' [valresultat()] and [mandathistorik()].
 #'
-#' English functions return English columns and technical categories. Use
-#' `names = "sv"` where supported, or a Swedish counterpart. Proper names and
+#' English functions return English columns and technical categories. The seven
+#' election-data functions and three mandate-period functions accept `names = "sv"`.
+#' Event metadata use [valtillfallen()] instead of a `names` argument. Proper names and
 #' literal source identifiers retain their source spelling. Boolean properties
 #' remain logical. The 2003 referendum options are `yes`, `no` and `blank` in
 #' English and `Ja`, `Nej` and `Blank` in Swedish; Blank is valid and separate

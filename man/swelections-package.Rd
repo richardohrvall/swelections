@@ -15,8 +15,9 @@ mandate periods. Swedish counterparts include \code{\link[=valtillfallen]{valtil
 \code{\link[=valresultat]{valresultat()}} and \code{\link[=mandathistorik]{mandathistorik()}}.
 }
 \details{
-English functions return English columns and technical categories. Use
-\code{names = "sv"} where supported, or a Swedish counterpart. Proper names and
+English functions return English columns and technical categories. The seven
+election-data functions and three mandate-period functions accept \code{names = "sv"}.
+Event metadata use \code{\link[=valtillfallen]{valtillfallen()}} instead of a \code{names} argument. Proper names and
 literal source identifiers retain their source spelling. Boolean properties
 remain logical. The 2003 referendum options are \code{yes}, \code{no} and \code{blank} in
 English and \code{Ja}, \code{Nej} and \code{Blank} in Swedish; Blank is valid and separate

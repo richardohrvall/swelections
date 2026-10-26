@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 type: software
 message: "If you use swelections in research, please cite the package and the version used."
-title: "swelections: Read and Harmonise Swedish Election Results"
+title: "swelections: Swedish Election Data"
 authors:
 - family-names: "Öhrvall"
   given-names: "Richard"
