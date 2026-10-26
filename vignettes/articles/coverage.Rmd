@@ -3,40 +3,64 @@ title: "Coverage"
 output: rmarkdown::html_document
 ---
 
-This page describes the published **v0.4.1** interfaces. Availability depends on
-the election event, function, geographic level and counting stage. A supported
-year does not imply that every combination exists. Function coverage indicates
-which interfaces are available, not that every field, geographic level or
-counting stage is available for each election.
+This page summarises the election data available in **v0.4.1**. Coverage varies
+by event, function, geographic level and counting stage: a supported year or
+function does not imply that every field or combination is available.
 
-## Data source views
+## Electoral events and years
 
-`canonical`, `remote` and `local` describe how data are obtained:
+Ordinary parliamentary, regional and municipal elections are covered for 2002,
+2006, 2010, 2014, 2018, 2022 and 2026. European Parliament elections are covered
+for 2004, 2009, 2014, 2019 and 2024. The package also includes the 2003 national
+referendum on the euro and the five re-elections listed below.
 
-- **Canonical:** the versioned set of validated Parquet files published in a
-  swelections data release. These files provide a stable data basis for the
-  published version without a local raw-data archive. They can also be read
-  directly in other tools, such as Python.
-- **Remote:** current data from an explicitly supported official source.
-- **Local:** your own compatible saved source files, selected explicitly.
+Historical election data are available through canonical data: the versioned
+Parquet files published in a swelections data release, usable without a local
+raw-data archive. The 2026 election data use supported current official sources
+through `remote`. These are source paths, not counting stages or grades of
+official status or quality. See [Accessing the data](accessing-data.html) for
+source choices and direct file access.
 
-These source choices describe how data are obtained, not different degrees of
-official status or quality, or the stage of the vote count.
+## Election types
 
-## Counting stages
+The `election` argument accepts `"parliamentary"` for the Riksdag, `"regional"`
+for regional councils, `"municipal"` for municipal councils and `"european"` for
+the European Parliament. `results()` also accepts `"referendum"` for the 2003
+euro referendum. The official codes `"RD"`, `"RF"`, `"KF"`, `"E"` and `"F"`,
+respectively, are also accepted.
 
-`final` and `preliminary` describe distinct stages of the official vote count.
-Preliminary results are not simply incomplete final results. See
-[Understanding Swedish elections](understanding-elections.html#electoral-geography)
-for the role of election-night and collection counting.
+## Geographic levels
 
-The package uses only `"final"` and `"preliminary"` in `count_stage`; election
-night and the collection count are not additional `count` choices. District
-records separately identify `"ordinary"`, `"collection"` or `"wednesday"` in
-`district_type`, following the source. Counting-stage availability varies by
-election; a missing preliminary snapshot is never filled with final figures.
+`results()` supports national (`"national"`), county (`"county"`), regional
+(`"region"`), municipal (`"municipality"`) and voting-district (`"district"`)
+results. Constituency levels are `"parliamentary_constituency"`,
+`"regional_constituency"` and `"municipal_constituency"`, depending on the
+election. Constituencies are electoral areas for the relevant parliament or
+council. Not every level is available for every election, function or counting
+stage; see `results()` and `seats()` for their respective geographic options.
 
-## Standard and full detail
+District output preserves ordinary and collection/Wednesday reporting units.
+Collection votes are not artificially allocated to ordinary voting districts.
+See [Understanding Swedish elections](understanding-elections.html#electoral-geography)
+for the distinction between constituencies, voting districts and collection
+districts.
+
+## Data available
+
+Depending on the election and function, the package provides:
+
+- votes and vote shares;
+- aggregate eligible-voter counts and turnout;
+- electorate composition where reported;
+- seat allocations;
+- candidacies and candidate characteristics, including age and sex where reported;
+- preference votes;
+- elected candidates and substitute relationships;
+- mandate holders, vacancies and other mandate-period changes.
+
+The tables and period descriptions below show which functions are available.
+
+### Standard and full detail
 
 `detail = "standard"` is the default output for most analyses. It includes the
 main useful variables, with a structure kept as consistent as practical across
@@ -45,7 +69,7 @@ source-specific or technical fields. These additional fields can therefore vary
 between elections and sources. Full output still follows the swelections table
 structure; it is not an unchanged copy of the original raw file.
 
-## Ordinary elections
+### Ordinary elections
 
 The seven election-data functions are `results()`, `seats()`, `candidacies()`,
 `candidates()`, `elected()`, `substitutes()` and `preference_votes()`.
@@ -55,7 +79,7 @@ The seven election-data functions are `results()`, `seats()`, `candidacies()`,
 | Parliamentary (RD), regional (RF), municipal (KF), 2002 | Canonical | Six functions; no `candidacies()` | Final |
 | RD/RF/KF, 2006 | Canonical | All seven | Final |
 | RD/RF/KF, 2010 and 2014 | Canonical | All seven | Final and supported preliminary views |
-| RD/RF/KF, 2018 | Canonical | All seven | Final; preliminary requests are rejected |
+| RD/RF/KF, 2018 | Canonical | All seven | Only final results are available; preliminary results are not available. |
 | RD/RF/KF, 2022 | Canonical | All seven | Final and supported preliminary views |
 | RD/RF/KF, 2026 | Remote | Supported current functions and files | Availability follows the official current distribution |
 | European Parliament, 2004, 2014 | Canonical | All seven | Final |
@@ -72,22 +96,7 @@ Separately supported current candidacy exports and 2022–2026 mandate-period
 history are also available through remote sources. See `data_sources` for
 function-specific source requirements.
 
-## Geography
-
-`results()` offers national, county/region, municipality, constituency and
-voting-district views where applicable to the election and source. The
-constituency categories include parliamentary, regional and municipal
-constituencies; they are not interchangeable. See `results()` for exact
-`level` values and `seats()` for mandate geography.
-
-District output preserves ordinary and collection/Wednesday reporting units.
-Collection votes are not artificially allocated to ordinary voting districts.
-See [Understanding Swedish elections](understanding-elections.html#electoral-geography)
-for constituencies, district codes, polling stations and collection districts.
-Historical reporting structures can differ; source geography is retained rather
-than harmonised across elections.
-
-## Re-elections
+### Re-elections
 
 These are separate election events within the original election's continuing
 mandate period, rather than replacement ordinary elections in a time series.
@@ -111,7 +120,7 @@ under the original ordinary election year. For Örebro this is 65 seats: 48
 unaffected seats from 2010 plus 17 from the 2011 event. No new municipality-wide
 seat allocation is calculated from combined votes.
 
-## Mandate-period history
+### Mandate-period history
 
 `mandate_history()`, `members_at()` and `vacant_seats_at()` use the same population
 of allocated mandates. They describe formal electoral mandate holding under the
@@ -129,9 +138,27 @@ verified from 15 September 2014 up to the 10 May 2015 re-election. Date-specific
 queries requiring this interval return an error rather than inferring either a
 continuing mandate or a vacancy.
 
-## Important source limitations
+## Counting stages
 
-- **RKL 2002:** the full ballot-candidacy population has not been recovered.
+`count = "preliminary"` selects election-night counting and the subsequent
+preliminary collection count; `count = "final"` selects the final vote count.
+These are distinct counting stages, not complementary datasets to add together.
+Personal votes are counted in the final count, and geographic reporting can
+differ between stages.
+
+The `count_stage` column records `"preliminary"` or `"final"`. Election-night
+and collection counting are parts of the preliminary process, not additional
+argument values. Where reported, `district_type` separately identifies
+`"ordinary"`, `"collection"` or `"wednesday"`. A missing preliminary snapshot
+is never filled with final figures. See
+[Sources & methodology](sources-methodology.html#preliminary-and-final-counting)
+and [Understanding Swedish elections](understanding-elections.html#collection-districts)
+for interpretation.
+
+## Important coverage limitations
+
+- **Parliamentary, regional and municipal elections, 2002:** The available
+  source data do not contain the complete set of candidacies.
   Reported result/preference observations remain separate from that gap. Some
   small-party votes remain aggregated; missing original files do not imply
   missing final party totals where complementary official sources reconcile them.
@@ -139,18 +166,18 @@ continuing mandate or a vacancy.
   source allocation and linkage issues. A compatible preserved archive can be
   used explicitly with `source = "local"`; auto never selects it. See the
   [detailed completeness record](https://github.com/richardohrvall/swelections/blob/main/development/COMPLETENESS_EU_2009.md).
-- **EU 2004:** 943 valid handwritten votes remain a reported aggregate without
-  invented individual party designations.
+- **EU 2004:** 943 valid handwritten votes remain an aggregate; votes are not assigned to
+  individual parties without supporting evidence.
 - **EU 2014:** ten valid handwritten votes in Vårdsberg have an unreported party
   designation in the preserved result material; they remain in valid totals.
 - **EU 2024:** candidate 1203 occurs in an earlier candidacy snapshot but is
   absent from the later approved population. This documented snapshot difference
   does not change the final votes or mandates.
 - **Referendum 2003:** Blank is a valid voting option, separate from invalid
-  ballots. Aggregate electorate composition is available nationally and by county:
-  `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad` and
-  `eligible_foreign_citizens`. These sum to `eligible_voters`; they are missing
-  at finer levels and are never allocated downward.
+  ballots. Aggregate electorate composition is available nationally and by county,
+  distinguishing eligible Swedish citizens resident in Sweden, Swedish citizens
+  abroad and foreign citizens. These counts sum to the eligible-voter total;
+  they are unavailable at finer levels and are never allocated downward.
 
 An unavailable complete preliminary collection snapshot is a source/recovery
 limitation, not evidence that the authority never produced one. Election-night
@@ -158,3 +185,12 @@ material is not silently substituted for it.
 
 See [Reference](../reference/index.html) for current interfaces and
 [Sources & methodology](sources-methodology.html) for interpretation.
+
+## Historical comparability
+
+Electoral rules, constituencies, voting districts and administrative areas can
+change between elections. The package preserves historical geographic units;
+it does not make them directly comparable across years. Harmonising historical
+geographies remains ongoing development work, rather than a completed feature.
+See [Understanding Swedish elections](understanding-elections.html#historical-comparability)
+for the implications for comparisons over time.

@@ -9,13 +9,23 @@ easier to find and use, including historical results drawn from preserved
 material whose original files or web locations have changed or disappeared.
 Coverage and available detail vary by election and function.
 
+**Development status**
+
+`swelections` is under active development. The API and data structures may change as the package is expanded and refined.
+
 ## Coverage
 
-Version 0.4.1 covers parliamentary, regional and municipal elections from
-2002 to 2026; European Parliament elections from 2004 to 2024; the 2003 euro
-referendum; and five re-elections. Mandate histories are available for 2014–2018,
-2018–2022 and, through current official sources, 2022–2026. Availability varies
-by function, geographic level and counting stage; see
+The package covers Swedish electoral events from 2002 onwards: elections to
+the Riksdag, regional and municipal councils and the European Parliament;
+the 2003 national referendum on the euro; and five re-elections. Depending on
+the event and function, data include results, seats, candidate and preference-vote
+data, and mandate-period information. Geographic views range from national to
+voting-district level, including counties, regions, municipalities and electoral
+constituencies where applicable.
+
+Mandate histories cover 2014–2018 and 2018–2022, with 2022–2026 available through
+current official sources. Availability varies by year, function, geographic
+level and counting stage; see
 [Coverage](https://richardohrvall.github.io/swelections/articles/coverage.html).
 
 ## Installation
@@ -39,9 +49,26 @@ library(swelections)
 results(year = 2022, election = "parliamentary", level = "national")
 ```
 
-English and Swedish interfaces are available. The package returns election
-results, seat allocations, candidacies, candidate summaries, preference votes,
-elected candidates, substitute relationships and mandate histories.
+## Functions
+
+| Use | English interface | Swedish interface |
+| --- | --- | --- |
+| Election results | `results()` | `valresultat()` |
+| Seat allocations | `seats()` | `mandat()` |
+| Candidacies and candidates | `candidacies()`, `candidates()` | `kandidaturer()`, `kandidater()` |
+| Preference votes | `preference_votes()` | `personroster()` |
+| Elected candidates and substitutes | `elected()`, `substitutes()` | `valda()`, `ersattare()` |
+| Mandate history and changes | `mandate_history()`, `members_at()`, `vacant_seats_at()` | `mandathistorik()`, `ledamoter_vid()`, `tomma_stolar_vid()` |
+| Election events | `election_events()` | `valtillfallen()` |
+
+For the five re-elections, `results()` and `seats()` provide event results and
+allocations; `election_events()` lists the events. Supported mandate histories
+also describe the Båstad and Falun re-election transitions.
+
+English and Swedish interfaces are available. The seven election-data functions
+and three mandate-period functions accept `names = "sv"` for Swedish column
+names and technical categories. For Swedish event metadata, use `valtillfallen()`.
+Proper names and literal source identifiers retain their source spelling.
 
 The default `source = "auto"` is recommended for most users. It chooses approved
 canonical data first, otherwise a supported current Swedish Election Authority

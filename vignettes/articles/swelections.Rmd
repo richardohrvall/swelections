@@ -34,6 +34,9 @@ results. Constituency levels are `"parliamentary_constituency"`,
 `"regional_constituency"` and `"municipal_constituency"`, depending on the
 election. Constituencies are electoral areas for the relevant parliament or
 council. Available levels vary by election, year and counting stage.
+For a brief introduction to the Swedish electoral system and the geographic
+and institutional features relevant to these data, see
+[Understanding Swedish elections](understanding-elections.html).
 
 For example, read the final 2022 parliamentary result nationally or by voting
 district:

@@ -1,6 +1,9 @@
 url: https://richardohrvall.github.io/swelections/
 template:
   bootstrap: 5
+  light-switch: true
+  theme: arrow-light
+  theme-dark: arrow-dark
 lang: en
 home:
   title: Swedish election data in R
@@ -14,7 +17,7 @@ home:
 navbar:
   structure:
     left: [home, intro, reference, data, news]
-    right: [search, github]
+    right: [search, github, lightswitch]
   components:
     home:
       text: Home
