@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="man/figures/logo.png" alt="swelections" width="240">
+</p>
+
 # swelections
 
 `swelections` is an R package for Swedish election results, candidates and mandate
