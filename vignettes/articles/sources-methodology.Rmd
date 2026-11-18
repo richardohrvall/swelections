@@ -135,12 +135,20 @@ different elections. See
 Better comparability through harmonisation of historical geographies is a
 long-term development goal, not a completed feature.
 
-## The 2003 euro referendum
+## Referendums
 
-`yes`, `no` and `blank` are reported voting options in the 2003 euro referendum.
-They are categories, not Boolean values. Blank votes are separate from invalid
-ballots. This structure is specific to that referendum and should not be
-generalised to other elections.
+Referendum results share a dedicated schema using `voting_option_code`,
+`voting_option_name`, `is_blank_option` and `referendum_question` rather than
+party fields. In the 2003 euro referendum and the 2019 Öland municipal
+referendum, `yes`, `no` and `blank` (`JA`, `NEJ`, `BLANK`) are reported voting
+options; they are categories, not Boolean values, and blank votes are valid
+and separate from invalid ballots.
+
+Unlike national elections and the 2003 referendum, municipal referendums are not
+distributed centrally by Valmyndigheten and often originate from municipal web
+publications or preserved archive snapshots. Where a municipal source does not
+report invalid ballots separately, `invalid_votes`, `total_votes` and `turnout`
+remain typed `NA` rather than being inferred.
 
 ## Code license and source data
 

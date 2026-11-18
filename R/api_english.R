@@ -108,16 +108,23 @@
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
 #'   `results()` also accepts `"referendum"` or `"F"` for final 2003 national
-#'   results and final 2019 municipal referendum results ("Öland en kommun?").
+#'   results and final municipal referendum results (currently 2019 Öland,
+#'   `"Öland en kommun?"`, at `level = "municipality"` or `"district"`).
+#'   Omitting `year` (or passing `year = "all"` with `level = NULL` or `"national"`)
+#'   keeps the 2003 national referendum default; specify `year` (or `level = "municipality"`
+#'   /`"district"`) for municipal referendums. A given year may contain multiple
+#'   municipal referendums, distinguished by `election_event`, `municipality_code`
+#'   and `referendum_question`.
 #'   Referendum rows use `voting_option_code/name`, not party fields. Blank is
 #'   valid; invalid ballots are separate (or `NA` where unreported in municipal
 #'   tables, leaving `total_votes` and `turnout` `NA`). District output includes
 #'   ordinary and Wednesday/collection units (`district_type`); Wednesday/collection
 #'   units have missing electorate/turnout.
 #'   Local 2003 input is the preserved directory containing `final.xml` and
-#'   `final-municipal/`; local 2019 input is the preserved directory containing
-#'   the verified municipality HTML snapshots; complete preliminary results are not supported.
-#'   County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
+#'   `final-municipal/`; local municipal referendum input (e.g. 2019) is the
+#'   preserved directory containing verified HTML snapshots; complete preliminary
+#'   results are not supported.
+#'   County/national 2003 referendum results also include three Statistics Sweden (SCB) electorate groups:
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/re_elections.R
 \name{valtillfallen}
 \alias{valtillfallen}
-\title{Upptäck ordinarie val och omval}
+\title{Upptäck ordinarie val, omval och folkomröstningar}
 \usage{
 valtillfallen(ar = "alla", val = NULL, valklass = "alla")
 }
@@ -23,11 +23,14 @@ Tillgänglighetsuppgifter är metadata, inte en garanti om alla datavyer.
 \description{
 Svensk motsvarighet till \code{\link[=election_events]{election_events()}}. Funktionen listar valtillfällen
 utan att hämta resultat. Omval är egna valtillfällen inom den ursprungliga
-mandatperioden. Listan hjälper till att välja år och valtyp, men behöver inte
-anropas före \code{\link[=valresultat]{valresultat()}} eller \code{\link[=mandat]{mandat()}}.
+mandatperioden. Folkomröstningar visas när \code{val = "F"} (eller \code{"referendum"})
+anges; kommunala folkomröstningar anger då även \code{folkomrostningsfraga} och
+kommunal omfattning. Listan hjälper till att välja år och valtyp, men behöver
+inte anropas före \code{\link[=valresultat]{valresultat()}} eller \code{\link[=mandat]{mandat()}}.
 }
 \examples{
 valtillfallen(valklass = "omval")
+valtillfallen(val = "F")
 valtillfallen(ar = 2011, val = "KF", valklass = "omval")
 }
 \seealso{

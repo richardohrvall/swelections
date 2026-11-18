@@ -7,10 +7,10 @@ output: rmarkdown::html_document
 knitr::opts_chunk$set(eval = FALSE)
 ```
 
-The current release covers Swedish electoral events from 2002 onwards,
+The package covers Swedish electoral events from 2002 onwards,
 including elections to the Riksdag, regional and municipal councils and the
-European Parliament, as well as the 2003 national referendum on the euro
-and re-elections.
+European Parliament, as well as the 2003 national referendum on the euro,
+supported municipal referendums and re-elections.
 This guide introduces results, seats, mandate-period changes, preference votes
 and re-elections; see [Coverage](coverage.html) for available years and functions.
 Install the current package release, v0.4.1, from GitHub. The `nanoparquet`

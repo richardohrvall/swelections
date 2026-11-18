@@ -89,10 +89,10 @@
   unique(as.integer(year))
 }
 
-#' Discover ordinary elections and re-elections
+#' Discover ordinary elections, re-elections and referendums
 #'
 #' List election events, their geographic scope and links to the original
-#' election. Discovery requires no result downloads.
+#' election (or referendum question). Discovery requires no result downloads.
 #' This function has no `names` argument. Use [valtillfallen()] for Swedish metadata.
 #'
 #' @details
@@ -100,6 +100,15 @@
 #' mandate period. It is neither a new ordinary election in a longitudinal series
 #' nor the start of a new mandate period. Each re-election links to its original
 #' election and retains its actual geographic scope.
+#'
+#' Referendums are included when `"referendum"` or `"F"` is passed to
+#' `election` (`NULL` selects ordinary and re-election RD/RF/KF events only).
+#' Municipal referendums use `scope_level = "municipality"`, single or
+#' comma-separated municipality codes in `scope_code` (for coordinated
+#' multi-municipality referendums such as 2019 Öland,
+#' `SE-F-2019-05-26-0840-0885`), and expose the ballot prompt in
+#' `referendum_question`. Multiple local referendums can occur in the same year
+#' or on the same date.
 #'
 #' Use [results()] and [seats()] with `election_kind = "re_election"` for event
 #' results/allocations. Use [seats()] with `after_re_election = TRUE` and the
@@ -112,6 +121,7 @@
 #' preliminary re-election support are unavailable. Unknown legal decision dates remain missing.
 #' @examples
 #' election_events(election_kind = "re_election")
+#' election_events(election = "referendum")
 #' election_events(2003, "municipal", "re_election") # Orsa
 #' election_events(2011, "regional", "re_election") # Västra Götaland
 #' election_events(2011, "municipal", "re_election") # Örebro Nordöstra
@@ -150,12 +160,14 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
   out[order(out$election_date,out$election_code,out$scope_code),]
 }
 
-#' Upptäck ordinarie val och omval
+#' Upptäck ordinarie val, omval och folkomröstningar
 #'
 #' Svensk motsvarighet till [election_events()]. Funktionen listar valtillfällen
 #' utan att hämta resultat. Omval är egna valtillfällen inom den ursprungliga
-#' mandatperioden. Listan hjälper till att välja år och valtyp, men behöver inte
-#' anropas före [valresultat()] eller [mandat()].
+#' mandatperioden. Folkomröstningar visas när `val = "F"` (eller `"referendum"`)
+#' anges; kommunala folkomröstningar anger då även `folkomrostningsfraga` och
+#' kommunal omfattning. Listan hjälper till att välja år och valtyp, men behöver
+#' inte anropas före [valresultat()] eller [mandat()].
 #'
 #' @param ar Valhändelsens år, en vektor av år eller `"alla"`.
 #' @param val Valtyp RD, RF eller KF, alternativt E för Europaparlamentsval
@@ -168,6 +180,7 @@ election_events <- function(year='all', election=NULL, election_kind='all') {
 #' @seealso [election_events()], [valresultat()], [mandat()]
 #' @examples
 #' valtillfallen(valklass = "omval")
+#' valtillfallen(val = "F")
 #' valtillfallen(ar = 2011, val = "KF", valklass = "omval")
 #' @export
 valtillfallen <- function(ar = "alla", val = NULL, valklass = "alla") {

@@ -30,16 +30,23 @@ election, geographic level and count stage.}
 \item{election}{\code{"parliamentary"}, \code{"regional"} or \code{"municipal"};
 official codes \code{"RD"}, \code{"RF"} and \code{"KF"} are also accepted.
 \code{results()} also accepts \code{"referendum"} or \code{"F"} for final 2003 national
-results and final 2019 municipal referendum results ("Öland en kommun?").
+results and final municipal referendum results (currently 2019 Öland,
+\code{"Öland en kommun?"}, at \code{level = "municipality"} or \code{"district"}).
+Omitting \code{year} (or passing \code{year = "all"} with \code{level = NULL} or \code{"national"})
+keeps the 2003 national referendum default; specify \code{year} (or \code{level = "municipality"}
+/\code{"district"}) for municipal referendums. A given year may contain multiple
+municipal referendums, distinguished by \code{election_event}, \code{municipality_code}
+and \code{referendum_question}.
 Referendum rows use \code{voting_option_code/name}, not party fields. Blank is
 valid; invalid ballots are separate (or \code{NA} where unreported in municipal
 tables, leaving \code{total_votes} and \code{turnout} \code{NA}). District output includes
 ordinary and Wednesday/collection units (\code{district_type}); Wednesday/collection
 units have missing electorate/turnout.
 Local 2003 input is the preserved directory containing \code{final.xml} and
-\verb{final-municipal/}; local 2019 input is the preserved directory containing
-the verified municipality HTML snapshots; complete preliminary results are not supported.
-County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
+\verb{final-municipal/}; local municipal referendum input (e.g. 2019) is the
+preserved directory containing verified HTML snapshots; complete preliminary
+results are not supported.
+County/national 2003 referendum results also include three Statistics Sweden (SCB) electorate groups:
 \code{eligible_swedish_citizens_in_sweden}, \code{eligible_swedish_citizens_abroad}
 and \code{eligible_foreign_citizens}. Their sum matches \code{eligible_voters}.
 Components are missing at finer levels; counts are never allocated downward.
