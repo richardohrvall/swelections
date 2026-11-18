@@ -107,12 +107,16 @@
 #'   `"ordinary"`, `"re_election"`, or `"all"`. Year selects the actual poll year.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
-#'   `results()` also accepts `"referendum"` or `"F"` for final 2003 results.
+#'   `results()` also accepts `"referendum"` or `"F"` for final 2003 national
+#'   results and final 2019 municipal referendum results ("Öland en kommun?").
 #'   Referendum rows use `voting_option_code/name`, not party fields. Blank is
-#'   valid; invalid ballots are separate. District output includes ordinary and
-#'   Wednesday units (`district_type`); Wednesday electorate/turnout are missing.
+#'   valid; invalid ballots are separate (or `NA` where unreported in municipal
+#'   tables, leaving `total_votes` and `turnout` `NA`). District output includes
+#'   ordinary and Wednesday/collection units (`district_type`); Wednesday/collection
+#'   units have missing electorate/turnout.
 #'   Local 2003 input is the preserved directory containing `final.xml` and
-#'   `final-municipal/`; complete preliminary results are not supported.
+#'   `final-municipal/`; local 2019 input is the preserved directory containing
+#'   the verified municipality HTML snapshots; complete preliminary results are not supported.
 #'   County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
@@ -223,7 +227,7 @@ results <- function(
   if (!any(election %in% c("F", "referendum"))) .re_ordinary_hint(year, election, from, to)
   if (is.character(election) && length(election) == 1L &&
       !is.na(election) && election %in% c("referendum", "F"))
-    return(.referendum2003_results(year, year_missing, from, to, count, level,
+    return(.referendum_results(year, year_missing, from, to, count, level,
       source, data_dir, update, archive, progress, names, detail))
   .english_call(.raw_public_api$valresultat, list(
     val = election, rakning = .english_argument_value(count, "count"),

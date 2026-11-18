@@ -2,7 +2,7 @@
 .stodd_valar <- function(funktion, val) {
   if (identical(val, "E") && funktion %in% c("valresultat", "mandat", "kandidaturer", "kandidater", "personroster", "valda", "ersattare")) return(c(2004L, 2009L, 2014L, 2019L, 2024L))
   register <- list(
-    valresultat = list(F = 2003L, RD = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L), RF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L),
+    valresultat = list(F = c(2003L, 2019L), RD = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L), RF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L),
                       KF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L)),
     mandat = list(RD = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L), RF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L),
                   KF = c(2002L, 2006L, 2010L, 2014L, 2018L, 2022L, 2026L)),

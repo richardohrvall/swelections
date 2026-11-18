@@ -9,8 +9,8 @@ valtillfallen(ar = "alla", val = NULL, valklass = "alla")
 \arguments{
 \item{ar}{Valhändelsens år, en vektor av år eller \code{"alla"}.}
 
-\item{val}{Valtyp RD, RF eller KF, alternativt E för Europaparlamentsval.
-\code{NULL} väljer RD, RF och KF, precis som i \code{\link[=election_events]{election_events()}}.}
+\item{val}{Valtyp RD, RF eller KF, alternativt E för Europaparlamentsval
+eller F för folkomröstningar. \code{NULL} väljer RD, RF och KF, precis som i \code{\link[=election_events]{election_events()}}.}
 
 \item{valklass}{\code{"ordinarie"}, \code{"omval"} eller \code{"alla"}.
 Motsvarande engelska värden accepteras också.}

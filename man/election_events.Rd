@@ -9,7 +9,8 @@ election_events(year = "all", election = NULL, election_kind = "all")
 \arguments{
 \item{year}{Event year(s), or \code{"all"}.}
 
-\item{election}{Election type(s), as in \code{\link[=results]{results()}}. \code{NULL} selects RD/RF/KF.}
+\item{election}{Election type(s), as in \code{\link[=results]{results()}}, or \code{"referendum"} / \code{"F"}.
+\code{NULL} selects RD/RF/KF.}
 
 \item{election_kind}{\code{"ordinary"}, \code{"re_election"} or \code{"all"}.}
 }

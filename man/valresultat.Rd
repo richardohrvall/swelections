@@ -18,14 +18,18 @@ den först angivna årsordningen bevarad. Standard är 2026 när inga
 intervallgränser anges.}
 
 \item{val}{Exakt en valtyp: \code{"RD"}, \code{"RF"} eller \code{"KF"}. Inte \code{NULL}.
-\code{"F"} stöder slutlig folkomröstning 2003 med \code{rostningsalternativkod/namn}
-i stället för partifält. Blank är giltig; ogiltiga röster redovisas separat.
-SCB:s tre medborgarskaps-/bosättningsgrupper finns för län och riket och
+\code{"F"} stöder slutlig folkomröstning 2003 (nationell) samt 2019 års kommunala
+folkomröstning ("Öland en kommun?", nivå \code{"kommun"} och \code{"valdistrikt"}) med
+\code{rostningsalternativkod/namn} i stället för partifält. Blank är giltig;
+ogiltiga röster redovisas separat (eller \code{NA} där källan saknar uppgift,
+vilket även ger \code{NA} för \code{totalt_antal_roster} och \code{valdel}).
+SCB:s tre medborgarskaps-/bosättningsgrupper finns för län och riket 2003 och
 summerar exakt till röstberättigade. Gruppvärden på finare nivåer saknas;
 inga länstal fördelas till kommuner eller distrikt.
-Valdistriktsvyn innehåller vanliga distrikt och onsdagsenheter. De senare
+Valdistriktsvyn innehåller vanliga distrikt och onsdags-/uppsamlingsenheter. De senare
 saknar egna röstberättigade och valdeltagande. Lokal 2003-källa är mappen
-med \code{final.xml} och \verb{final-municipal/}. Komplett preliminär källa saknas.
+med \code{final.xml} och \verb{final-municipal/}; lokal 2019-källa är mappen med
+verifierade HTML-snapshots. Komplett preliminär källa saknas.
 \code{"E"} stöder EU-valen 2004, 2009, 2014, 2019 och 2024 i alla sju funktioner. Resultat finns för
 riket, län, kommun, kommunvalkrets och valdistrikt; mandat för riket.
 Personvalsområdet är hela riket. För EU 2024 används senare officiell kandidatsnapshot;
