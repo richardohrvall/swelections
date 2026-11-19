@@ -21,8 +21,9 @@ reported. You can also examine preference votes, elected candidates and
 substitutes, or follow mandate holders and vacancies during supported periods.
 English and Swedish interfaces are available.
 
-The current release covers ordinary parliamentary, regional and municipal
-elections, European Parliament elections, the 2003 euro referendum and five
+The package covers ordinary parliamentary, regional and municipal
+elections, European Parliament elections, the 2003 euro referendum, supported
+municipal referendums (starting with the 2019 Öland referendum) and five
 re-elections. The available functions, geographic levels and counting stages
 vary between elections. See [Coverage](articles/coverage.html) for the current
 version's coverage and limitations.

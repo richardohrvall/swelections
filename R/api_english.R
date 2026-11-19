@@ -107,13 +107,24 @@
 #'   `"ordinary"`, `"re_election"`, or `"all"`. Year selects the actual poll year.
 #' @param election `"parliamentary"`, `"regional"` or `"municipal"`;
 #'   official codes `"RD"`, `"RF"` and `"KF"` are also accepted.
-#'   `results()` also accepts `"referendum"` or `"F"` for final 2003 results.
+#'   `results()` also accepts `"referendum"` or `"F"` for final 2003 national
+#'   results and final municipal referendum results (currently 2019 Öland,
+#'   `"Öland en kommun?"`, at `level = "municipality"` or `"district"`).
+#'   Omitting `year` (or passing `year = "all"` with `level = NULL` or `"national"`)
+#'   keeps the 2003 national referendum default; specify `year` (or `level = "municipality"`
+#'   /`"district"`) for municipal referendums. A given year may contain multiple
+#'   municipal referendums, distinguished by `election_event`, `municipality_code`
+#'   and `referendum_question`.
 #'   Referendum rows use `voting_option_code/name`, not party fields. Blank is
-#'   valid; invalid ballots are separate. District output includes ordinary and
-#'   Wednesday units (`district_type`); Wednesday electorate/turnout are missing.
+#'   valid; invalid ballots are separate (or `NA` where unreported in municipal
+#'   tables, leaving `total_votes` and `turnout` `NA`). District output includes
+#'   ordinary and Wednesday/collection units (`district_type`); Wednesday/collection
+#'   units have missing electorate/turnout.
 #'   Local 2003 input is the preserved directory containing `final.xml` and
-#'   `final-municipal/`; complete preliminary results are not supported.
-#'   County/national referendum results also include three Statistics Sweden (SCB) electorate groups:
+#'   `final-municipal/`; local municipal referendum input (e.g. 2019) is the
+#'   preserved directory containing verified HTML snapshots; complete preliminary
+#'   results are not supported.
+#'   County/national 2003 referendum results also include three Statistics Sweden (SCB) electorate groups:
 #'   `eligible_swedish_citizens_in_sweden`, `eligible_swedish_citizens_abroad`
 #'   and `eligible_foreign_citizens`. Their sum matches `eligible_voters`.
 #'   Components are missing at finer levels; counts are never allocated downward.
@@ -223,7 +234,7 @@ results <- function(
   if (!any(election %in% c("F", "referendum"))) .re_ordinary_hint(year, election, from, to)
   if (is.character(election) && length(election) == 1L &&
       !is.na(election) && election %in% c("referendum", "F"))
-    return(.referendum2003_results(year, year_missing, from, to, count, level,
+    return(.referendum_results(year, year_missing, from, to, count, level,
       source, data_dir, update, archive, progress, names, detail))
   .english_call(.raw_public_api$valresultat, list(
     val = election, rakning = .english_argument_value(count, "count"),

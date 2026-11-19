@@ -2,14 +2,15 @@
 % Please edit documentation in R/re_elections.R
 \name{election_events}
 \alias{election_events}
-\title{Discover ordinary elections and re-elections}
+\title{Discover ordinary elections, re-elections and referendums}
 \usage{
 election_events(year = "all", election = NULL, election_kind = "all")
 }
 \arguments{
 \item{year}{Event year(s), or \code{"all"}.}
 
-\item{election}{Election type(s), as in \code{\link[=results]{results()}}. \code{NULL} selects RD/RF/KF.}
+\item{election}{Election type(s), as in \code{\link[=results]{results()}}, or \code{"referendum"} / \code{"F"}.
+\code{NULL} selects RD/RF/KF.}
 
 \item{election_kind}{\code{"ordinary"}, \code{"re_election"} or \code{"all"}.}
 }
@@ -19,7 +20,7 @@ Unknown decision references remain missing. Re-elections share the original mand
 }
 \description{
 List election events, their geographic scope and links to the original
-election. Discovery requires no result downloads.
+election (or referendum question). Discovery requires no result downloads.
 This function has no \code{names} argument. Use \code{\link[=valtillfallen]{valtillfallen()}} for Swedish metadata.
 }
 \details{
@@ -27,6 +28,15 @@ A re-election is a separate polling event within the original continuing
 mandate period. It is neither a new ordinary election in a longitudinal series
 nor the start of a new mandate period. Each re-election links to its original
 election and retains its actual geographic scope.
+
+Referendums are included when \code{"referendum"} or \code{"F"} is passed to
+\code{election} (\code{NULL} selects ordinary and re-election RD/RF/KF events only).
+Municipal referendums use \code{scope_level = "municipality"}, single or
+comma-separated municipality codes in \code{scope_code} (for coordinated
+multi-municipality referendums such as 2019 Öland,
+\code{SE-F-2019-05-26-0840-0885}), and expose the ballot prompt in
+\code{referendum_question}. Multiple local referendums can occur in the same year
+or on the same date.
 
 Use \code{\link[=results]{results()}} and \code{\link[=seats]{seats()}} with \code{election_kind = "re_election"} for event
 results/allocations. Use \code{\link[=seats]{seats()}} with \code{after_re_election = TRUE} and the
@@ -40,6 +50,7 @@ preliminary re-election support are unavailable. Unknown legal decision dates re
 }
 \examples{
 election_events(election_kind = "re_election")
+election_events(election = "referendum")
 election_events(2003, "municipal", "re_election") # Orsa
 election_events(2011, "regional", "re_election") # Västra Götaland
 election_events(2011, "municipal", "re_election") # Örebro Nordöstra

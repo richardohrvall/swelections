@@ -70,9 +70,14 @@ Counts that happen to be zero or one remain counts.
 ## Referendum and aggregate labels
 
 Blank is a valid referendum response option, never an invalid-ballot category.
-Invalid ballots remain separate. The official referendum option identifiers
-`JA`, `NEJ`, `BLANK` remain literal in `voting_option_code`; the normalized option
-names are `yes`, `no`, `blank`. These are categories, not Boolean vote values.
+Invalid ballots remain separate (or typed `NA` where unreported by a municipal
+source, leaving `total_votes` and `turnout` typed `NA`). For 2003 and 2019 Öland,
+the official referendum option identifiers `JA`, `NEJ`, `BLANK` remain literal in
+`voting_option_code`; the normalized option names are `yes`, `no`, `blank`. These
+are categories, not Boolean vote values. Future municipal referendums with
+additional or non-binary ballot options require updating `.value_dictionary()`
+(`voting_option_name`) or explicitly keeping literal option labels alongside
+`voting_option_code` and `is_blank_option`.
 
 `Other parties` and `Handwritten votes` are aggregate display labels. Actual
 party names are unchanged. The missing-party-designation disclosure and literal

@@ -21,7 +21,8 @@ Coverage and available detail vary by election and function.
 
 The package covers Swedish electoral events from 2002 onwards: elections to
 the Riksdag, regional and municipal councils and the European Parliament;
-the 2003 national referendum on the euro; and five re-elections. Depending on
+the 2003 national referendum on the euro and supported municipal referendums
+(currently the 2019 Öland referendum); and five re-elections. Depending on
 the event and function, data include results, seats, candidate and preference-vote
 data, and mandate-period information. Geographic views range from national to
 voting-district level, including counties, regions, municipalities and electoral

@@ -47,6 +47,7 @@ Their old prototype/commit status is not the current release status.
 | --- | --- | --- |
 | RKL 2002 | [inventory](SOURCE_INVENTORY_2002.md) | [implementation](IMPLEMENTATION_2002.md), [completeness](COMPLETENESS_2002.md), [validation](VALIDATION_2002.md), [final reconciliation](FINAL_RESULT_RECONCILIATION_2002.md), [official supplement](SUPPLEMENT_2002.md) |
 | Referendum 2003 | [inventory](SOURCE_INVENTORY_2003.md) | [validation, schema and completeness](VALIDATION_2003.md) |
+| Municipal referendums (2019 Öland) | [implementation and source record](IMPLEMENTATION_MUNICIPAL_REFERENDUMS.md) | [implementation and source record](IMPLEMENTATION_MUNICIPAL_REFERENDUMS.md) |
 | RKL 2006 | [inventory](SOURCE_INVENTORY_2006.md) | [implementation](IMPLEMENTATION_2006.md), [validation](VALIDATION_2006.md) |
 | RKL 2010 | [pinned inventory](2010_SOURCE_INVENTORY.json) | [source/implementation validation](IMPLEMENTATION_2010_VALIDATION.md), [preliminary preservation](PRELIMINARY_2010_SOURCE_RETRIEVAL.md) |
 | RKL 2014 | [source/implementation validation](IMPLEMENTATION_2014_VALIDATION.md) | [source/implementation validation](IMPLEMENTATION_2014_VALIDATION.md) |
@@ -67,7 +68,9 @@ source links for future geography work; no GIS implementation is implied.
 ## Builders and acquisition
 
 [CANONICAL_DATA.md](CANONICAL_DATA.md) lists the complete build sequence. Keep
-all `data-raw/build-canonical-*.R` builders, `canonical-build-contract.R`,
+all `data-raw/build-canonical-*.R` builders (including
+`data-raw/build-canonical-referendum-2019.R` for unpublished local municipal
+referendum builds), `canonical-build-contract.R`,
 `prepare-canonical-2022.R`, `export-canonical-parquet-2018.R` and the release
 preparer and frozen-release metadata validator. History uses the two combined
 2014/2018 manifests. `data-raw/prepare-canonical-v0.4.1.R` coordinates the new

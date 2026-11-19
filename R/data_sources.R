@@ -1,7 +1,7 @@
 #' Select canonical or official raw election sources
 #'
 #' Source selection is shared across ordinary RKL elections, European Parliament
-#' elections and the 2003 referendum. It does not change their schemas or coverage.
+#' elections and referendums. It does not change their schemas or coverage.
 #'
 #' @section Selection:
 #' * `source = "auto"` first selects canonical coverage explicitly approved in the
@@ -16,9 +16,9 @@
 #'   the requested asset/view to exist in the selected manifest.
 #' * `source = "local"` uses the user's preserved raw sources, never the network.
 #' * `source = "remote"` explicitly uses a current, official and supported
-#'   Valmyndigheten source, regardless of format or canonical availability.
-#'   It never falls back to canonical or local sources. A new presentation
-#'   format does not automatically replace an older supported export contract.
+#'   Valmyndigheten or archived municipal source, regardless of format or canonical
+#'   availability. It never falls back to canonical or local sources. A new
+#'   presentation format does not automatically replace an older supported export contract.
 #'
 #' Without approved canonical coverage, `auto` uses a supported remote source,
 #' never user-saved local raw files, even when a raw archive is configured. If
@@ -28,8 +28,12 @@
 #' preliminary source is never replaced by final data.
 #'
 #' Published canonical coverage enables RKL 2002--2022, EU 2004--2024 and the
-#' 2003 referendum under data-v0.4.1. RKL 2002 excludes candidacies; the referendum
-#' supports results only. EU 2009 excludes automatic preference votes even if a
+#' 2003 referendum under data-v0.4.1. RKL 2002 excludes candidacies; referendums
+#' support results only. Municipal referendums (such as 2019 Öland) are not
+#' published in data-v0.4.1; they use SHA256-verified archived snapshots under
+#' `remote`/`auto` or preserved local snapshots via `source = "local"`, while
+#' unpublished local canonical builds can still be tested with `source = "canonical"`.
+#' EU 2009 excludes automatic preference votes even if a
 #' configured private manifest contains those assets. Use explicit local sources
 #' for that historical preference-vote archive. RKL 2018 selects the corrected
 #' generation, never the former data-v0.1.0 files. Re-elections in 2003, 2011,
@@ -97,10 +101,14 @@
 #' elected/substitute and preference-vote results. Missing historical names and
 #' unsupported attributes remain missing.
 #'
+#' For municipal referendums (such as 2019 Öland), `data_dir` may contain
+#' `referendum/<year>/`, `folkomrostning/<year>/`, `<year>/` or the verified
+#' snapshot files directly.
+#'
 #' Configure a canonical build using `options(swelections.canonical_manifest =
 #' "my-build/manifest.json")`. Multi-product configurations can use a named
-#' character vector with keys `rkl:ordinary:2014`, `eu:ordinary:2014` or
-#' `folkomr:ordinary:2003`. Shorter `series:year` keys and legacy year-only keys
+#' character vector with keys `rkl:ordinary:2014`, `eu:ordinary:2014`,
+#' `folkomr:ordinary:2003` or `folkomr:ordinary:2019`. Shorter `series:year` keys and legacy year-only keys
 #' remain supported; family/event keys take precedence. Every selected manifest
 #' is checked against the requested family, year and schema. Canonical assets,
 #' cache and URL options retain their existing meanings.

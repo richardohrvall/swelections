@@ -106,6 +106,8 @@ Rscript data-raw/build-canonical-eu-2024.R RAW_ROOT OUTPUT_EU2024
 Rscript data-raw/build-canonical-mandate-history.R 2014 OUTPUT_2014_RESULTS/manifest.json RAW_ROOT OUTPUT_2014
 Rscript data-raw/build-canonical-mandate-history.R 2018 OUTPUT_2018_RESULTS/manifest.json RAW_ROOT OUTPUT_2018
 Rscript data-raw/build-canonical-re-elections.R RAW_ROOT ORSA_RERUN_XML OUTPUT_RE_ELECTIONS
+# Optional unpublished local municipal referendum build (not part of data-v0.4.1):
+Rscript data-raw/build-canonical-referendum-2019.R REFERENDUM_2019_SOURCE_DIRECTORY OUTPUT_REFERENDUM_2019
 ```
 
 Source-root layouts and required auxiliary snapshots differ by builder; use its
@@ -113,6 +115,10 @@ header and the year-specific source/validation document. The 2018 full-schema RD
 stage is intentional and is not itself distributed. The fixed result and later
 membership sources remain separate; two history assets augment the 2014/2018
 products. The ongoing 2022–2026 history is remote, not a canonical build product.
+Unpublished municipal referendum builds (configured via
+`options(swelections.canonical_manifest = c("folkomr:ordinary:2019" = ...))`) use
+`auto_eligible = FALSE` and require `source = "canonical"` until included in a
+reviewed `data-v*` release.
 
 2022 preparation is sourced by its builder. It selects the pinned historical
 candidate CSV (MD5 `639daa9630a1f2554f1c6839473448ee`), verifies official correction

@@ -19,9 +19,10 @@ English functions return English columns and technical categories. The seven
 election-data functions and three mandate-period functions accept \code{names = "sv"}.
 Event metadata use \code{\link[=valtillfallen]{valtillfallen()}} instead of a \code{names} argument. Proper names and
 literal source identifiers retain their source spelling. Boolean properties
-remain logical. The 2003 referendum options are \code{yes}, \code{no} and \code{blank} in
-English and \code{Ja}, \code{Nej} and \code{Blank} in Swedish; Blank is valid and separate
-from invalid ballots.
+remain logical. Referendums (the 2003 national euro referendum and supported
+municipal referendums) use \code{yes}, \code{no} and \code{blank} in English and \code{Ja},
+\code{Nej} and \code{Blank} in Swedish where those options apply; Blank is valid and
+separate from invalid ballots.
 
 \code{source = "auto"} selects approved canonical coverage for the requested
 election family, event, year and view; otherwise it uses a supported remote
@@ -34,8 +35,9 @@ The published data-v0.4.1 generation covers ordinary RKL 2002--2022, EU
 2004--2024, the final 2003 referendum, five re-election results/seats events
 and completed-period histories for 2014/2018. Coverage varies by function,
 geography and counting stage; RKL 2002 candidacies and EU 2009 canonical
-preference votes are excluded. Supported 2026 election data and current
-2022 mandate history use their separate remote sources.
+preference votes are excluded. Supported 2026 election data, current
+2022 mandate history and supported municipal referendums (such as 2019 Öland)
+use their separate remote or preserved local sources.
 
 \code{update} and \code{archive} apply only to supported raw-source operations, not
 canonical data. They do not make automatic selection choose a local archive.
